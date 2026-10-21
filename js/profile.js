@@ -36,7 +36,7 @@
     paint();
     $('#myList').addEventListener('click', (e) => {
       const b = e.target.closest('[data-del]');
-      if (b) { myBibs.remove(b.dataset.del); paint(); }
+      if (b && confirm('ลบ ' + b.dataset.del + ' ออกจากรายการในเครื่องนี้?\n(ข้อมูลการสมัครยังอยู่ในระบบ เปิดกลับได้ด้วยการล็อกอิน หรือเบอร์โทร 4 ตัวท้าย)')) { myBibs.remove(b.dataset.del); paint(); }
     });
     // ล็อกอินอยู่ → ดึงรายการจริงจากบัญชี (ตัดรายการเก่าที่ไม่มีในระบบแล้ว)
     if (Auth.loggedIn()) {
