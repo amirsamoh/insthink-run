@@ -514,8 +514,8 @@ html { scroll-behavior: smooth; }
 .hero2-art .bandana-shot { position: absolute; width: 300px; max-width: none; right: -30px; bottom: -40px; border-radius: 26px; transform: rotate(-10deg); box-shadow: 0 30px 60px -20px rgba(0,0,0,.6); }
 .hero2 .hero-stars { position: absolute; left: 0; top: 20px; right: auto; }
 .hero2 .hero-stars img { height: 46px; filter: brightness(0) invert(1); opacity: .9; }
-.spark { position: absolute; color: var(--lime); font-size: 22px; line-height: 1; animation: twinkle 3s ease-in-out infinite; }
-.spark.s1 { left: 36%; top: 30%; } .spark.s2 { left: 8%; bottom: 26%; font-size: 14px; animation-delay: 1s; } .spark.s3 { right: 12%; top: 4%; font-size: 16px; color: #fff; animation-delay: 2s; }
+.spark { position: absolute; width: 22px; height: 22px; background: var(--lime); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 3s ease-in-out infinite; }
+.spark.s1 { left: 36%; top: 30%; } .spark.s2 { left: 8%; bottom: 26%; width: 14px; height: 14px; animation-delay: 1s; } .spark.s3 { right: 12%; top: 4%; width: 16px; height: 16px; background: #fff; animation-delay: 2s; }
 @keyframes twinkle { 50% { opacity: .3; transform: scale(.7); } }
 @media (min-width: 820px) {
   .hero2 { grid-template-columns: 1.15fr 1fr; padding: 54px 48px; min-height: 520px; align-items: center; }
@@ -535,7 +535,7 @@ html { scroll-behavior: smooth; }
 /* ---------- Marquee ---------- */
 .marquee { margin-top: 44px; background: var(--night); color: #fff; overflow: hidden; transform: rotate(-2deg) scale(1.04); padding: 14px 0; }
 .marquee .track { display: flex; gap: 22px; width: max-content; animation: marq 26s linear infinite; font: 800 italic 26px/1 var(--font); text-transform: uppercase; white-space: nowrap; }
-.marquee i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--lime); font-style: normal; }
+.marquee i { display: inline-block; width: 16px; height: 16px; background: var(--lime); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); vertical-align: middle; font-style: normal; }
 @keyframes marq { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .marquee .track, .spark { animation: none; } html { scroll-behavior: auto; } }
 
@@ -632,7 +632,7 @@ footer.site-foot .foot-btns { display: flex; gap: 10px; flex-wrap: wrap; justify
 
 /* ---------------- v5: หน้าแรก CTA ใหญ่ / หัวหน้าสมัคร ---------------- */
 .cta-big { margin-top: 64px; border-radius: 28px; padding: 34px 24px; color: #fff; background: var(--grad); display: grid; gap: 22px; position: relative; overflow: hidden; }
-.cta-big::after { content: ''; position: absolute; right: 22px; top: 18px; width: 10px; height: 10px; border-radius: 50%; background: var(--lime); }
+.cta-big::after { content: ''; position: absolute; right: 22px; top: 14px; width: 26px; height: 26px; background: var(--lime); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
 .cta-big h2 { font: 800 italic clamp(40px, 10vw, 64px)/.95 var(--font); text-transform: uppercase; margin: 12px 0 8px; }
 .cta-big h2 .g { background: none; color: var(--night); -webkit-text-fill-color: var(--night); }
 .cta-big p { margin: 0; color: #EAF2FF; }

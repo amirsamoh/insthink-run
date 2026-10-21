@@ -118,7 +118,7 @@
       const canvas = await html2canvas(el, {
         width: 1080, height: 1920, scale: 1, x: 0, y: 0, scrollX: 0, scrollY: 0,
         windowWidth: 1080, windowHeight: 1920,
-        backgroundColor: '#0F2244', useCORS: true, logging: false,
+        backgroundColor: '#0F2244', useCORS: true, onclone: window.U.canvasifyImages(el), logging: false,
       });
       return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     } finally {

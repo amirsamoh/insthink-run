@@ -96,6 +96,28 @@
     });
   }
 
+  /**
+   * html2canvas บางเครื่องไม่วาดรูปที่ฝังเป็น data: URL (รูปโปรไฟล์ / QR) → ได้กรอบเปล่า
+   * แก้: ในฉากที่จะจับภาพ แทน <img data:> ด้วย <canvas> ที่วาดจากรูปต้นฉบับ (วาดได้แน่นอน)
+   * ใช้: html2canvas(el, { onclone: U.canvasifyImages(el) })
+   */
+  function canvasifyImages(origRoot) {
+    const origs = Array.from(origRoot.querySelectorAll('img')).map((im) => ({ im, w: im.getBoundingClientRect().width, h: im.getBoundingClientRect().height }));
+    return (doc) => {
+      const root = doc.getElementById(origRoot.id) || doc.body;
+      Array.from(root.querySelectorAll('img')).forEach((clone, i) => {
+        const o = origs[i];
+        if (!o || !/^data:/.test(clone.getAttribute('src') || '') || !o.im.naturalWidth) return;
+        const c = doc.createElement('canvas');
+        c.width = o.im.naturalWidth; c.height = o.im.naturalHeight;
+        c.getContext('2d').drawImage(o.im, 0, 0);
+        c.className = clone.className;
+        c.style.cssText = 'display:block;width:' + o.w + 'px;height:' + o.h + 'px';
+        clone.parentNode.replaceChild(c, clone);
+      });
+    };
+  }
+
   /** แจ้งเตือนอัตโนมัติเมื่อสคริปต์ของหน้าเว็บพัง (แทนที่จะเงียบ แล้วฟอร์มรีโหลดเอง) */
   window.addEventListener('error', (e) => { if (e.message) toast('หน้าเว็บมีข้อผิดพลาด: ' + e.message, 'err'); });
   window.addEventListener('unhandledrejection', (e) => toast('เกิดข้อผิดพลาด: ' + ((e.reason && e.reason.message) || e.reason), 'err'));
@@ -298,6 +320,6 @@
   window.U = {
     $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
-    promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, routeSvg, starSvg, fmtDate,
+    promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, canvasifyImages, routeSvg, starSvg, fmtDate,
   };
 })();
