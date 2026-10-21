@@ -69,7 +69,7 @@
     const tags = [`<span class="tag"><b>${esc(p.label)}</b></span>`];
     if (d.code === 'SHIP') tags.push(`<span class="tag">ผ้าโพกหัว: <b>${r.shipStatus === 'SHIPPED' ? 'จัดส่งแล้ว' : 'รอจัดส่ง'}</b> (ไม่ต้องมอบที่งาน)</span>`);
     else tags.push('<span class="tag">มอบ <b>ผ้าโพกหัว 1 ผืน</b></span>');
-    if (p.runner) tags.push(`<span class="tag">${esc(r.food)}</span>`, `<span class="tag">${esc(r.drink)} <b>${esc(r.sweetness)}</b></span>`);
+    if (p.runner) tags.push(`<span class="tag">เครื่องดื่ม: <b>${esc(r.drink)}</b> · หวาน ${esc(r.sweetness || '100%')}</span>`);
     return `<p style="margin:8px 0 0;font-size:20px;font-weight:500">${esc(r.firstName)} ${esc(r.lastName)} ${r.nickname ? '(' + esc(r.nickname) + ')' : ''}</p>
       <div class="tags">${tags.join('')}</div>`;
   }

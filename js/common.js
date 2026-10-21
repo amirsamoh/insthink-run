@@ -63,7 +63,7 @@
   const delivery = (code) => CFG.DELIVERY.find((d) => d.code === code) || CFG.DELIVERY[0];
   const money = (n) => Number(n || 0).toLocaleString('th-TH') + ' ฿';
 
-  const PAY_LABEL = { UNPAID: 'รอชำระเงิน', SLIP_UPLOADED: 'รอตรวจสอบสลิป', PAID: 'ชำระแล้ว', REJECTED: 'สลิปไม่ผ่าน' };
+  const PAY_LABEL = { UNPAID: 'รอชำระเงิน', SLIP_UPLOADED: 'รอตรวจสอบสลิป', PAID: 'ชำระแล้ว', REJECTED: 'แอดมินปฏิเสธ' };
   const PAY_CLASS = { UNPAID: 'warn', SLIP_UPLOADED: 'info', PAID: 'ok', REJECTED: 'bad' };
   const payPill = (s) => `<span class="pill ${PAY_CLASS[s] || ''}">${PAY_LABEL[s] || s || '-'}</span>`;
   const checkinLabel = (r) => (pkg(r.package).runner ? (r.status === 'CHECKED_IN' ? 'เช็คอินแล้ว' : 'ยังไม่เช็คอิน') : (r.status === 'CHECKED_IN' ? 'รับของแล้ว' : 'ยังไม่รับของ'));
@@ -145,6 +145,34 @@
     });
   }
 
+  /** รูปโปรไฟล์: ครอปกลางเป็นสี่เหลี่ยมจัตุรัส 320px แล้วลดคุณภาพจนไฟล์ ≤ ~34KB (เก็บในชีตได้) */
+  function compressAvatar(file) {
+    return new Promise((resolve, reject) => {
+      if (!file || !/^image\//.test(file.type)) return reject(new Error('กรุณาเลือกไฟล์รูปภาพ'));
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const size = 320, side = Math.min(img.width, img.height);
+        const c = document.createElement('canvas'); c.width = c.height = size;
+        const x = c.getContext('2d');
+        x.fillStyle = '#fff'; x.fillRect(0, 0, size, size);
+        x.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+        URL.revokeObjectURL(url);
+        let q = 0.82, out = c.toDataURL('image/jpeg', q);
+        while (out.length > 42000 && q > 0.3) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+        out.length > 44000 ? reject(new Error('รูปซับซ้อนเกินไป ลองเลือกรูปอื่น')) : resolve(out);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('เปิดไฟล์รูปไม่ได้ ลองบันทึกเป็น JPG แล้วอัปโหลดใหม่')); };
+      img.src = url;
+    });
+  }
+
+  /** วงกลมรูปโปรไฟล์ (ไม่มีรูป → ตัวอักษรแรกของชื่อ) */
+  function avatarHtml(m, cls) {
+    const ini = esc(String((m && (m.nickname || m.firstName)) || '?').charAt(0).toUpperCase());
+    return `<span class="avatar ${cls || ''}">${m && m.photo ? `<img src="${esc(m.photo)}" alt="">` : ini}</span>`;
+  }
+
   /* ---------- เส้นทางวิ่ง → SVG ---------- */
   function routeSvg(opts) {
     const o = Object.assign({ stroke: '#1B3B67', dash: '#FFFFFF', width: 3.2, glow: true, grid: 'rgba(15,34,68,.08)', start: '#FFFFFF' }, opts || {});
@@ -173,22 +201,29 @@
     return d.toLocaleString('th-TH', opt);
   }
 
-  /** เติม header ให้ทุกหน้าที่มี <header data-nav> + แถบ DEMO */
+  /** เติม header (เมนู + บัญชี) และปุ่ม Admin ท้ายเว็บ ให้ทุกหน้า */
   function mountChrome() {
     const nav = $('[data-nav]');
     if (nav) {
       const here = location.pathname.split('/').pop() || 'index.html';
-      const links = [['index.html', 'สมัคร'], ['search.html', 'ค้นหา'], ['profile.html', 'ของฉัน']];
+      const links = [['index.html', 'สมัครวิ่ง'], ['search.html', 'ค้นหา'], ['profile.html', 'ของฉัน']];
+      const m = Auth.member();
+      const acct = Auth.loggedIn()
+        ? `<a class="acct-link" href="account.html" aria-label="บัญชีของฉัน">${avatarHtml(m, 'sm')}</a>`
+        : `<a class="btn btn-sm btn-dark" href="login.html">เข้าสู่ระบบ</a>`;
       nav.innerHTML = `
         <a class="brand" href="index.html" aria-label="INSTHINK RUN CLUB"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></a>
-        <nav class="nav-links">${links.map(([h, t]) => `<a href="${h}" class="${here === h ? 'on' : ''}">${t}</a>`).join('')}</nav>`;
+        <nav class="nav-links">${links.map(([h, t]) => `<a href="${h}" class="${here === h ? 'on' : ''}">${t}</a>`).join('')}${acct}</nav>`;
     }
-    if (window.API && API.isDemo && !$('.demo-flag')) {
-      const f = document.createElement('div');
-      f.className = 'demo-flag';
-      f.textContent = 'DEMO MODE · ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น';
-      document.body.appendChild(f);
-      document.body.classList.add('has-demo');
+    // Footer มาตรฐาน (โลโก้ขาว + สโลแกน + ปุ่ม Admin) ทุกหน้าที่มี <footer class="site-foot">
+    const foot = $('footer.site-foot');
+    if (foot && !foot.querySelector('.admin-link')) {
+      foot.innerHTML = `<div class="foot-in">
+        <img src="img/logo-white.png" alt="INSTHINK RUN CLUB">
+        <div class="tagline">Insthink · Community · Coffee Run</div>
+        <a class="btn btn-sm admin-link" href="admin.html">🔒 Admin</a>
+        <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')}</div>
+      </div>`;
     }
   }
   document.addEventListener('DOMContentLoaded', mountChrome);
@@ -196,6 +231,6 @@
   window.U = {
     $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
-    promptPayPayload, compressImage, routeSvg, starSvg, fmtDate,
+    promptPayPayload, compressImage, compressAvatar, avatarHtml, routeSvg, starSvg, fmtDate,
   };
 })();

@@ -80,7 +80,10 @@
       <img class="s-logo" src="img/logo-white.png" alt="">
       <div class="s-date">${esc(CFG.EVENT.dateLabel)}<small>${esc(CFG.EVENT.location)}</small></div>
       <div class="s-title">I'm<br><span class="o">running</span></div>
-      <div class="s-runner">${esc(runner.nickname || runner.firstName)}<small>${esc(runner.firstName)} ${esc(runner.lastName)}</small></div>
+      <div class="s-runner">
+        <span class="s-avatar">${runner.photo ? `<img src="${esc(runner.photo)}" alt="">` : esc(String(runner.nickname || runner.firstName || '?').charAt(0).toUpperCase())}</span>
+        <span class="s-rname">${esc(runner.nickname || runner.firstName)}<small>${esc(runner.firstName)} ${esc(runner.lastName)}</small></span>
+      </div>
       <div class="s-route">
         ${routeSvg({ stroke: '#FFFFFF', dash: '#0F2244', start: '#0F2244', grid: 'rgba(255,255,255,.07)', width: 2.6 })}
         <div class="rinfo">

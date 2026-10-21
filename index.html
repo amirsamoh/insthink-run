@@ -15,102 +15,140 @@
 <body>
   <header class="site-head" data-nav></header>
 
-  <main class="wrap">
-    <!-- ================= HERO ================= -->
-    <section class="hero">
-      <div class="hero-stars" id="heroStars"></div>
-      <div class="hero-stripes"></div>
-      <span class="eyebrow"><span id="evEdition">INSTHINK RUN 2026</span></span>
-      <h1>Run <span class="n">6K.</span><br><span class="o">Think</span> Free.</h1>
-      <div class="hero-meta">
-        <span class="meta-chip">📅 <b id="evDate">—</b></span>
-        <span class="meta-chip">⏱ ปล่อยตัว <b id="evTime">—</b></span>
-        <span class="meta-chip">📍 <b id="evLoc">—</b></span>
+  <div class="wrap">
+    <!-- ================= HERO (การ์ดมืดไล่เฉด + รูปผ้าโพกหัว) ================= -->
+    <section class="hero2">
+      <div class="hero2-text">
+        <span class="kicker light">INSTHINK · COMMUNITY COFFEE RUN</span>
+        <h1>Run <span class="g">6K.</span><br>Think Free.</h1>
+        <p class="hero2-sub"><span id="evEdition">INSTHINK RUN CLUB</span> — วิ่ง 6 กิโลเมตร รับผ้าโพกหัว ริสแบน สติกเกอร์ Limited Edition และข้าวยำบุฟเฟ่ต์กับกาแฟหลังเข้าเส้นชัย</p>
+        <div class="hero-meta">
+          <span class="meta-chip">📅 <b id="evDate">—</b></span>
+          <span class="meta-chip">⏱ ปล่อยตัว <b id="evTime">—</b></span>
+          <span class="meta-chip">📍 <b id="evLoc">—</b></span>
+        </div>
+        <div class="hero2-cta">
+          <a class="btn btn-light" href="#register">สมัครวิ่ง <span class="arr">↗</span></a>
+          <a class="btn btn-ghost" href="#goods">ดูของที่ได้รับ</a>
+        </div>
+      </div>
+      <div class="hero2-art" aria-hidden="true">
+        <div class="hero-stars" id="heroStars"></div>
+        <img class="bandana-shot" src="img/bandana-chair.webp" alt="">
+        <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span>
       </div>
     </section>
 
-    <form id="regForm" novalidate autocomplete="on" onsubmit="return false">
+    <!-- ตัวเลขสำคัญ -->
+    <section class="stats">
+      <div><b>6<small>KM</small></b><span>ระยะวิ่ง</span></div>
+      <div><b id="stTime">06:00</b><span>เวลาปล่อยตัว</span></div>
+      <div><b>256<small>฿</small></b><span>ค่าสมัครรวมของที่ระลึก</span></div>
+      <div><b>3<small>ชิ้น</small></b><span>ของที่ระลึก</span></div>
+    </section>
+  </div>
+
+  <!-- แถบตัวอักษรเลื่อน -->
+  <div class="marquee" aria-hidden="true"><div class="track">
+    <span>INSTHINK</span><i>✦</i><span>RUN CLUB</span><i>✦</i><span>COFFEE RUN</span><i>✦</i><span>日本山</span><i>✦</i><span>インスティンク</span><i>✦</i>
+    <span>INSTHINK</span><i>✦</i><span>RUN CLUB</span><i>✦</i><span>COFFEE RUN</span><i>✦</i><span>日本山</span><i>✦</i><span>インスティンク</span><i>✦</i>
+  </div></div>
+
+  <main class="wrap">
+    <!-- ของที่ได้รับ (สไลด์แนวนอน) -->
+    <section id="goods" class="block">
+      <div class="block-head">
+        <div>
+          <span class="kicker">ของที่ได้รับ</span>
+          <h2 class="block-title">Race <span class="g">Kit</span></h2>
+          <p class="muted">ทุกชิ้นรวมในค่าสมัคร 256 บาท · ซื้อผ้าโพกหัวอย่างเดียวได้ 190 บาท</p>
+        </div>
+        <div class="slide-nav">
+          <button class="round" type="button" data-slide="-1" aria-label="ก่อนหน้า">‹</button>
+          <button class="round dark" type="button" data-slide="1" aria-label="ถัดไป">›</button>
+        </div>
+      </div>
+      <div class="slider" id="goodsSlider">
+        <figure class="slide"><img class="cut flat" src="img/bandana-flat.webp" alt="ผ้าโพกหัว INSTHINK Bandana" loading="lazy">
+          <figcaption><b>ผ้าโพกหัว Bandana</b><span>ลายภูเขาและคลื่น 日本山 · Free size</span></figcaption></figure>
+        <figure class="slide"><img src="img/stickers.jpg" alt="สติกเกอร์ Limited Edition" loading="lazy">
+          <figcaption><b>สติกเกอร์ Limited Edition</b><span>เฉพาะนักวิ่ง</span></figcaption></figure>
+        <figure class="slide wide"><div class="band-img"><img src="img/wristband.jpg" alt="ริสแบน INSTHINK" loading="lazy"></div>
+          <figcaption><b>ริสแบน (Wristband)</b><span>เฉพาะนักวิ่ง · INSTHINK Community Coffee Run</span></figcaption></figure>
+        <figure class="slide meal"><div class="meal-art"><span>🍚</span><span>☕</span></div>
+          <figcaption><b>ข้าวยำบุฟเฟ่ต์ + เครื่องดื่ม</b><span>ลาเต้ อเมริกาโน่ ชาพีชพิชชี่ และอื่น ๆ 1 แก้ว</span></figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ขั้นตอน (การ์ดปักหมุด) -->
+    <section class="block">
+      <span class="kicker">ขั้นตอน</span>
+      <h2 class="block-title">How it <span class="g">works</span></h2>
+      <p class="muted" style="max-width:420px">สมัครครั้งเดียว ใช้ได้ทุกรอบ · จ่ายแล้วได้ E-BIB ทันที ไม่ต้องรอแอดมิน</p>
+      <div class="pins">
+        <article class="pin"><i></i><small>01</small><h3>สมัครสมาชิก</h3><p>อีเมล + รหัสผ่าน และใส่รูปโปรไฟล์ของคุณ</p></article>
+        <article class="pin"><i></i><small>02</small><h3>สมัครวิ่ง</h3><p>เลือกแพ็กเกจ เครื่องดื่ม และวิธีรับผ้าโพกหัว</p></article>
+        <article class="pin"><i></i><small>03</small><h3>จ่ายผ่าน PromptPay</h3><p>สแกน QR แล้วแนบสลิป ระบบยืนยันให้ทันที</p></article>
+        <article class="pin"><i></i><small>04</small><h3>รับ E-BIB</h3><p>โชว์ QR เช็คอินหน้างาน และแชร์ลง IG Story</p></article>
+      </div>
+      <p class="ready">Ready to run! ✦</p>
+    </section>
+
+    <!-- เส้นทาง (การ์ดมืด) -->
+    <section class="route-dark">
+      <div class="rd-map" id="homeRoute"></div>
+      <div class="rd-info">
+        <span class="kicker light">Route</span>
+        <div class="rd-km">6<small>KM</small></div>
+        <div class="rd-name" id="homeRouteName">INSTHINK LOOP</div>
+        <p id="homeRouteLoc"></p>
+      </div>
+    </section>
+
+    <div id="register" class="anchor"></div>
+    <span class="kicker">สมัครวิ่ง</span>
+    <h2 class="block-title">Join the <span class="g">run</span></h2>
+    <!-- ยังไม่ได้เข้าสู่ระบบ -->
+    <section class="card center hidden" id="gate" style="margin-top:20px">
+      <h2 style="margin:0 0 6px">เข้าสู่ระบบก่อนสมัครวิ่ง</h2>
+      <p class="muted" style="margin:0 0 16px">สมัครสมาชิกครั้งเดียว (ใส่รูปโปรไฟล์ได้) แล้วสมัครวิ่งได้ทุกรอบโดยไม่ต้องกรอกข้อมูลซ้ำ</p>
+      <div class="btn-row" style="justify-content:center">
+        <a class="btn btn-primary" href="login.html?next=index.html">เข้าสู่ระบบ</a>
+        <a class="btn" href="login.html?next=index.html#signup">สมัครสมาชิก</a>
+      </div>
+    </section>
+
+    <form id="regForm" class="hidden" novalidate autocomplete="on" onsubmit="return false">
 
       <!-- 01 แพ็กเกจ -->
       <h2 class="section-title"><span class="num">01</span>เลือกแพ็กเกจ</h2>
       <div class="packages" id="pkgList"><!-- สร้างจาก config --></div>
       <div class="err-msg hidden" data-err="package">กรุณาเลือกแพ็กเกจ</div>
 
-      <!-- 02 ข้อมูลผู้สมัคร -->
-      <h2 class="section-title"><span class="num">02</span>ข้อมูลผู้สมัคร</h2>
+      <!-- 02 ผู้สมัคร (ดึงจากบัญชีสมาชิก) -->
+      <h2 class="section-title"><span class="num">02</span>ผู้สมัคร</h2>
       <div class="card grid">
-        <div class="grid grid-2">
-          <div class="field">
-            <label for="firstName">ชื่อ <span class="req">*</span></label>
-            <input class="input" id="firstName" name="firstName" autocomplete="given-name" maxlength="60">
-          </div>
-          <div class="field">
-            <label for="lastName">นามสกุล <span class="req">*</span></label>
-            <input class="input" id="lastName" name="lastName" autocomplete="family-name" maxlength="60">
-          </div>
+        <div class="who-card" id="whoCard"></div>
+        <div class="notice warn small hidden" id="emgHint" data-runner>
+          ยังไม่ได้ใส่ผู้ติดต่อฉุกเฉิน — <a href="account.html">เพิ่มในบัญชีของฉัน</a> (แนะนำสำหรับนักวิ่ง)
         </div>
-        <div class="grid grid-3">
-          <div class="field">
-            <label for="nickname">ชื่อเล่น / ชื่อบน BIB</label>
-            <input class="input" id="nickname" name="nickname" maxlength="20" placeholder="เช่น MIRZ">
-          </div>
-          <div class="field" data-runner>
-            <label for="gender">เพศ</label>
-            <select class="input" id="gender" name="gender">
-              <option value="">ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>อื่น ๆ</option>
-            </select>
-          </div>
-          <div class="field" data-runner>
-            <label for="birthDate">วันเกิด</label>
-            <input class="input" id="birthDate" name="birthDate" type="date" autocomplete="bday">
-          </div>
-        </div>
-        <div class="grid grid-2">
-          <div class="field">
-            <label for="phone">เบอร์โทรศัพท์ <span class="req">*</span></label>
-            <input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="16" placeholder="08xxxxxxxx">
-            <div class="hint">ใช้ 4 ตัวท้ายยืนยันตัวตนเมื่อเปิดจากเครื่องอื่น</div>
-          </div>
-          <div class="field">
-            <label for="email">อีเมล <span class="req">*</span></label>
-            <input class="input" id="email" name="email" type="email" autocomplete="email" maxlength="100" placeholder="you@email.com">
-            <div class="hint">ระบบส่งการยืนยันและ E-BIB ไปที่อีเมลนี้</div>
-          </div>
-        </div>
-        <div class="grid grid-2" data-runner>
-          <div class="field">
-            <label for="emergencyName">ผู้ติดต่อฉุกเฉิน</label>
-            <input class="input" id="emergencyName" name="emergencyName" maxlength="60">
-          </div>
-          <div class="field">
-            <label for="emergencyPhone">เบอร์ผู้ติดต่อฉุกเฉิน</label>
-            <input class="input" id="emergencyPhone" name="emergencyPhone" type="tel" inputmode="numeric" maxlength="16">
-          </div>
-        </div>
+        <div class="hint">ข้อมูลส่วนตัวมาจากบัญชีสมาชิกของคุณ แก้ไขได้ที่ <a href="account.html">บัญชีของฉัน</a></div>
       </div>
 
-      <!-- 03 Finisher meal (เฉพาะนักวิ่ง) -->
+      <!-- 03 เครื่องดื่ม + แพ้อาหาร (เฉพาะนักวิ่ง) -->
       <div data-runner>
-        <h2 class="section-title"><span class="num">03</span>Finisher Meal</h2>
+        <h2 class="section-title"><span class="num">03</span>เครื่องดื่ม &amp; อาหาร</h2>
         <div class="card grid">
           <div class="field">
-            <span class="label">อาหาร <span class="req">*</span></span>
-            <div class="chips" id="foodList"></div>
-            <div class="err-msg hidden" data-err="food">กรุณาเลือกอาหาร</div>
-          </div>
-          <div class="field">
-            <span class="label">เครื่องดื่ม <span class="req">*</span></span>
+            <span class="label">เลือกเครื่องดื่ม 1 อย่าง <span class="req">*</span></span>
             <div class="chips" id="drinkList"></div>
             <div class="err-msg hidden" data-err="drink">กรุณาเลือกเครื่องดื่ม</div>
+            <div class="drink-note">ความหวาน 100% <small>(หวานปกติ)</small></div>
           </div>
           <div class="field">
-            <span class="label">ระดับความหวาน <span class="req">*</span></span>
-            <div class="chips sweet" id="sweetList"></div>
-            <div class="err-msg hidden" data-err="sweetness">กรุณาเลือกระดับความหวาน</div>
-          </div>
-          <div class="field">
-            <label for="note">หมายเหตุ / แพ้อาหาร</label>
-            <input class="input" id="note" name="note" maxlength="200" placeholder="เช่น แพ้ถั่ว">
+            <label for="note">แพ้อาหารอะไรไหม?</label>
+            <input class="input" id="note" name="note" maxlength="200" placeholder="เช่น แพ้ถั่ว / ไม่แพ้อะไร">
+            <div class="hint">อาหารเป็นข้าวยำบุฟเฟ่ต์ ไม่ต้องเลือกเมนู แจ้งเฉพาะสิ่งที่แพ้</div>
           </div>
         </div>
       </div>
@@ -145,12 +183,8 @@
           <span>ข้าพเจ้ายินยอมให้ผู้จัดงานเก็บและใช้ข้อมูลส่วนบุคคลเพื่อการจัดงานครั้งนี้เท่านั้น (PDPA)<span data-runner> และรับรองว่ามีสุขภาพพร้อมสำหรับการวิ่ง</span></span>
         </label>
         <div class="err-msg hidden" data-err="consent">กรุณายอมรับเงื่อนไข</div>
-        <label class="check">
-          <input type="checkbox" id="remember" checked>
-          <span>จำข้อมูลไว้ในเครื่องนี้ (กรอกครั้งหน้าเร็วขึ้น)</span>
-        </label>
         <button class="btn btn-primary btn-block" id="submitBtn" type="submit">ยืนยันและไปชำระเงิน →</button>
-        <p class="hint center" style="margin:0">ชำระผ่าน PromptPay และแนบสลิปในขั้นตอนถัดไป</p>
+        <p class="hint center" style="margin:0">ชำระผ่าน PromptPay แล้วแนบสลิป — ระบบยืนยันให้อัตโนมัติทันที</p>
       </div>
     </form>
   </main>

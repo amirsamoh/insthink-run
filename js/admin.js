@@ -2,8 +2,8 @@
  * =====================================================================
  *  Admin Dashboard (admin.html)
  *  - ดึงข้อมูลด้วย action "list" ทุก ADMIN_REFRESH_SEC วินาที (near real-time)
- *  - สถิติ: นักวิ่ง/โควตา, รอตรวจสลิป, รายได้, ผ้าโพกหัว (รับที่งาน/จัดส่ง), อาหาร
- *  - งานหลังบ้าน: ตรวจสลิป (verify), บันทึกเลขพัสดุ (ship), เช็คอิน, แก้ไข, ลบ, CSV
+ *  - สถิติ: นักวิ่ง, ยังไม่ชำระ, รายได้, ผ้าโพกหัว (รับที่งาน/จัดส่ง), เครื่องดื่ม, แพ้อาหาร (กรองตามอีเวนต์ได้)
+ *  - การชำระเงินยืนยันอัตโนมัติเมื่อแนบสลิป · แอดมินดูสลิป/ปฏิเสธได้ (verify), บันทึกเลขพัสดุ (ship), เช็คอิน, แก้ไข, ลบ, CSV
  * =====================================================================
  */
 (function () {
@@ -15,7 +15,7 @@
   let rows = [];
   let timer = null;
   let loading = false;
-  const f = { text: '', pkg: '', pay: '', del: '', inn: '' };   // ตัวกรองตาราง
+  const f = { text: '', pkg: '', pay: '', del: '', inn: '', event: CFG.EVENT.id };   // ตัวกรองตาราง
 
   /* ---------- Login ---------- */
   async function enter(k) {
@@ -26,7 +26,6 @@
     $('#gate').classList.add('hidden');
     $('#app').classList.remove('hidden');
     $('#topActions').classList.remove('hidden');
-    if (API.isDemo) $('#demoTools').classList.remove('hidden');
     setupFilters();
     await refresh();
     schedule();
@@ -48,6 +47,7 @@
     loading = true;
     try {
       rows = await API.call('list', { key });
+      eventOptions();
       $('#updated').textContent = 'อัปเดต ' + new Date().toLocaleTimeString('th-TH');
       renderStats();
       renderTable();
@@ -72,6 +72,9 @@
 
   /* ---------- สถิติ ---------- */
   const isRun = (r) => pkg(r.package).runner;
+  // รายการของอีเวนต์ที่เลือก (ข้อมูลเก่าที่ไม่มี eventId นับเป็นรอบแรก)
+  const evOf = (r) => r.eventId || CFG.EVENT.id;
+  const scoped = () => (f.event ? rows.filter((r) => evOf(r) === f.event) : rows);
   const isPaid = (r) => r.paymentStatus === 'PAID';
   const isIn = (r) => r.status === 'CHECKED_IN';
 
@@ -89,15 +92,15 @@
   }
 
   function renderStats() {
+    const rows = scoped();
     const runners = rows.filter(isRun);
     const paidRunners = runners.filter(isPaid);
-    const pending = rows.filter((r) => r.paymentStatus === 'SLIP_UPLOADED').length;
+    const unpaid = rows.filter((r) => r.paymentStatus === 'UNPAID').length;
     const revenue = rows.filter(isPaid).reduce((s, r) => s + Number(r.amount || 0), 0);
     const inRun = paidRunners.filter(isIn).length;
 
-    $('#kRunners').innerHTML = runners.length + '<small> / ' + CFG.MAX_RUNNERS + '</small>';
-    $('#kRunBar').style.width = Math.min(100, (runners.length / CFG.MAX_RUNNERS) * 100) + '%';
-    $('#kPending').textContent = pending;
+    $('#kRunners').innerHTML = runners.length + '<small> คน</small>';
+    $('#kPending').textContent = unpaid;
     $('#kRevenue').textContent = money(revenue);
     $('#kBandana').innerHTML = rows.filter(isPaid).length + '<small> ผืน</small>';
     $('#kIn').innerHTML = inRun + '<small> / ' + paidRunners.length + '</small>';
@@ -119,9 +122,11 @@
       <div><span>จัดส่ง · ส่งแล้ว</span><b>${shipped}</b></div>
       <div><span>ซื้อผ้าโพกหัวอย่างเดียว</span><b>${paid.filter((r) => !isRun(r)).length}</b></div>`;
 
-    hbars($('#foodBars'), CFG.FOODS, paidRunners, 'food');
     hbars($('#drinkBars'), CFG.DRINKS, paidRunners, 'drink', { colors: Object.fromEntries(CFG.DRINKS.map((d) => [d, 'var(--sky)'])) });
-    hbars($('#sweetBars'), CFG.SWEETNESS, paidRunners, 'sweetness', { colors: Object.fromEntries(CFG.SWEETNESS.map((d) => [d, 'var(--ink)'])) });
+    const allergy = paidRunners.filter((r) => r.note && !/^(ไม่แพ้|ไม่มี|-|no)/i.test(r.note));
+    $('#allergyList').innerHTML = allergy.length
+      ? allergy.map((r) => `<div><b>${esc(r.bib)}</b> ${esc(r.nickname || r.firstName)} — ${esc(r.note)}</div>`).join('')
+      : '<span class="muted">ไม่มีผู้แจ้งแพ้อาหาร</span>';
   }
 
   /* ---------- ตัวกรอง ---------- */
@@ -129,10 +134,17 @@
     $('#fPkg').innerHTML = '<option value="">ทุกแพ็กเกจ</option>' + CFG.PACKAGES.map((p) => `<option value="${esc(p.code)}">${esc(p.label)}</option>`).join('');
     $('#fPay').innerHTML = '<option value="">ทุกสถานะชำระ</option>' + Object.keys(PAY_LABEL).map((k) => `<option value="${k}">${PAY_LABEL[k]}</option>`).join('');
     const opts = (arr) => arr.map((v) => `<option>${esc(v)}</option>`).join('');
-    $('#editForm [name=food]').innerHTML = opts(CFG.FOODS);
     $('#editForm [name=drink]').innerHTML = opts(CFG.DRINKS);
-    $('#editForm [name=sweetness]').innerHTML = opts(CFG.SWEETNESS);
   }
+
+  // ตัวเลือกอีเวนต์: รวมทุกรอบที่มีในข้อมูล + รอบปัจจุบัน
+  function eventOptions() {
+    const ids = Array.from(new Set([CFG.EVENT.id].concat(rows.map(evOf))));
+    const sel = $('#fEvent');
+    sel.innerHTML = '<option value="">ทุกอีเวนต์</option>' + ids.map((v) => `<option value="${esc(v)}">${esc(v)}${v === CFG.EVENT.id ? ' (รอบนี้)' : ''}</option>`).join('');
+    sel.value = f.event;
+  }
+  $('#fEvent').addEventListener('change', (e) => { f.event = e.target.value; renderStats(); renderTable(); });
 
   $('#fText').addEventListener('input', (e) => { f.text = e.target.value.trim().toLowerCase(); renderTable(); });
   [['#fPkg', 'pkg'], ['#fPay', 'pay'], ['#fDel', 'del'], ['#fIn', 'inn']].forEach(([s, k]) =>
@@ -140,10 +152,10 @@
 
   const setPayFilter = (v) => { f.pay = v; $('#fPay').value = v; renderTable(); $('.table-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
   $('#payBars').addEventListener('click', (e) => { const b = e.target.closest('[data-pay]'); if (b) setPayFilter(f.pay === b.dataset.pay ? '' : b.dataset.pay); });
-  $('#kPendingBox').addEventListener('click', () => setPayFilter('SLIP_UPLOADED'));
+  $('#kPendingBox').addEventListener('click', () => setPayFilter('UNPAID'));
 
   function filtered() {
-    return rows.filter((r) => {
+    return scoped().filter((r) => {
       if (f.pkg && r.package !== f.pkg) return false;
       if (f.pay && r.paymentStatus !== f.pay) return false;
       if (f.inn && r.status !== f.inn) return false;
@@ -165,7 +177,7 @@
 
   function renderTable() {
     const list = filtered().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    $('#rowCount').textContent = list.length + ' / ' + rows.length + ' รายการ';
+    $('#rowCount').textContent = list.length + ' / ' + scoped().length + ' รายการ';
     $('#tbody').innerHTML = list.length ? list.map((r) => {
       const p = pkg(r.package);
       const paid = isPaid(r);
@@ -180,8 +192,7 @@
         <td>${deliveryCell(r)}</td>
         <td>${canIn ? (isIn(r) ? '<span class="pill ok">แล้ว</span> <span class="muted small">' + esc(fmtDate(r.checkinAt, true)) + '</span>' : '<span class="muted">ยัง</span>') : '<span class="muted">–</span>'}</td>
         <td><div class="actions">
-          ${r.hasSlip && !paid ? '<button class="btn btn-sm btn-dark" data-act="slip">ตรวจสลิป</button>' : ''}
-          ${r.hasSlip && paid ? '<button class="btn btn-sm" data-act="slip">สลิป</button>' : ''}
+          ${r.hasSlip ? '<button class="btn btn-sm" data-act="slip">ดูสลิป</button>' : ''}
           ${paid && r.delivery === 'SHIP' && r.shipStatus !== 'SHIPPED' ? '<button class="btn btn-sm btn-dark" data-act="ship">จัดส่ง</button>' : ''}
           ${canIn ? `<button class="btn btn-sm" data-act="toggle">${isIn(r) ? 'ยกเลิกเช็คอิน' : 'เช็คอิน'}</button>` : ''}
           <button class="btn btn-sm" data-act="edit">แก้ไข</button>
@@ -236,10 +247,9 @@
     $('#sImg').alt = 'กำลังโหลดสลิป…';
     $('#sLink').classList.add('hidden');
     $('#sReason').value = '';
+    // ระบบอนุมัติให้อัตโนมัติแล้ว: แอดมินใช้หน้านี้ดูสลิป และ "ปฏิเสธ" ได้เฉพาะกรณีสลิปผิดปกติ
     const paid = isPaid(r);
     $('#sApprove').classList.toggle('hidden', paid);
-    $('#sReject').classList.toggle('hidden', paid);
-    $('#sReason').classList.toggle('hidden', paid);
     $('#slipModal').classList.remove('hidden');
     try {
       const s = await API.call('slip', { key, bib: r.bib });
@@ -257,7 +267,7 @@
     try {
       await API.call('verify', { key, bib: current.bib, approve, reason: $('#sReason').value.trim() });
       $('#slipModal').classList.add('hidden');
-      toast(current.bib + (approve ? ' ยืนยันการชำระแล้ว · ส่งอีเมลแจ้งแล้ว' : ' แจ้งให้แนบสลิปใหม่แล้ว'), 'ok');
+      toast(current.bib + (approve ? ' ยืนยันการชำระแล้ว' : ' ปฏิเสธสลิปแล้ว · ผู้สมัครแนบใหม่ได้'), 'ok');
       await refresh();
     } catch (err) {
       toast(err.message, 'err');
@@ -323,8 +333,8 @@
 
   /* ---------- ส่งออก CSV (เปิดใน Excel ภาษาไทยได้ เพราะใส่ BOM) ---------- */
   $('#csvBtn').addEventListener('click', () => {
-    const cols = ['bib', 'package', 'firstName', 'lastName', 'nickname', 'gender', 'phone', 'email', 'food', 'drink', 'sweetness',
-      'delivery', 'address', 'zipcode', 'amount', 'paymentStatus', 'paidAt', 'shipStatus', 'trackingNo', 'status', 'checkinAt', 'checkinBy', 'note', 'createdAt'];
+    const cols = ['bib', 'package', 'firstName', 'lastName', 'nickname', 'gender', 'phone', 'email', 'drink',
+      'delivery', 'address', 'zipcode', 'amount', 'paymentStatus', 'paidAt', 'shipStatus', 'trackingNo', 'status', 'checkinAt', 'checkinBy', 'note', 'eventId', 'createdAt'];
     const cell = (v) => {
       let s = String(v == null ? '' : v);
       if (/^[=+\-@]/.test(s)) s = "'" + s;   // กันสูตรใน Excel
@@ -338,7 +348,4 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
 
-  /* ---------- Demo tools ---------- */
-  $('#seedBtn').addEventListener('click', async () => { API.demo.seed(40); await refresh(); toast('เพิ่มข้อมูลตัวอย่างแล้ว', 'ok'); });
-  $('#resetBtn').addEventListener('click', async () => { if (confirm('ล้างข้อมูล Demo ทั้งหมด?')) { API.demo.reset(); await refresh(); } });
 })();

@@ -42,16 +42,11 @@
           <button class="btn btn-sm" id="csvBtn">⇩ CSV</button>
         </div>
       </div>
-      <div class="toolbar hidden" id="demoTools" style="margin-bottom:12px">
-        <span class="muted small">DEMO:</span>
-        <button class="btn btn-sm" id="seedBtn">+ ข้อมูลตัวอย่าง 40 รายการ</button>
-        <button class="btn btn-sm" id="resetBtn">ล้างข้อมูล Demo</button>
-      </div>
 
       <!-- KPI -->
       <div class="kpis">
-        <div class="kpi hl"><span>นักวิ่ง (สมัคร / รับ)</span><b id="kRunners">0</b><div class="bar"><i id="kRunBar" style="width:0"></i></div></div>
-        <div class="kpi alert" id="kPendingBox" title="กดเพื่อดูรายการรอตรวจสลิป"><span>รอตรวจสลิป</span><b id="kPending">0</b></div>
+        <div class="kpi hl"><span>นักวิ่งที่สมัคร</span><b id="kRunners">0</b></div>
+        <div class="kpi alert" id="kPendingBox" title="กดเพื่อดูรายการที่ยังไม่ชำระ"><span>ยังไม่ชำระเงิน</span><b id="kPending">0</b></div>
         <div class="kpi"><span>รายได้ที่ยืนยันแล้ว</span><b id="kRevenue">0</b></div>
         <div class="kpi"><span>ผ้าโพกหัวที่ต้องเตรียม</span><b id="kBandana">0</b></div>
         <div class="kpi"><span>เช็คอินนักวิ่ง</span><b id="kIn">0</b><div class="bar"><i id="kInBar" style="width:0"></i></div></div>
@@ -68,16 +63,17 @@
           <div class="stat-list" id="bandanaStats"></div>
         </div>
         <div class="card panel">
-          <h3>Finisher Meal <span class="muted small" style="font:400 12px var(--font);text-transform:none">(นักวิ่งที่ชำระแล้ว)</span></h3>
-          <div class="hbars" id="foodBars"></div>
-          <div class="hbars mt" id="drinkBars"></div>
-          <div class="hbars mt" id="sweetBars"></div>
+          <h3>เครื่องดื่ม <span class="muted small" style="font:400 12px var(--font);text-transform:none">(นักวิ่งที่ชำระแล้ว · หวาน 100%)</span></h3>
+          <div class="hbars" id="drinkBars"></div>
+          <h3 class="mt">แพ้อาหาร</h3>
+          <div class="small" id="allergyList"></div>
         </div>
       </div>
 
       <!-- ตาราง -->
       <h2 class="section-title" style="margin-top:28px"><span class="num">//</span>รายการทั้งหมด <small id="rowCount"></small></h2>
       <div class="toolbar">
+        <select class="input" id="fEvent"></select>
         <input class="input" id="fText" placeholder="ค้นหา ชื่อ / เลข / เบอร์">
         <select class="input" id="fPkg"><option value="">ทุกแพ็กเกจ</option></select>
         <select class="input" id="fPay"><option value="">ทุกสถานะชำระ</option></select>
@@ -146,17 +142,13 @@
         <div class="field"><label>เบอร์โทร</label><input class="input" name="phone" inputmode="numeric"></div>
       </div>
       <div class="field"><label>อีเมล</label><input class="input" name="email" type="email"></div>
-      <div class="grid grid-2" data-run>
-        <div class="field"><label>อาหาร</label><select class="input" name="food"></select></div>
-        <div class="field"><label>เครื่องดื่ม</label><select class="input" name="drink"></select></div>
-      </div>
-      <div class="field" data-run><label>ความหวาน</label><select class="input" name="sweetness"></select></div>
+      <div class="field" data-run><label>เครื่องดื่ม</label><select class="input" name="drink"></select></div>
       <div class="field" data-ship><label>ที่อยู่จัดส่ง</label><textarea class="input" name="address"></textarea></div>
       <div class="grid grid-2" data-ship>
         <div class="field"><label>รหัสไปรษณีย์</label><input class="input" name="zipcode" inputmode="numeric"></div>
         <div class="field"><label>เลขพัสดุ</label><input class="input" name="trackingNo"></div>
       </div>
-      <div class="field"><label>หมายเหตุ</label><input class="input" name="note"></div>
+      <div class="field"><label>แพ้อาหาร / หมายเหตุ</label><input class="input" name="note"></div>
       <div class="btn-row">
         <button class="btn" type="button" data-close>ยกเลิก</button>
         <button class="btn btn-primary" type="submit" id="eSave">บันทึก</button>

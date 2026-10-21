@@ -1,23 +1,52 @@
 /**
  * =====================================================================
- *  หน้าสมัคร (index.html)
- *  1) สร้างตัวเลือกจาก config   2) สลับฟอร์มตามแพ็กเกจ (วิ่ง / ผ้าโพกหัวอย่างเดียว)
- *  3) คำนวณยอด   4) ตรวจฟอร์ม   5) ส่ง register → ไปหน้าชำระเงิน
+ *  หน้าสมัครวิ่ง (index.html)
+ *  1) ต้องเข้าสู่ระบบ (บัญชีสมาชิก) — ข้อมูลส่วนตัวมาจากบัญชี ไม่ต้องกรอกซ้ำ
+ *  2) เลือกแพ็กเกจ / เครื่องดื่ม / แพ้อาหาร / รับผ้าโพกหัว
+ *  3) คำนวณยอด → ตรวจฟอร์ม → register → ไปหน้าชำระเงิน
  * =====================================================================
  */
 (function () {
   const CFG = window.APP_CONFIG;
-  const { $, $$, esc, toast, busy, normPhone, myBibs, pkg, delivery, money, starSvg } = window.U;
-  const PROFILE_KEY = 'irc_profile';
-  const PROFILE_FIELDS = ['firstName', 'lastName', 'nickname', 'gender', 'birthDate', 'phone', 'email', 'emergencyName', 'emergencyPhone', 'address', 'zipcode'];
+  const { $, $$, esc, toast, busy, myBibs, pkg, delivery, money, starSvg, avatarHtml } = window.U;
 
   /* ---------- ข้อมูลงาน ---------- */
   $('#evEdition').textContent = CFG.EVENT.edition;
   $('#evDate').textContent = CFG.EVENT.dateLabel;
   $('#evTime').textContent = CFG.EVENT.startTime + ' น.';
   $('#evLoc').textContent = CFG.EVENT.location;
-  $('#heroStars').innerHTML = starSvg() + starSvg() + starSvg();
+  $('#heroStars').innerHTML = '<img src="img/stars-navy.png" alt="">';
   $('#bandanaIco').innerHTML = starSvg('#fff');
+  $('#stTime').textContent = CFG.EVENT.startTime;
+
+  /* ---------- Landing: เส้นทาง + สไลด์ของที่ได้รับ ---------- */
+  $('#homeRoute').innerHTML = window.U.routeSvg({ stroke: '#5FD3EE', dash: '#0A1430', start: '#0A1430', grid: 'rgba(255,255,255,.06)', width: 2.4 });
+  $('#homeRouteName').textContent = CFG.ROUTE.name;
+  $('#homeRouteLoc').textContent = '📍 ' + CFG.EVENT.location + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.';
+  $$('[data-slide]').forEach((b) => b.addEventListener('click', () => {
+    const sl = $('#goodsSlider');
+    sl.scrollBy({ left: Number(b.dataset.slide) * (sl.firstElementChild.offsetWidth + 12), behavior: 'smooth' });
+  }));
+
+  /* ---------- ต้องล็อกอินก่อน ---------- */
+  if (!Auth.loggedIn()) {
+    $('#gate').classList.remove('hidden');
+    return;
+  }
+  $('#regForm').classList.remove('hidden');
+
+  let member = Auth.member() || {};
+  function paintMember(m) {
+    member = m;
+    $('#whoCard').innerHTML = `${avatarHtml(m, 'lg')}
+      <div class="meta"><b>${esc((m.firstName || '') + ' ' + (m.lastName || ''))}</b>
+      ${m.nickname ? '<span class="muted">“' + esc(m.nickname) + '”</span><br>' : ''}
+      <span class="muted small">${esc(m.phone || '')} · ${esc(m.email || '')}</span></div>`;
+    $('#emgHint').classList.toggle('hidden', !!(m.emergencyName && m.emergencyPhone) || !isRunnerSelected());
+  }
+  // ดึงข้อมูลล่าสุด (รูป/เบอร์ที่เพิ่งแก้) — ถ้า session หมดอายุจะเด้งไปล็อกอิน
+  API.call('me').then((r) => { Auth.setMember(r.member); paintMember(r.member); })
+    .catch(() => { if (!Auth.loggedIn()) location.reload(); });
 
   /* ---------- สร้างตัวเลือก ---------- */
   $('#pkgList').innerHTML = CFG.PACKAGES.map((p) => `
@@ -29,7 +58,6 @@
           <div class="price">${p.price}<small>฿</small></div>
         </div>
         <ul>${p.includes.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>
-        ${p.runner ? '<span class="seats" id="seats">รับ ' + CFG.MAX_RUNNERS + ' คน</span>' : ''}
       </div>
     </label>`).join('');
 
@@ -37,45 +65,21 @@
     <label class="opt"><input type="radio" name="delivery" value="${esc(d.code)}" ${i === 0 ? 'checked' : ''}>
       <div class="box"><b>${esc(d.label)}</b><span>${d.fee ? '+' + money(d.fee) : 'ฟรี'}</span></div></label>`).join('');
 
-  const chips = (name, items) => items.map((v) => `
-    <label class="chip"><input type="radio" name="${name}" value="${esc(v)}"><span>${esc(v)}</span></label>`).join('');
-  $('#foodList').innerHTML = chips('food', CFG.FOODS);
-  $('#drinkList').innerHTML = chips('drink', CFG.DRINKS);
-  $('#sweetList').innerHTML = chips('sweetness', CFG.SWEETNESS);
+  $('#drinkList').innerHTML = CFG.DRINKS.map((v) => `
+    <label class="chip"><input type="radio" name="drink" value="${esc(v)}"><span>${esc(v)}</span></label>`).join('');
 
-  /* ---------- ที่นั่งคงเหลือ ---------- */
-  API.call('info').then((info) => {
-    const el = $('#seats');
-    if (!el) return;
-    if (info.runnersLeft <= 0) {
-      el.textContent = 'ที่นั่งเต็มแล้ว';
-      el.classList.add('full');
-      const r = $('input[name=package][value=RUN]');
-      r.disabled = true; r.checked = false;
-      update();
-    } else {
-      el.textContent = 'เหลือ ' + info.runnersLeft + ' / ' + info.maxRunners + ' ที่';
-    }
-  }).catch(() => { /* ไม่แสดงจำนวนถ้าโหลดไม่ได้ */ });
-
-  /* ---------- เติมข้อมูลที่เคยบันทึก ---------- */
-  try {
-    const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
-    if (saved) PROFILE_FIELDS.forEach((k) => { if (saved[k] && $('#' + k)) $('#' + k).value = saved[k]; });
-  } catch (e) { /* ignore */ }
-
-  // ช่องตัวเลข: พิมพ์ได้เฉพาะตัวเลข · เบอร์โทรแปลง +66 → 0 ตอนออกจากช่อง (กันเบราว์เซอร์กรอกให้ในรูปแบบ +66)
-  ['#phone', '#emergencyPhone', '#zipcode'].forEach((s) => $(s).addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ''); }));
-  ['#phone', '#emergencyPhone'].forEach((s) => $(s).addEventListener('change', (e) => { e.target.value = normPhone(e.target.value); }));
+  $('#zipcode').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ''); });
 
   /* ---------- สลับฟอร์มตามแพ็กเกจ + คำนวณยอด ---------- */
   const radio = (name) => { const r = $(`input[name="${name}"]:checked`); return r ? r.value : ''; };
+  const isRunnerSelected = () => { const c = radio('package'); return !c || pkg(c).runner; };
 
   function update() {
     const code = radio('package');
     const p = code ? pkg(code) : null;
     const isRunner = !p || p.runner;     // ยังไม่เลือก → แสดงฟอร์มนักวิ่ง
     $$('[data-runner]').forEach((el) => el.classList.toggle('hidden', !isRunner));
+    $('#emgHint').classList.toggle('hidden', !isRunner || !!(member.emergencyName && member.emergencyPhone));
     $('#numDelivery').textContent = isRunner ? '04' : '03';
     $('#numSummary').textContent = isRunner ? '05' : '04';
 
@@ -89,15 +93,13 @@
       <div class="row total"><span>ยอดชำระ</span><b>${money(price + d.fee)}</b></div>`;
   }
   $('#regForm').addEventListener('change', update);
+  paintMember(member);
   update();
 
   /* ---------- ตรวจฟอร์ม ---------- */
   function collect() {
-    const d = {};
-    PROFILE_FIELDS.concat(['note']).forEach((k) => { d[k] = $('#' + k).value.trim(); });
-    d.phone = normPhone(d.phone);
-    d.emergencyPhone = normPhone(d.emergencyPhone);
-    ['package', 'food', 'drink', 'sweetness', 'delivery'].forEach((k) => { d[k] = radio(k); });
+    const d = { package: radio('package'), drink: radio('drink'), delivery: radio('delivery') };
+    ['note', 'address', 'zipcode'].forEach((k) => { d[k] = $('#' + k).value.trim(); });
     d.consent = $('#consent').checked;
     return d;
   }
@@ -108,7 +110,6 @@
     $$('[data-err]').forEach((el) => el.classList.add('hidden'));
     $$('[data-dyn]').forEach((el) => el.remove());
 
-    // ช่องกรอก: ขอบแดง + ข้อความใต้ช่องบอกว่าผิดอะไร
     const bad = (id, label, msg) => {
       const el = $('#' + id);
       el.classList.add('invalid');
@@ -117,16 +118,15 @@
       el.insertAdjacentElement('afterend', m);
       errs.push({ el, label });
     };
-    // กลุ่มตัวเลือก: แสดงข้อความที่เตรียมไว้ใน HTML
     const badGroup = (k, label) => { const el = $(`[data-err="${k}"]`); el.classList.remove('hidden'); errs.push({ el, label }); };
 
     const p = d.package ? pkg(d.package) : null;
     if (!p) badGroup('package', 'แพ็กเกจ');
-    if (!d.firstName) bad('firstName', 'ชื่อ', 'กรุณากรอกชื่อ');
-    if (!d.lastName) bad('lastName', 'นามสกุล', 'กรุณากรอกนามสกุล');
-    if (!/^0\d{8,9}$/.test(d.phone)) bad('phone', 'เบอร์โทรศัพท์', 'เบอร์ต้องขึ้นต้นด้วย 0 และมี 9–10 หลัก เช่น 0812345678');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) bad('email', 'อีเมล', 'กรุณากรอกอีเมลให้ถูกต้อง เช่น name@gmail.com');
-    if (p && p.runner) [['food', 'อาหาร'], ['drink', 'เครื่องดื่ม'], ['sweetness', 'ความหวาน']].forEach(([k, l]) => { if (!d[k]) badGroup(k, l); });
+    if (!member.firstName || !/^0\d{8,9}$/.test(member.phone || '')) {
+      toast('ข้อมูลในบัญชีไม่ครบ กรุณาแก้ไขที่ "บัญชีของฉัน" ก่อน', 'err');
+      return false;
+    }
+    if (p && p.runner && !d.drink) badGroup('drink', 'เครื่องดื่ม');
     if (d.delivery === 'SHIP') {
       if (d.address.length < 10) bad('address', 'ที่อยู่จัดส่ง', 'กรุณากรอกที่อยู่ให้ครบ (บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด)');
       if (!/^\d{5}$/.test(d.zipcode)) bad('zipcode', 'รหัสไปรษณีย์', 'รหัสไปรษณีย์ 5 หลัก');
@@ -150,10 +150,6 @@
     busy(btn, true, 'กำลังบันทึก…');
     try {
       const { runner } = await API.call('register', d);
-      if ($('#remember').checked) {
-        const p = {}; PROFILE_FIELDS.forEach((k) => { p[k] = d[k]; });
-        try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (err) { /* ignore */ }
-      }
       myBibs.add(runner.bib, runner.token);   // เครื่องนี้เปิดหน้าได้โดยไม่ต้องยืนยัน
       location.href = 'profile.html?bib=' + encodeURIComponent(runner.bib) + '&new=1';
     } catch (err) {

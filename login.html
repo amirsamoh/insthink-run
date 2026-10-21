@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>เข้าสู่ระบบ · INSTHINK RUN CLUB</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-head" data-nav></header>
+
+  <main class="wrap" style="max-width:520px">
+    <h1 class="display" style="font-size:34px;margin:22px 0 4px">INSTHINK <span style="color:var(--navy)">Account</span></h1>
+    <p class="muted" style="margin:0 0 16px">สมัครสมาชิกครั้งเดียว ใช้สมัครวิ่งได้ทุกรอบ ไม่ต้องกรอกข้อมูลซ้ำ</p>
+
+    <div class="tabs" id="tabs">
+      <button type="button" data-tab="login" class="on">เข้าสู่ระบบ</button>
+      <button type="button" data-tab="signup">สมัครสมาชิก</button>
+    </div>
+
+    <!-- เข้าสู่ระบบ -->
+    <form class="card grid" id="loginForm" novalidate>
+      <div class="field"><label for="lEmail">อีเมล</label>
+        <input class="input" id="lEmail" type="email" autocomplete="email" maxlength="100"></div>
+      <div class="field"><label for="lPass">รหัสผ่าน</label>
+        <input class="input" id="lPass" type="password" autocomplete="current-password" maxlength="100"></div>
+      <button class="btn btn-primary btn-block" id="lBtn" type="submit">เข้าสู่ระบบ</button>
+      <p class="center small" style="margin:0"><a href="#" id="toForgot">ลืมรหัสผ่าน?</a></p>
+    </form>
+
+    <!-- สมัครสมาชิก -->
+    <form class="card grid hidden" id="signupForm" novalidate>
+      <div class="avatar-pick">
+        <span id="sAvatar"></span>
+        <div>
+          <label class="btn btn-sm" for="sPhoto">📷 เลือกรูปโปรไฟล์</label>
+          <input id="sPhoto" type="file" accept="image/*">
+          <div class="hint">ไม่บังคับ · ใช้บน E-BIB และรูป IG Story</div>
+        </div>
+      </div>
+      <div class="grid grid-2">
+        <div class="field"><label for="sFirst">ชื่อ <span class="req">*</span></label><input class="input" id="sFirst" autocomplete="given-name" maxlength="60"></div>
+        <div class="field"><label for="sLast">นามสกุล <span class="req">*</span></label><input class="input" id="sLast" autocomplete="family-name" maxlength="60"></div>
+      </div>
+      <div class="field"><label for="sNick">ชื่อเล่น / ชื่อบน BIB</label><input class="input" id="sNick" maxlength="20" placeholder="เช่น MIRZ"></div>
+      <div class="field"><label for="sPhone">เบอร์โทรศัพท์ <span class="req">*</span></label>
+        <input class="input" id="sPhone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="16" placeholder="08xxxxxxxx"></div>
+      <div class="field"><label for="sEmail">อีเมล <span class="req">*</span></label>
+        <input class="input" id="sEmail" type="email" autocomplete="email" maxlength="100" placeholder="you@email.com">
+        <div class="hint">ใช้เข้าสู่ระบบ และรับการยืนยัน / E-BIB</div></div>
+      <div class="field"><label for="sPass">รหัสผ่าน <span class="req">*</span></label>
+        <input class="input" id="sPass" type="password" autocomplete="new-password" maxlength="100">
+        <div class="hint">อย่างน้อย 8 ตัวอักษร</div></div>
+      <button class="btn btn-primary btn-block" id="sBtn" type="submit">สมัครสมาชิก</button>
+    </form>
+
+    <!-- ลืมรหัสผ่าน -->
+    <form class="card grid hidden" id="forgotForm" novalidate>
+      <h3 style="margin:0">รีเซ็ตรหัสผ่าน</h3>
+      <div class="field"><label for="fEmail">อีเมลที่สมัคร</label>
+        <input class="input" id="fEmail" type="email" autocomplete="email" maxlength="100"></div>
+      <button class="btn btn-primary btn-block" id="fBtn" type="submit">ส่งรหัสไปที่อีเมล</button>
+      <div class="grid hidden" id="resetBox">
+        <div class="field"><label for="fCode">รหัส 6 หลักจากอีเมล</label>
+          <input class="input" id="fCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+        <div class="field"><label for="fNew">รหัสผ่านใหม่</label>
+          <input class="input" id="fNew" type="password" autocomplete="new-password" maxlength="100"></div>
+        <button class="btn btn-dark btn-block" id="rBtn" type="button">ตั้งรหัสผ่านใหม่</button>
+      </div>
+      <p class="center small" style="margin:0"><a href="#" id="backLogin">← กลับไปเข้าสู่ระบบ</a></p>
+    </form>
+  </main>
+
+  <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

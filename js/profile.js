@@ -1,7 +1,7 @@
 /**
  * =====================================================================
  *  หน้า "ของฉัน" (profile.html?bib=R0001)
- *  - ยืนยันตัวตน: token ในเครื่อง / ลิงก์อีเมล (?t=) / เบอร์โทร 4 ตัวท้าย
+ *  - ยืนยันตัวตน: บัญชีที่ล็อกอิน / token ในเครื่อง / ลิงก์อีเมล (?t=) / เบอร์โทร 4 ตัวท้าย
  *  - ชำระเงิน: PromptPay QR ตามยอดจริง + แนบสลิป (ย่อรูปก่อนส่ง)
  *  - นักวิ่ง: E-BIB (QR ใช้งานได้เมื่อชำระแล้ว) + เส้นทาง + IG Story
  *  - ออเดอร์ผ้าโพกหัว: สถานะการชำระ/จัดส่ง
@@ -52,6 +52,7 @@
   }
   const token = urlToken || myBibs.token(bib);
   if (token) load({ token }).catch((e) => { toast(e.message, 'err'); askPhone(); });
+  else if (Auth.loggedIn()) load({}).catch(() => askPhone());   // เจ้าของที่ล็อกอินอยู่ (session แนบอัตโนมัติ)
   else askPhone();
 
   function askPhone() {
@@ -92,8 +93,7 @@
     const doneLast = p.runner ? paid : (d.code === 'SHIP' ? runner.shipStatus === 'SHIPPED' : runner.status === 'CHECKED_IN');
     const steps = [
       ['สมัคร', true],
-      ['ชำระเงิน', ['SLIP_UPLOADED', 'PAID'].includes(runner.paymentStatus)],
-      ['ตรวจสอบ', paid],
+      ['ชำระเงิน (แนบสลิป)', paid],
       [lastStep, doneLast],
     ];
     const firstOpen = steps.findIndex((s) => !s[1]);
@@ -117,10 +117,10 @@
     n.classList.add('hidden');
     if (runner.paymentStatus === 'SLIP_UPLOADED') {
       n.className = 'notice info';
-      n.textContent = 'ได้รับสลิปแล้วเมื่อ ' + fmtDate(runner.slipAt, true) + ' · รอทีมงานตรวจสอบ (แนบใหม่ได้หากส่งผิด)';
+      n.textContent = 'ได้รับสลิปแล้วเมื่อ ' + fmtDate(runner.slipAt, true) + ' · รอทีมงานตรวจสอบ';
     } else if (runner.paymentStatus === 'REJECTED') {
       n.className = 'notice bad';
-      n.textContent = 'สลิปไม่ผ่านการตรวจสอบ: ' + (runner.payNote || '-') + ' — กรุณาแนบสลิปใหม่';
+      n.textContent = 'ทีมงานแจ้งให้แนบสลิปใหม่: ' + (runner.payNote || '-');
     }
 
     $('#payAmount').textContent = money(runner.amount);
@@ -149,7 +149,7 @@
       rows.push(['การจัดส่ง', runner.shipStatus === 'SHIPPED' ? 'ส่งแล้ว · ' + (runner.trackingNo || '') : 'รอจัดส่ง']);
       if (runner.address) rows.push(['ที่อยู่จัดส่ง', runner.address + ' ' + (runner.zipcode || ''), true]);
     }
-    if (p.runner) rows.push(['อาหาร', runner.food], ['เครื่องดื่ม', runner.drink + ' · หวาน ' + runner.sweetness]);
+    if (p.runner) rows.push(['เครื่องดื่ม', runner.drink + ' · หวาน ' + (runner.sweetness || '100%') + ' (หวานปกติ)'], ['แพ้อาหาร', runner.note || '-']);
     $('#detail').innerHTML = rows.map(([k, v, wide]) => `<div class="${wide ? 'wide' : ''}"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
   }
 
@@ -159,8 +159,9 @@
     $('#bName').textContent = runner.firstName + ' ' + runner.lastName;
     $('#bNick').textContent = runner.nickname ? '“' + runner.nickname + '”' : '';
     $('#bBandana').textContent = d.code === 'SHIP' ? 'จัดส่ง' : 'รับที่งาน';
-    $('#bFood').textContent = runner.food;
-    $('#bDrink').textContent = runner.drink + ' · ' + runner.sweetness;
+    $('#bFood').textContent = runner.note || '-';
+    $('#bDrink').textContent = runner.drink;
+    $('#bAvatar').innerHTML = U.avatarHtml(runner, 'lg');
     $('#bStart').textContent = CFG.EVENT.startTime + ' น.';
     U.renderBarcode($('#bBarcode'), runner.bib);
 
@@ -182,7 +183,7 @@
       lock.className = 'lock';
       lock.textContent = paid ? 'เปิดจากลิงก์ในอีเมลเพื่อแสดง QR' : 'QR จะแสดงเมื่อชำระเงินแล้ว';
       box.appendChild(lock);
-      $('#bibHint').textContent = paid ? '' : 'E-BIB จะใช้งานได้หลังทีมงานยืนยันการชำระเงิน';
+      $('#bibHint').textContent = paid ? '' : 'E-BIB จะใช้งานได้ทันทีหลังแนบสลิป';
     }
     $('#bibActions').classList.toggle('hidden', !paid);
 
@@ -218,7 +219,7 @@
       $('#slipPreview').classList.add('hidden');
       $('#slipFile').value = '';
       btn.classList.add('hidden');
-      toast('ส่งสลิปแล้ว รอทีมงานตรวจสอบ', 'ok');
+      toast(runner.paymentStatus === 'PAID' ? 'ชำระเงินสำเร็จ! E-BIB พร้อมใช้งานแล้ว' : 'ส่งสลิปแล้ว รอทีมงานตรวจสอบ', 'ok');
       render();
     } catch (err) {
       toast(err.message, 'err');
