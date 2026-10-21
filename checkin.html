@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="robots" content="noindex">
+  <title>Check-in · INSTHINK RUN CLUB</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-head">
+    <a class="brand" href="index.html"><img src="img/logo.png" alt="INSTHINK RUN CLUB"><span class="tag-role">STAFF</span></a>
+    <button class="btn btn-sm hidden" id="logoutBtn">ออกจากระบบ</button>
+  </header>
+
+  <main class="wrap">
+    <!-- เข้าสู่ระบบด้วย STAFF_KEY -->
+    <form class="gate card" id="gate">
+      <h2>Staff Check-in</h2>
+      <p class="muted" style="margin-top:0">กรอกรหัสเจ้าหน้าที่ (STAFF_KEY หรือ ADMIN_KEY)</p>
+      <div class="grid">
+        <input class="input" id="staffName" placeholder="ชื่อเจ้าหน้าที่ / จุด เช่น โต๊ะ 1" maxlength="40">
+        <input class="input" id="staffKey" type="password" placeholder="รหัส" autocomplete="current-password">
+        <button class="btn btn-primary btn-block" id="gateBtn" type="submit">เข้าสู่ระบบ</button>
+      </div>
+    </form>
+
+    <section id="app" class="hidden">
+      <div class="scan-wrap">
+        <div class="grid">
+          <div id="reader"></div>
+          <button class="btn btn-primary" id="camBtn">เปิดกล้องสแกน</button>
+          <form class="search-bar" id="manualForm">
+            <input class="input" id="manualBib" placeholder="พิมพ์เลข เช่น R0012" autocomplete="off" style="text-transform:uppercase" maxlength="5">
+            <button class="btn btn-dark" type="submit">เช็คอิน</button>
+          </form>
+        </div>
+
+        <div class="grid">
+          <div class="scan-result" id="result">
+            <div class="big">READY</div>
+            <p class="muted" style="margin:6px 0 0">สแกน QR บน E-BIB · ระบบรับเฉพาะรายการที่ชำระเงินแล้ว</p>
+          </div>
+          <div class="card">
+            <div class="card-title" style="font-size:17px">ล่าสุด <span class="muted" style="font:400 14px var(--font)" id="countToday">0 คน</span></div>
+            <div class="log" id="log"><span class="muted">ยังไม่มีรายการ</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/checkin.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="robots" content="noindex">
+  <title>Dashboard · INSTHINK RUN CLUB</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-head">
+    <a class="brand" href="index.html"><img src="img/logo.png" alt="INSTHINK RUN CLUB"><span class="tag-role">ADMIN</span></a>
+    <div class="btn-row hidden" id="topActions" style="flex-wrap:nowrap">
+      <a class="btn btn-sm" href="checkin.html">สแกน</a>
+      <button class="btn btn-sm" id="logoutBtn">ออก</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Login -->
+    <form class="gate card" id="gate">
+      <h2>Admin</h2>
+      <p class="muted" style="margin-top:0">กรอก ADMIN_KEY (ดูได้จาก Execution log ตอนรัน setup() ใน Apps Script)</p>
+      <div class="grid">
+        <input class="input" id="adminKey" type="password" placeholder="ADMIN_KEY" autocomplete="current-password">
+        <button class="btn btn-primary btn-block" id="gateBtn" type="submit">เข้าสู่แดชบอร์ด</button>
+      </div>
+    </form>
+
+    <section id="app" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:22px 0 14px">
+        <h1 class="display" style="font-size:34px">Race <span style="color:var(--navy)">Control</span></h1>
+        <div class="toolbar">
+          <span class="live" id="live"><i></i><span id="updated">กำลังโหลด…</span></span>
+          <label class="check" style="font-size:13px;align-items:center"><input type="checkbox" id="auto" checked>อัปเดตอัตโนมัติ</label>
+          <button class="btn btn-sm" id="refreshBtn">↻ รีเฟรช</button>
+          <button class="btn btn-sm" id="csvBtn">⇩ CSV</button>
+        </div>
+      </div>
+      <div class="toolbar hidden" id="demoTools" style="margin-bottom:12px">
+        <span class="muted small">DEMO:</span>
+        <button class="btn btn-sm" id="seedBtn">+ ข้อมูลตัวอย่าง 40 รายการ</button>
+        <button class="btn btn-sm" id="resetBtn">ล้างข้อมูล Demo</button>
+      </div>
+
+      <!-- KPI -->
+      <div class="kpis">
+        <div class="kpi hl"><span>นักวิ่ง (สมัคร / รับ)</span><b id="kRunners">0</b><div class="bar"><i id="kRunBar" style="width:0"></i></div></div>
+        <div class="kpi alert" id="kPendingBox" title="กดเพื่อดูรายการรอตรวจสลิป"><span>รอตรวจสลิป</span><b id="kPending">0</b></div>
+        <div class="kpi"><span>รายได้ที่ยืนยันแล้ว</span><b id="kRevenue">0</b></div>
+        <div class="kpi"><span>ผ้าโพกหัวที่ต้องเตรียม</span><b id="kBandana">0</b></div>
+        <div class="kpi"><span>เช็คอินนักวิ่ง</span><b id="kIn">0</b><div class="bar"><i id="kInBar" style="width:0"></i></div></div>
+      </div>
+
+      <div class="panels">
+        <div class="card panel">
+          <h3>การชำระเงิน</h3>
+          <div class="hbars" id="payBars"></div>
+          <p class="muted small" style="margin:10px 0 0">แตะแถวเพื่อกรองตาราง</p>
+        </div>
+        <div class="card panel">
+          <h3>ผ้าโพกหัว</h3>
+          <div class="stat-list" id="bandanaStats"></div>
+        </div>
+        <div class="card panel">
+          <h3>Finisher Meal <span class="muted small" style="font:400 12px var(--font);text-transform:none">(นักวิ่งที่ชำระแล้ว)</span></h3>
+          <div class="hbars" id="foodBars"></div>
+          <div class="hbars mt" id="drinkBars"></div>
+          <div class="hbars mt" id="sweetBars"></div>
+        </div>
+      </div>
+
+      <!-- ตาราง -->
+      <h2 class="section-title" style="margin-top:28px"><span class="num">//</span>รายการทั้งหมด <small id="rowCount"></small></h2>
+      <div class="toolbar">
+        <input class="input" id="fText" placeholder="ค้นหา ชื่อ / เลข / เบอร์">
+        <select class="input" id="fPkg"><option value="">ทุกแพ็กเกจ</option></select>
+        <select class="input" id="fPay"><option value="">ทุกสถานะชำระ</option></select>
+        <select class="input" id="fDel">
+          <option value="">ทุกวิธีรับของ</option>
+          <option value="PICKUP">รับที่งาน</option>
+          <option value="SHIP_PENDING">จัดส่ง · รอส่ง</option>
+          <option value="SHIP_SHIPPED">จัดส่ง · ส่งแล้ว</option>
+        </select>
+        <select class="input" id="fIn">
+          <option value="">ทุกสถานะเช็คอิน</option>
+          <option value="CHECKED_IN">เช็คอิน/รับของแล้ว</option>
+          <option value="REGISTERED">ยังไม่เช็คอิน</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>เลข</th><th>ชื่อ</th><th>โทร</th><th>แพ็กเกจ</th><th>ยอด</th><th>ชำระเงิน</th><th>รับของ</th><th>เช็คอิน</th><th></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- ตรวจสลิป -->
+  <div class="modal hidden" id="slipModal">
+    <div class="card grid">
+      <h3>ตรวจสลิป <span id="sBib" style="color:var(--navy)"></span></h3>
+      <div class="summary" id="sInfo"></div>
+      <img class="slip-view" id="sImg" alt="สลิป">
+      <a class="small hidden" id="sLink" target="_blank" rel="noopener">เปิดไฟล์ใน Google Drive ↗</a>
+      <input class="input" id="sReason" placeholder="เหตุผล (กรณีไม่ผ่าน) เช่น ยอดไม่ตรง">
+      <div class="btn-row">
+        <button class="btn" type="button" data-close>ปิด</button>
+        <button class="btn btn-danger" type="button" id="sReject">ไม่ผ่าน</button>
+        <button class="btn btn-ok" type="button" id="sApprove">✓ ยืนยันชำระแล้ว</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- จัดส่ง -->
+  <div class="modal hidden" id="shipModal">
+    <form class="card grid" id="shipForm">
+      <h3>บันทึกการจัดส่ง <span id="shBib" style="color:var(--navy)"></span></h3>
+      <div class="notice info small" id="shAddr"></div>
+      <input class="input" id="shTrack" placeholder="เลขพัสดุ เช่น EF123456789TH" maxlength="40" style="text-transform:uppercase">
+      <div class="btn-row">
+        <button class="btn" type="button" data-close>ยกเลิก</button>
+        <button class="btn btn-primary" type="submit" id="shSave">บันทึก + แจ้งอีเมล</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- แก้ไข -->
+  <div class="modal hidden" id="editModal">
+    <form class="card grid" id="editForm">
+      <h3>แก้ไข <span id="eBib" style="color:var(--navy)"></span></h3>
+      <div class="grid grid-2">
+        <div class="field"><label>ชื่อ</label><input class="input" name="firstName"></div>
+        <div class="field"><label>นามสกุล</label><input class="input" name="lastName"></div>
+      </div>
+      <div class="grid grid-2">
+        <div class="field"><label>ชื่อเล่น</label><input class="input" name="nickname"></div>
+        <div class="field"><label>เบอร์โทร</label><input class="input" name="phone" inputmode="numeric"></div>
+      </div>
+      <div class="field"><label>อีเมล</label><input class="input" name="email" type="email"></div>
+      <div class="grid grid-2" data-run>
+        <div class="field"><label>อาหาร</label><select class="input" name="food"></select></div>
+        <div class="field"><label>เครื่องดื่ม</label><select class="input" name="drink"></select></div>
+      </div>
+      <div class="field" data-run><label>ความหวาน</label><select class="input" name="sweetness"></select></div>
+      <div class="field" data-ship><label>ที่อยู่จัดส่ง</label><textarea class="input" name="address"></textarea></div>
+      <div class="grid grid-2" data-ship>
+        <div class="field"><label>รหัสไปรษณีย์</label><input class="input" name="zipcode" inputmode="numeric"></div>
+        <div class="field"><label>เลขพัสดุ</label><input class="input" name="trackingNo"></div>
+      </div>
+      <div class="field"><label>หมายเหตุ</label><input class="input" name="note"></div>
+      <div class="btn-row">
+        <button class="btn" type="button" data-close>ยกเลิก</button>
+        <button class="btn btn-primary" type="submit" id="eSave">บันทึก</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

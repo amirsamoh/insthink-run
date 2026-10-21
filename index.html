@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>INSTHINK RUN CLUB · สมัครวิ่ง 6K</title>
+  <meta name="description" content="สมัครวิ่ง 6K กับ INSTHINK RUN CLUB รับผ้าโพกหัว Bandana และ E-BIB ออนไลน์">
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-head" data-nav></header>
+
+  <main class="wrap">
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+      <div class="hero-stars" id="heroStars"></div>
+      <div class="hero-stripes"></div>
+      <span class="eyebrow"><span id="evEdition">INSTHINK RUN 2026</span></span>
+      <h1>Run <span class="n">6K.</span><br><span class="o">Think</span> Free.</h1>
+      <div class="hero-meta">
+        <span class="meta-chip">📅 <b id="evDate">—</b></span>
+        <span class="meta-chip">⏱ ปล่อยตัว <b id="evTime">—</b></span>
+        <span class="meta-chip">📍 <b id="evLoc">—</b></span>
+      </div>
+    </section>
+
+    <form id="regForm" novalidate autocomplete="on">
+
+      <!-- 01 แพ็กเกจ -->
+      <h2 class="section-title"><span class="num">01</span>เลือกแพ็กเกจ</h2>
+      <div class="packages" id="pkgList"><!-- สร้างจาก config --></div>
+      <div class="err-msg hidden" data-err="package">กรุณาเลือกแพ็กเกจ</div>
+
+      <!-- 02 ข้อมูลผู้สมัคร -->
+      <h2 class="section-title"><span class="num">02</span>ข้อมูลผู้สมัคร</h2>
+      <div class="card grid">
+        <div class="grid grid-2">
+          <div class="field">
+            <label for="firstName">ชื่อ <span class="req">*</span></label>
+            <input class="input" id="firstName" name="firstName" autocomplete="given-name" maxlength="60">
+          </div>
+          <div class="field">
+            <label for="lastName">นามสกุล <span class="req">*</span></label>
+            <input class="input" id="lastName" name="lastName" autocomplete="family-name" maxlength="60">
+          </div>
+        </div>
+        <div class="grid grid-3">
+          <div class="field">
+            <label for="nickname">ชื่อเล่น / ชื่อบน BIB</label>
+            <input class="input" id="nickname" name="nickname" maxlength="20" placeholder="เช่น MIRZ">
+          </div>
+          <div class="field" data-runner>
+            <label for="gender">เพศ</label>
+            <select class="input" id="gender" name="gender">
+              <option value="">ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>อื่น ๆ</option>
+            </select>
+          </div>
+          <div class="field" data-runner>
+            <label for="birthDate">วันเกิด</label>
+            <input class="input" id="birthDate" name="birthDate" type="date" autocomplete="bday">
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="field">
+            <label for="phone">เบอร์โทรศัพท์ <span class="req">*</span></label>
+            <input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="08xxxxxxxx">
+            <div class="hint">ใช้ 4 ตัวท้ายยืนยันตัวตนเมื่อเปิดจากเครื่องอื่น</div>
+          </div>
+          <div class="field">
+            <label for="email">อีเมล <span class="req">*</span></label>
+            <input class="input" id="email" name="email" type="email" autocomplete="email" maxlength="100" placeholder="you@email.com">
+            <div class="hint">ระบบส่งการยืนยันและ E-BIB ไปที่อีเมลนี้</div>
+          </div>
+        </div>
+        <div class="grid grid-2" data-runner>
+          <div class="field">
+            <label for="emergencyName">ผู้ติดต่อฉุกเฉิน</label>
+            <input class="input" id="emergencyName" name="emergencyName" maxlength="60">
+          </div>
+          <div class="field">
+            <label for="emergencyPhone">เบอร์ผู้ติดต่อฉุกเฉิน</label>
+            <input class="input" id="emergencyPhone" name="emergencyPhone" type="tel" inputmode="numeric" maxlength="10">
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 Finisher meal (เฉพาะนักวิ่ง) -->
+      <div data-runner>
+        <h2 class="section-title"><span class="num">03</span>Finisher Meal</h2>
+        <div class="card grid">
+          <div class="field">
+            <span class="label">อาหาร <span class="req">*</span></span>
+            <div class="chips" id="foodList"></div>
+            <div class="err-msg hidden" data-err="food">กรุณาเลือกอาหาร</div>
+          </div>
+          <div class="field">
+            <span class="label">เครื่องดื่ม <span class="req">*</span></span>
+            <div class="chips" id="drinkList"></div>
+            <div class="err-msg hidden" data-err="drink">กรุณาเลือกเครื่องดื่ม</div>
+          </div>
+          <div class="field">
+            <span class="label">ระดับความหวาน <span class="req">*</span></span>
+            <div class="chips sweet" id="sweetList"></div>
+            <div class="err-msg hidden" data-err="sweetness">กรุณาเลือกระดับความหวาน</div>
+          </div>
+          <div class="field">
+            <label for="note">หมายเหตุ / แพ้อาหาร</label>
+            <input class="input" id="note" name="note" maxlength="200" placeholder="เช่น แพ้ถั่ว">
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 การรับผ้าโพกหัว -->
+      <h2 class="section-title"><span class="num" id="numDelivery">04</span>รับผ้าโพกหัว</h2>
+      <div class="card grid">
+        <div class="bandana-note">
+          <div class="ico" id="bandanaIco"></div>
+          <div><b>ผ้าโพกหัว INSTHINK Bandana</b><br><span class="muted">Free size · 1 ผืนต่อ 1 รายการ</span></div>
+        </div>
+        <div class="options" id="deliveryList"></div>
+        <div class="grid hidden" id="addressBox">
+          <div class="field">
+            <label for="address">ที่อยู่จัดส่ง <span class="req">*</span></label>
+            <textarea class="input" id="address" name="address" maxlength="300" autocomplete="street-address" placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด"></textarea>
+          </div>
+          <div class="field" style="max-width:220px">
+            <label for="zipcode">รหัสไปรษณีย์ <span class="req">*</span></label>
+            <input class="input" id="zipcode" name="zipcode" inputmode="numeric" maxlength="5" autocomplete="postal-code">
+          </div>
+          <div class="hint" style="margin-top:-6px">ชื่อผู้รับและเบอร์โทรใช้ตามข้อมูลผู้สมัคร</div>
+        </div>
+      </div>
+
+      <!-- สรุปยอด + ยืนยัน -->
+      <h2 class="section-title"><span class="num" id="numSummary">05</span>สรุปและยืนยัน</h2>
+      <div class="card grid">
+        <div class="summary" id="summary"></div>
+        <label class="check">
+          <input type="checkbox" id="consent">
+          <span>ข้าพเจ้ายินยอมให้ผู้จัดงานเก็บและใช้ข้อมูลส่วนบุคคลเพื่อการจัดงานครั้งนี้เท่านั้น (PDPA)<span data-runner> และรับรองว่ามีสุขภาพพร้อมสำหรับการวิ่ง</span></span>
+        </label>
+        <div class="err-msg hidden" data-err="consent">กรุณายอมรับเงื่อนไข</div>
+        <label class="check">
+          <input type="checkbox" id="remember" checked>
+          <span>จำข้อมูลไว้ในเครื่องนี้ (กรอกครั้งหน้าเร็วขึ้น)</span>
+        </label>
+        <button class="btn btn-primary btn-block" id="submitBtn" type="submit">ยืนยันและไปชำระเงิน →</button>
+        <p class="hint center" style="margin:0">ชำระผ่าน PromptPay และแนบสลิปในขั้นตอนถัดไป</p>
+      </div>
+    </form>
+  </main>
+
+  <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>
