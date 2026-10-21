@@ -22,15 +22,28 @@
   /* ---------- ไม่มีเลขใน URL → รายการในเครื่อง ---------- */
   if (!bib) {
     $('#pickView').classList.remove('hidden');
-    const list = myBibs.all();
-    if (list.length) {
-      $('#pickEmpty').classList.add('hidden');
+    const paint = () => {
+      const list = myBibs.all();
+      $('#pickEmpty').classList.toggle('hidden', list.length > 0);
       $('#myList').innerHTML = list.map((x) => {
         const p = pkgByPrefix(x.bib);
-        return `<a class="result" href="profile.html?bib=${encodeURIComponent(x.bib)}">
+        return `<div class="result-wrap"><a class="result" href="profile.html?bib=${encodeURIComponent(x.bib)}">
           <span class="bib-tag ${p.runner ? '' : 'm'}">${esc(x.bib)}</span>
-          <span class="who"><b>${esc(p.title)}</b><span>แตะเพื่อเปิด</span></span><span>→</span></a>`;
+          <span class="who"><b>${esc(p.title)}</b><span>แตะเพื่อเปิด</span></span><span>→</span></a>
+          <button class="result-del" type="button" data-del="${esc(x.bib)}">ลบออก</button></div>`;
       }).join('');
+    };
+    paint();
+    $('#myList').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-del]');
+      if (b) { myBibs.remove(b.dataset.del); paint(); }
+    });
+    // ล็อกอินอยู่ → ดึงรายการจริงจากบัญชี (ตัดรายการเก่าที่ไม่มีในระบบแล้ว)
+    if (Auth.loggedIn()) {
+      API.call('myRegs', {}).then(({ regs }) => {
+        localStorage.setItem('irc_my_bibs', JSON.stringify(regs.map((r) => ({ bib: r.bib, token: r.token || '' }))));
+        paint();
+      }).catch(() => {});
     }
     return;
   }
@@ -54,7 +67,7 @@
     history.replaceState(null, '', 'profile.html?' + params.toString());
   }
   const token = urlToken || myBibs.token(bib);
-  if (token) load({ token }).catch((e) => { toast(e.message, 'err'); askPhone(); });
+  if (token) load({ token }).catch((e) => { myBibs.remove(bib); toast(e.message, 'err'); askPhone(); });
   else if (Auth.loggedIn()) load({}).catch(() => askPhone());   // เจ้าของที่ล็อกอินอยู่ (session แนบอัตโนมัติ)
   else askPhone();
 

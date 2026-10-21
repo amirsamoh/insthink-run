@@ -61,18 +61,35 @@
     const url = await blobToDataUrl(blob);
     const file = new File([blob], name, { type: blob.type || 'image/png' });
     const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+    const inApp = /Line\/|FBAN|FBAV|Instagram|MicroMessenger|TikTok/i.test(navigator.userAgent);
     const sheet = document.createElement('div');
     sheet.className = 'save-sheet';
     sheet.innerHTML = `<div class="ss-in">
       <img src="${url}" alt="${esc(name)}">
-      <p><b>กดค้างที่รูป</b> แล้วเลือก “บันทึกรูปภาพ / Save image”</p>
+      <button class="btn btn-light btn-xl" type="button" data-dl>ดาวน์โหลดรูปลงเครื่อง</button>
+      <p>หรือ <b>กดค้างที่รูป</b> แล้วเลือก “บันทึกรูปภาพ / Save image”</p>
+      ${inApp ? '<div class="ss-warn">คุณเปิดเว็บผ่านแอป LINE / Facebook / Instagram ซึ่งมักบล็อกการบันทึกรูป กด “คัดลอกลิงก์เว็บ” แล้วเปิดใน Safari หรือ Chrome จะบันทึกได้</div>' : ''}
       <div class="btn-row">
-        ${canShare ? '<button class="btn btn-light" type="button" data-share>บันทึก / แชร์</button>' : ''}
+        ${canShare ? '<button class="btn btn-light" type="button" data-share>แชร์ / บันทึกลงอัลบั้ม</button>' : ''}
+        ${inApp ? '<button class="btn btn-light" type="button" data-copy>คัดลอกลิงก์เว็บ</button>' : ''}
         <button class="btn btn-ghost" type="button" data-close>ปิด</button>
       </div></div>`;
     document.body.appendChild(sheet);
     sheet.addEventListener('click', async (e) => {
       if (e.target.closest('[data-close]') || e.target === sheet) return sheet.remove();
+      if (e.target.closest('[data-dl]')) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = name;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+        toast('กำลังดาวน์โหลด ตรวจในโฟลเดอร์ ดาวน์โหลด / ไฟล์', 'ok');
+        return;
+      }
+      if (e.target.closest('[data-copy]')) {
+        try { await navigator.clipboard.writeText(location.origin + location.pathname.replace(/[^/]*$/, '')); toast('คัดลอกลิงก์แล้ว นำไปเปิดใน Safari / Chrome', 'ok'); }
+        catch (err) { toast('คัดลอกไม่ได้ กดค้างที่ช่องที่อยู่เว็บเพื่อคัดลอก', 'err'); }
+        return;
+      }
       if (e.target.closest('[data-share]')) {
         try { await navigator.share({ files: [file] }); } catch (err) { /* ผู้ใช้ยกเลิก — ยังกดค้างบันทึกได้ */ }
       }
@@ -100,6 +117,7 @@
       list.unshift({ bib, token });
       try { localStorage.setItem(MY_KEY, JSON.stringify(list.slice(0, 10))); } catch (e) { /* ignore */ }
     },
+    remove(bib) { try { localStorage.setItem(MY_KEY, JSON.stringify(myBibs.all().filter((x) => x.bib !== bib))); } catch (e) { /* ignore */ } },
     token(bib) { const f = myBibs.all().find((x) => x.bib === bib); return f ? f.token : ''; },
   };
 
