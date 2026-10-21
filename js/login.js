@@ -29,7 +29,10 @@
   $('#backLogin').addEventListener('click', (e) => { e.preventDefault(); show('login'); });
   if (location.hash === '#signup') show('signup');
 
-  const done = (r) => { Auth.set(r.session, r.member); location.href = next; };
+  const done = (r, msg) => {
+    Auth.set(r.session, r.member);
+    if (msg) { toast(msg, 'ok'); setTimeout(() => { location.href = next; }, 1200); } else location.href = next;
+  };
   const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
   /* ---------- เข้าสู่ระบบ ---------- */
@@ -64,7 +67,7 @@
       : !emailOk(d.email) ? 'อีเมลไม่ถูกต้อง' : d.password.length < 8 ? 'รหัสผ่านอย่างน้อย 8 ตัวอักษร' : '';
     if (bad) return toast(bad, 'err');
     busy($('#sBtn'), true, 'กำลังสมัคร…');
-    try { done(await API.call('signup', d)); }
+    try { done(await API.call('signup', d), 'สมัครสมาชิกสำเร็จ'); }
     catch (err) { toast(err.message, 'err'); busy($('#sBtn'), false); }
   });
 

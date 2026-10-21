@@ -65,7 +65,7 @@
     sheet.className = 'save-sheet';
     sheet.innerHTML = `<div class="ss-in">
       <img src="${url}" alt="${esc(name)}">
-      <p>📲 <b>กดค้างที่รูป</b> แล้วเลือก “บันทึกรูปภาพ / Save image”</p>
+      <p><b>กดค้างที่รูป</b> แล้วเลือก “บันทึกรูปภาพ / Save image”</p>
       <div class="btn-row">
         ${canShare ? '<button class="btn btn-light" type="button" data-share>บันทึก / แชร์</button>' : ''}
         <button class="btn btn-ghost" type="button" data-close>ปิด</button>
@@ -268,8 +268,8 @@
         <img src="img/logo-white.png" alt="INSTHINK RUN CLUB">
         <div class="tagline">Insthink · Community · Coffee Run</div>
         <div class="foot-btns">
-          <a class="btn btn-sm admin-link" href="admin.html">🔒 Admin</a>
-          <a class="btn btn-sm admin-link" href="checkin.html">📷 Staff เช็คอิน</a>
+          <a class="btn btn-sm admin-link" href="admin.html">Admin</a>
+          <a class="btn btn-sm admin-link" href="checkin.html">Staff เช็คอิน</a>
         </div>
         <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')}</div>
       </div>`;

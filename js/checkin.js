@@ -103,7 +103,7 @@
         beep(true);
         count++;
         $('#countToday').textContent = count + ' คน';
-        show('ok', '✓ ' + esc(p.bib), runnerTags(res.runner));
+        show('ok', esc(p.bib), runnerTags(res.runner));
         addLog(p.bib, res.runner.firstName);
       }
     } catch (err) {

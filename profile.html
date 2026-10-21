@@ -17,7 +17,7 @@
   <main class="wrap">
     <!-- เพิ่งสมัครสำเร็จ -->
     <div class="success-head hidden" id="successHead">
-      <div class="tick">✓</div>
+      <div class="tick"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
       <h2>สมัครแล้ว!</h2>
       <p class="muted" style="margin:6px 0 0">ขั้นตอนสุดท้าย: ชำระเงินและแนบสลิปด้านล่าง ระบบยืนยันให้อัตโนมัติทันที · เราส่งลิงก์หน้านี้ไปที่อีเมลของคุณแล้ว</p>
     </div>
@@ -58,11 +58,11 @@
               <li>ตรวจยอดเงินให้ตรง แล้วโอน</li>
               <li>แนบสลิปด้านล่าง — ระบบยืนยันการชำระให้ทันที ไม่ต้องรอแอดมิน</li>
             </ol>
-            <button class="btn btn-sm" id="btnSaveQr" type="button" style="justify-self:start">⇩ บันทึกรูป QR</button>
+            <button class="btn btn-sm" id="btnSaveQr" type="button" style="justify-self:start">บันทึกรูป QR</button>
             <label class="upload" id="uploadBox">
               <input type="file" id="slipFile" accept="image/*">
               <img id="slipPreview" class="hidden" alt="ตัวอย่างสลิป">
-              <b id="uploadLabel">📎 แตะเพื่อเลือกรูปสลิป</b>
+              <b id="uploadLabel">แตะเพื่อเลือกรูปสลิป</b>
               <span class="muted small">JPG / PNG · ระบบย่อขนาดให้อัตโนมัติ</span>
             </label>
             <button class="btn btn-primary hidden" id="btnSendSlip" type="button">ส่งสลิป</button>
@@ -96,7 +96,7 @@
           </div>
           <p class="center muted small" id="bibHint" style="margin-top:12px"></p>
           <div class="btn-row no-print hidden" id="bibActions">
-            <button class="btn btn-dark" id="btnSaveBib">⇩ บันทึกรูป E-BIB</button>
+            <button class="btn btn-dark" id="btnSaveBib">บันทึกรูป E-BIB</button>
           </div>
         </div>
 

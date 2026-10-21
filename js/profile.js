@@ -37,11 +37,14 @@
 
   /* ---------- ยืนยันตัวตน + โหลดข้อมูล ---------- */
   async function load(a) {
-    const { runner: r } = await API.call('get', Object.assign({ bib }, a));
-    auth = a;
-    runner = r;
-    if (r.token) { myBibs.add(r.bib, r.token); auth = { token: r.token }; }
-    render();
+    U.loading(true, 'กำลังโหลดข้อมูล…', 'รอสักครู่');
+    try {
+      const { runner: r } = await API.call('get', Object.assign({ bib }, a));
+      auth = a;
+      runner = r;
+      if (r.token) { myBibs.add(r.bib, r.token); auth = { token: r.token }; }
+      render();
+    } finally { U.loading(false); }
   }
 
   // ลิงก์จากอีเมล: ?t=TOKEN → ใช้แล้วลบออกจาก URL (ไม่ให้ติดไปเวลาแชร์ลิงก์)
@@ -135,7 +138,7 @@
       $('#ppQr').innerHTML = '<div class="notice warn small" style="margin:20px 0">ผู้จัดงานยังไม่ได้ตั้งค่าเลข PromptPay<br>(config.js → PAYMENT.promptpayId)</div>';
       $('#btnSaveQr').classList.add('hidden');
     }
-    $('#uploadLabel').textContent = runner.paymentStatus === 'SLIP_UPLOADED' ? '📎 แนบสลิปใหม่ (ถ้าต้องการ)' : '📎 แตะเพื่อเลือกรูปสลิป';
+    $('#uploadLabel').textContent = runner.paymentStatus === 'SLIP_UPLOADED' ? 'แนบสลิปใหม่ (ถ้าต้องการ)' : 'แตะเพื่อเลือกรูปสลิป';
   }
 
   function renderDetail(p, d) {
@@ -288,6 +291,7 @@
     try {
       if (document.fonts) await document.fonts.ready;
       const el = $('#ebib');
+      await Promise.all(Array.from(el.querySelectorAll('img')).map((im) => (im.complete && im.naturalWidth ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
       // จับภาพที่ขนาดคงที่ 420px (มือถือจอเล็กก็ได้รูปเท่ากัน) · scale 2 = คมชัด
       const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true, width: el.offsetWidth, height: el.offsetHeight, scrollX: 0, scrollY: -window.scrollY });
       const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));

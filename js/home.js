@@ -18,7 +18,7 @@
   // เส้นทาง
   $('#homeRoute').innerHTML = window.U.routeSvg({ stroke: '#5FD3EE', dash: '#0A1430', start: '#0A1430', grid: 'rgba(255,255,255,.06)', width: 2.4 });
   $('#homeRouteName').textContent = CFG.ROUTE.name;
-  $('#homeRouteLoc').textContent = '📍 ' + CFG.EVENT.location + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.';
+  $('#homeRouteLoc').textContent = CFG.EVENT.location + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.';
 
   // ปุ่มเลื่อนสไลด์ของที่ได้รับ
   $$('[data-slide]').forEach((b) => b.addEventListener('click', () => {
