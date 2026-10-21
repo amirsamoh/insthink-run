@@ -7,7 +7,7 @@
  */
 (function () {
   const CFG = window.APP_CONFIG;
-  const { $, $$, esc, toast, busy, myBibs, pkg, delivery, money, starSvg } = window.U;
+  const { $, $$, esc, toast, busy, normPhone, myBibs, pkg, delivery, money, starSvg } = window.U;
   const PROFILE_KEY = 'irc_profile';
   const PROFILE_FIELDS = ['firstName', 'lastName', 'nickname', 'gender', 'birthDate', 'phone', 'email', 'emergencyName', 'emergencyPhone', 'address', 'zipcode'];
 
@@ -64,7 +64,9 @@
     if (saved) PROFILE_FIELDS.forEach((k) => { if (saved[k] && $('#' + k)) $('#' + k).value = saved[k]; });
   } catch (e) { /* ignore */ }
 
+  // ช่องตัวเลข: พิมพ์ได้เฉพาะตัวเลข · เบอร์โทรแปลง +66 → 0 ตอนออกจากช่อง (กันเบราว์เซอร์กรอกให้ในรูปแบบ +66)
   ['#phone', '#emergencyPhone', '#zipcode'].forEach((s) => $(s).addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ''); }));
+  ['#phone', '#emergencyPhone'].forEach((s) => $(s).addEventListener('change', (e) => { e.target.value = normPhone(e.target.value); }));
 
   /* ---------- สลับฟอร์มตามแพ็กเกจ + คำนวณยอด ---------- */
   const radio = (name) => { const r = $(`input[name="${name}"]:checked`); return r ? r.value : ''; };
@@ -93,34 +95,47 @@
   function collect() {
     const d = {};
     PROFILE_FIELDS.concat(['note']).forEach((k) => { d[k] = $('#' + k).value.trim(); });
+    d.phone = normPhone(d.phone);
+    d.emergencyPhone = normPhone(d.emergencyPhone);
     ['package', 'food', 'drink', 'sweetness', 'delivery'].forEach((k) => { d[k] = radio(k); });
     d.consent = $('#consent').checked;
     return d;
   }
 
   function validate(d) {
-    const errs = [];
+    const errs = [];   // { el, label }
     $$('.input.invalid').forEach((el) => el.classList.remove('invalid'));
     $$('[data-err]').forEach((el) => el.classList.add('hidden'));
-    const bad = (id) => { $('#' + id).classList.add('invalid'); errs.push($('#' + id)); };
-    const badGroup = (k) => { const el = $(`[data-err="${k}"]`); el.classList.remove('hidden'); errs.push(el); };
+    $$('[data-dyn]').forEach((el) => el.remove());
+
+    // ช่องกรอก: ขอบแดง + ข้อความใต้ช่องบอกว่าผิดอะไร
+    const bad = (id, label, msg) => {
+      const el = $('#' + id);
+      el.classList.add('invalid');
+      const m = document.createElement('div');
+      m.className = 'err-msg'; m.setAttribute('data-dyn', ''); m.textContent = msg;
+      el.insertAdjacentElement('afterend', m);
+      errs.push({ el, label });
+    };
+    // กลุ่มตัวเลือก: แสดงข้อความที่เตรียมไว้ใน HTML
+    const badGroup = (k, label) => { const el = $(`[data-err="${k}"]`); el.classList.remove('hidden'); errs.push({ el, label }); };
 
     const p = d.package ? pkg(d.package) : null;
-    if (!p) badGroup('package');
-    if (!d.firstName) bad('firstName');
-    if (!d.lastName) bad('lastName');
-    if (!/^0\d{8,9}$/.test(d.phone)) bad('phone');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) bad('email');
-    if (p && p.runner) ['food', 'drink', 'sweetness'].forEach((k) => { if (!d[k]) badGroup(k); });
+    if (!p) badGroup('package', 'แพ็กเกจ');
+    if (!d.firstName) bad('firstName', 'ชื่อ', 'กรุณากรอกชื่อ');
+    if (!d.lastName) bad('lastName', 'นามสกุล', 'กรุณากรอกนามสกุล');
+    if (!/^0\d{8,9}$/.test(d.phone)) bad('phone', 'เบอร์โทรศัพท์', 'เบอร์ต้องขึ้นต้นด้วย 0 และมี 9–10 หลัก เช่น 0812345678');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) bad('email', 'อีเมล', 'กรุณากรอกอีเมลให้ถูกต้อง เช่น name@gmail.com');
+    if (p && p.runner) [['food', 'อาหาร'], ['drink', 'เครื่องดื่ม'], ['sweetness', 'ความหวาน']].forEach(([k, l]) => { if (!d[k]) badGroup(k, l); });
     if (d.delivery === 'SHIP') {
-      if (d.address.length < 10) bad('address');
-      if (!/^\d{5}$/.test(d.zipcode)) bad('zipcode');
+      if (d.address.length < 10) bad('address', 'ที่อยู่จัดส่ง', 'กรุณากรอกที่อยู่ให้ครบ (บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด)');
+      if (!/^\d{5}$/.test(d.zipcode)) bad('zipcode', 'รหัสไปรษณีย์', 'รหัสไปรษณีย์ 5 หลัก');
     }
-    if (!d.consent) badGroup('consent');
+    if (!d.consent) badGroup('consent', 'ติ๊กยอมรับเงื่อนไข');
 
     if (errs.length) {
-      errs[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      toast('กรุณากรอกข้อมูลให้ครบ', 'err');
+      errs[0].el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      toast('กรุณาตรวจสอบ: ' + errs.map((e) => e.label).join(', '), 'err');
     }
     return errs.length === 0;
   }

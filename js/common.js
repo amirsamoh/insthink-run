@@ -21,8 +21,9 @@
     t.className = 'toast ' + (type || '');
     t.textContent = msg;
     wrap.appendChild(t);
-    setTimeout(() => t.classList.add('out'), 3400);
-    setTimeout(() => t.remove(), 3900);
+    const ms = type === 'err' ? 6500 : 3400;   // ข้อความผิดพลาดค้างนานขึ้น จะได้อ่านทัน
+    setTimeout(() => t.classList.add('out'), ms);
+    setTimeout(() => t.remove(), ms + 500);
   }
 
   /** ปุ่มแสดงสถานะกำลังโหลด */
@@ -30,6 +31,18 @@
     if (!btn) return;
     if (on) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>' + (text || 'กำลังโหลด…'); }
     else { btn.disabled = false; if (btn.dataset.label) btn.innerHTML = btn.dataset.label; }
+  }
+
+  /** แจ้งเตือนอัตโนมัติเมื่อสคริปต์ของหน้าเว็บพัง (แทนที่จะเงียบ แล้วฟอร์มรีโหลดเอง) */
+  window.addEventListener('error', (e) => { if (e.message) toast('หน้าเว็บมีข้อผิดพลาด: ' + e.message, 'err'); });
+  window.addEventListener('unhandledrejection', (e) => toast('เกิดข้อผิดพลาด: ' + ((e.reason && e.reason.message) || e.reason), 'err'));
+
+  /** เบอร์โทร: เหลือเฉพาะตัวเลข และแปลง +66 / 66 เป็น 0 (เบราว์เซอร์มือถือมักกรอกให้ในรูปแบบ +66) */
+  function normPhone(v) {
+    let s = String(v || '').replace(/\D/g, '');
+    if (s.startsWith('660')) s = s.slice(2);                          // +66 0812345678 → 0812345678
+    else if (s.startsWith('66') && s.length >= 10) s = '0' + s.slice(2); // +66 812345678 → 0812345678
+    return s.slice(0, 10);
   }
 
   /* ---------- รายการของฉัน (จำไว้ในเครื่องที่สมัคร) ---------- */
@@ -181,7 +194,7 @@
   document.addEventListener('DOMContentLoaded', mountChrome);
 
   window.U = {
-    $, $$, esc, toast, busy, myBibs, pkg, pkgByPrefix, delivery, money,
+    $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
     promptPayPayload, compressImage, routeSvg, starSvg, fmtDate,
   };

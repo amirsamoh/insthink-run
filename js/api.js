@@ -11,15 +11,23 @@
 
   /* ---------------- Remote (Google Apps Script) ---------------- */
   async function remote(action, payload) {
-    const res = await fetch(CFG.API_URL, {
-      method: 'POST',
-      // text/plain = "simple request" → ไม่มี CORS preflight (Apps Script ไม่รองรับ OPTIONS)
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(Object.assign({ action }, payload || {})),
-      redirect: 'follow',
-    });
+    let res;
+    try {
+      res = await fetch(CFG.API_URL, {
+        method: 'POST',
+        // text/plain = "simple request" → ไม่มี CORS preflight (Apps Script ไม่รองรับ OPTIONS)
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ action }, payload || {})),
+        redirect: 'follow',
+      });
+    } catch (e) {
+      // fetch ล้มเหลวทั้งที่มีเน็ต มักเกิดจาก Deploy ไม่ได้ตั้ง "Who has access: Anyone" หรือ API_URL ผิด
+      throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบอินเทอร์เน็ต และการ Deploy (Who has access ต้องเป็น Anyone)');
+    }
     if (!res.ok) throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ (' + res.status + ')');
-    const json = await res.json();
+    let json;
+    try { json = await res.json(); }
+    catch (e) { throw new Error('เซิร์ฟเวอร์ตอบกลับผิดรูปแบบ — ตรวจว่า API_URL ลงท้ายด้วย /exec และ Deploy เป็น Web app แล้ว'); }
     if (!json.ok) throw new Error(json.error || 'เกิดข้อผิดพลาด');
     return json.data;
   }
