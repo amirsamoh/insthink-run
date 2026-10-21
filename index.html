@@ -29,7 +29,7 @@
       </div>
     </section>
 
-    <form id="regForm" novalidate autocomplete="on">
+    <form id="regForm" novalidate autocomplete="on" onsubmit="return false">
 
       <!-- 01 แพ็กเกจ -->
       <h2 class="section-title"><span class="num">01</span>เลือกแพ็กเกจ</h2>
@@ -68,7 +68,7 @@
         <div class="grid grid-2">
           <div class="field">
             <label for="phone">เบอร์โทรศัพท์ <span class="req">*</span></label>
-            <input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="08xxxxxxxx">
+            <input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="16" placeholder="08xxxxxxxx">
             <div class="hint">ใช้ 4 ตัวท้ายยืนยันตัวตนเมื่อเปิดจากเครื่องอื่น</div>
           </div>
           <div class="field">
@@ -84,7 +84,7 @@
           </div>
           <div class="field">
             <label for="emergencyPhone">เบอร์ผู้ติดต่อฉุกเฉิน</label>
-            <input class="input" id="emergencyPhone" name="emergencyPhone" type="tel" inputmode="numeric" maxlength="10">
+            <input class="input" id="emergencyPhone" name="emergencyPhone" type="tel" inputmode="numeric" maxlength="16">
           </div>
         </div>
       </div>
