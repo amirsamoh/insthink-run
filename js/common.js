@@ -33,6 +33,52 @@
     else { btn.disabled = false; if (btn.dataset.label) btn.innerHTML = btn.dataset.label; }
   }
 
+  /** หน้าจอ Loading เต็มจอ — ใช้ตอนรอเซิร์ฟเวอร์นาน ๆ (ส่งสลิป / สมัคร / สร้างรูป) */
+  function loading(on, text, sub) {
+    let el = $('#loadingOverlay');
+    if (!on) { if (el) el.remove(); return; }
+    if (!el) { el = document.createElement('div'); el.id = 'loadingOverlay'; el.className = 'loading-overlay'; document.body.appendChild(el); }
+    el.innerHTML = `<div class="lo-box"><span class="spinner"></span><b>${esc(text || 'Loading…')}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`;
+  }
+
+  const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+  const blobToDataUrl = (blob) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+
+  /**
+   * บันทึกรูป — คอมพิวเตอร์: ดาวน์โหลดไฟล์
+   * มือถือ: เปิดหน้ารูปเต็มจอ (กดค้างที่รูปเพื่อบันทึก) + ปุ่ม "บันทึก / แชร์" ที่เปิดแผงแชร์ของเครื่อง
+   * (มือถือหลายรุ่น และเบราว์เซอร์ในแอป LINE / IG / FB ไม่ยอมให้ดาวน์โหลดไฟล์ตรง ๆ)
+   */
+  async function saveImage(blob, name) {
+    if (!blob) return;
+    if (!isMobile()) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      return;
+    }
+    const url = await blobToDataUrl(blob);
+    const file = new File([blob], name, { type: blob.type || 'image/png' });
+    const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+    const sheet = document.createElement('div');
+    sheet.className = 'save-sheet';
+    sheet.innerHTML = `<div class="ss-in">
+      <img src="${url}" alt="${esc(name)}">
+      <p>📲 <b>กดค้างที่รูป</b> แล้วเลือก “บันทึกรูปภาพ / Save image”</p>
+      <div class="btn-row">
+        ${canShare ? '<button class="btn btn-light" type="button" data-share>บันทึก / แชร์</button>' : ''}
+        <button class="btn btn-ghost" type="button" data-close>ปิด</button>
+      </div></div>`;
+    document.body.appendChild(sheet);
+    sheet.addEventListener('click', async (e) => {
+      if (e.target.closest('[data-close]') || e.target === sheet) return sheet.remove();
+      if (e.target.closest('[data-share]')) {
+        try { await navigator.share({ files: [file] }); } catch (err) { /* ผู้ใช้ยกเลิก — ยังกดค้างบันทึกได้ */ }
+      }
+    });
+  }
+
   /** แจ้งเตือนอัตโนมัติเมื่อสคริปต์ของหน้าเว็บพัง (แทนที่จะเงียบ แล้วฟอร์มรีโหลดเอง) */
   window.addEventListener('error', (e) => { if (e.message) toast('หน้าเว็บมีข้อผิดพลาด: ' + e.message, 'err'); });
   window.addEventListener('unhandledrejection', (e) => toast('เกิดข้อผิดพลาด: ' + ((e.reason && e.reason.message) || e.reason), 'err'));
@@ -74,9 +120,9 @@
 
   function parseQr(text) {
     const s = String(text || '').trim();
-    const m = s.match(/^IRC\|([A-Z]\d{4})\|([a-z0-9]*)$/i);
+    const m = s.match(/^IRC\|([A-Z]\d{3,5})\|([a-z0-9]*)$/i);
     if (m) return { bib: m[1].toUpperCase(), token: m[2] };
-    if (/^[A-Z]\d{4}$/i.test(s)) return { bib: s.toUpperCase(), token: '' }; // barcode = เลขอย่างเดียว
+    if (/^[A-Z]\d{3,5}$/i.test(s)) return { bib: s.toUpperCase(), token: '' }; // barcode = เลขอย่างเดียว
     return null;
   }
 
@@ -125,7 +171,7 @@
 
   /* ---------- ย่อรูปสลิปก่อนอัปโหลด (ลดขนาดเหลือ ~100–300KB) ---------- */
   function compressImage(file, max, quality) {
-    max = max || 1400;
+    max = max || 1200;
     return new Promise((resolve, reject) => {
       if (!file || !/^image\//.test(file.type)) return reject(new Error('กรุณาเลือกไฟล์รูปภาพ'));
       const url = URL.createObjectURL(file);
@@ -138,7 +184,7 @@
         x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
         x.drawImage(img, 0, 0, c.width, c.height);
         URL.revokeObjectURL(url);
-        resolve(c.toDataURL('image/jpeg', quality || 0.82));
+        resolve(c.toDataURL('image/jpeg', quality || 0.78));
       };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('เปิดไฟล์รูปไม่ได้ ลองบันทึกเป็น JPG แล้วอัปโหลดใหม่')); };
       img.src = url;
@@ -206,7 +252,7 @@
     const nav = $('[data-nav]');
     if (nav) {
       const here = location.pathname.split('/').pop() || 'index.html';
-      const links = [['index.html', 'สมัครวิ่ง'], ['search.html', 'ค้นหา'], ['profile.html', 'ของฉัน']];
+      const links = [['register.html', 'สมัครวิ่ง'], ['search.html', 'ค้นหา'], ['profile.html', 'ของฉัน']];
       const m = Auth.member();
       const acct = Auth.loggedIn()
         ? `<a class="acct-link" href="account.html" aria-label="บัญชีของฉัน">${avatarHtml(m, 'sm')}</a>`
@@ -221,7 +267,10 @@
       foot.innerHTML = `<div class="foot-in">
         <img src="img/logo-white.png" alt="INSTHINK RUN CLUB">
         <div class="tagline">Insthink · Community · Coffee Run</div>
-        <a class="btn btn-sm admin-link" href="admin.html">🔒 Admin</a>
+        <div class="foot-btns">
+          <a class="btn btn-sm admin-link" href="admin.html">🔒 Admin</a>
+          <a class="btn btn-sm admin-link" href="checkin.html">📷 Staff เช็คอิน</a>
+        </div>
         <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')}</div>
       </div>`;
     }
@@ -231,6 +280,6 @@
   window.U = {
     $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
-    promptPayPayload, compressImage, compressAvatar, avatarHtml, routeSvg, starSvg, fmtDate,
+    promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, routeSvg, starSvg, fmtDate,
   };
 })();

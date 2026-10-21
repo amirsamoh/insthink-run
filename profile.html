@@ -26,7 +26,7 @@
     <section id="pickView" class="hidden">
       <h2 class="section-title"><span class="num">//</span>รายการของฉัน</h2>
       <div class="results" id="myList"></div>
-      <p class="muted mt" id="pickEmpty">ยังไม่มีรายการในเครื่องนี้ — <a href="index.html">สมัคร</a> หรือ <a href="search.html">ค้นหาด้วยชื่อ / เลข</a></p>
+      <p class="muted mt" id="pickEmpty">ยังไม่มีรายการในเครื่องนี้ — <a href="register.html">สมัคร</a> หรือ <a href="search.html">ค้นหาด้วยชื่อ / เลข</a></p>
     </section>
 
     <section id="profileView" class="hidden">
@@ -80,7 +80,7 @@
             </div>
             <div class="ebib-band"></div>
             <div class="ebib-ribbon hidden" id="bRibbon"></div>
-            <div class="ebib-num" id="bNum">R0000</div>
+            <div class="ebib-num" id="bNum">R000</div>
             <div class="center" id="bAvatar" style="margin-bottom:8px"></div>
             <div class="ebib-name"><span id="bName"></span><small id="bNick"></small></div>
             <div class="ebib-foot">
@@ -96,8 +96,7 @@
           </div>
           <p class="center muted small" id="bibHint" style="margin-top:12px"></p>
           <div class="btn-row no-print hidden" id="bibActions">
-            <button class="btn" id="btnSaveBib">บันทึกรูป E-BIB</button>
-            <button class="btn" onclick="window.print()">พิมพ์ BIB</button>
+            <button class="btn btn-dark" id="btnSaveBib">⇩ บันทึกรูป E-BIB</button>
           </div>
         </div>
 
@@ -116,7 +115,7 @@
 
           <div class="card no-print" id="storyCard">
             <div class="card-title">Share to IG Story</div>
-            <p class="muted small" style="margin:0 0 14px">รูป 1080×1920 พร้อมรูปโปรไฟล์ เลข BIB และเส้นทางวิ่ง (ไม่มี QR ส่วนตัว ปลอดภัยต่อการแชร์)</p>
+            <p class="muted small" style="margin:0 0 14px">กด “สร้างรูป Story” แล้วกด “แชร์” เพื่อลง IG ได้ทันที หรือกดค้างที่รูปเพื่อบันทึก · รูป 1080×1920 พร้อมรูปโปรไฟล์ เลข BIB และเส้นทางวิ่ง (ไม่มี QR ส่วนตัว ปลอดภัยต่อการแชร์)</p>
             <div class="story-preview hidden" id="storyPreview"><img alt="ตัวอย่างรูป IG Story"></div>
             <div class="btn-row mt"><button class="btn btn-primary" id="btnStory">สร้างรูป Story</button></div>
             <div class="btn-row mt hidden" id="storyActions">

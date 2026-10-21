@@ -21,7 +21,7 @@ window.APP_CONFIG = {
     instagram: '@insthink.runclub',          // TODO: IG ของงาน
   },
 
-  /** แพ็กเกจ — prefix = ตัวอักษรนำหน้าเลข (R0001 นักวิ่ง / M0001 ออเดอร์ผ้าโพกหัว) */
+  /** แพ็กเกจ — prefix = ตัวอักษรนำหน้าเลข (R001 นักวิ่ง / M001 ออเดอร์ผ้าโพกหัว) */
   PACKAGES: [
     {
       code: 'RUN', prefix: 'R', price: 256, runner: true,

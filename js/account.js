@@ -62,7 +62,7 @@
   /* ---------- รายการสมัคร ---------- */
   API.call('myRegs').then(({ regs }) => {
     if (!regs.length) {
-      $('#regs').innerHTML = '<p class="muted">ยังไม่มีรายการ — <a href="index.html">สมัครวิ่งเลย</a></p>';
+      $('#regs').innerHTML = '<p class="muted">ยังไม่มีรายการ — <a href="register.html">สมัครวิ่งเลย</a></p>';
       return;
     }
     $('#regs').innerHTML = regs.map((r) => {

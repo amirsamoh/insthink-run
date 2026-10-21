@@ -1,6 +1,6 @@
 /**
  * =====================================================================
- *  หน้าสมัครวิ่ง (index.html)
+ *  หน้าสมัครวิ่ง (register.html) — หน้าแรก (index.html) เป็นรายละเอียดงานอย่างเดียว
  *  1) ต้องเข้าสู่ระบบ (บัญชีสมาชิก) — ข้อมูลส่วนตัวมาจากบัญชี ไม่ต้องกรอกซ้ำ
  *  2) เลือกแพ็กเกจ / เครื่องดื่ม / แพ้อาหาร / รับผ้าโพกหัว
  *  3) คำนวณยอด → ตรวจฟอร์ม → register → ไปหน้าชำระเงิน
@@ -8,25 +8,14 @@
  */
 (function () {
   const CFG = window.APP_CONFIG;
-  const { $, $$, esc, toast, busy, myBibs, pkg, delivery, money, starSvg, avatarHtml } = window.U;
+  const { $, $$, esc, toast, busy, loading, myBibs, pkg, delivery, money, starSvg, avatarHtml } = window.U;
 
-  /* ---------- ข้อมูลงาน ---------- */
+  /* ---------- ข้อมูลงาน (หัวหน้าสมัคร) ---------- */
   $('#evEdition').textContent = CFG.EVENT.edition;
   $('#evDate').textContent = CFG.EVENT.dateLabel;
   $('#evTime').textContent = CFG.EVENT.startTime + ' น.';
   $('#evLoc').textContent = CFG.EVENT.location;
-  $('#heroStars').innerHTML = '<img src="img/stars-navy.png" alt="">';
   $('#bandanaIco').innerHTML = starSvg('#fff');
-  $('#stTime').textContent = CFG.EVENT.startTime;
-
-  /* ---------- Landing: เส้นทาง + สไลด์ของที่ได้รับ ---------- */
-  $('#homeRoute').innerHTML = window.U.routeSvg({ stroke: '#5FD3EE', dash: '#0A1430', start: '#0A1430', grid: 'rgba(255,255,255,.06)', width: 2.4 });
-  $('#homeRouteName').textContent = CFG.ROUTE.name;
-  $('#homeRouteLoc').textContent = '📍 ' + CFG.EVENT.location + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.';
-  $$('[data-slide]').forEach((b) => b.addEventListener('click', () => {
-    const sl = $('#goodsSlider');
-    sl.scrollBy({ left: Number(b.dataset.slide) * (sl.firstElementChild.offsetWidth + 12), behavior: 'smooth' });
-  }));
 
   /* ---------- ต้องล็อกอินก่อน ---------- */
   if (!Auth.loggedIn()) {
@@ -149,10 +138,12 @@
     const btn = $('#submitBtn');
     busy(btn, true, 'กำลังบันทึก…');
     try {
+      loading(true, 'กำลังบันทึกใบสมัคร…', 'กรุณารอสักครู่ อย่าปิดหน้านี้');
       const { runner } = await API.call('register', d);
       myBibs.add(runner.bib, runner.token);   // เครื่องนี้เปิดหน้าได้โดยไม่ต้องยืนยัน
       location.href = 'profile.html?bib=' + encodeURIComponent(runner.bib) + '&new=1';
     } catch (err) {
+      loading(false);
       toast(err.message, 'err');
       busy(btn, false);
     }

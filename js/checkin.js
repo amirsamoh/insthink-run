@@ -143,7 +143,7 @@
   $('#manualForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const v = $('#manualBib').value.trim().toUpperCase();
-    if (!/^[A-Z]\d{4}$/.test(v)) return toast('รูปแบบเลข เช่น R0012', 'err');
+    if (!/^[A-Z]\d{3,5}$/.test(v)) return toast('รูปแบบเลข เช่น R012', 'err');
     lastCode = ''; // อนุญาตให้กดซ้ำได้
     handle(v);
     $('#manualBib').value = '';

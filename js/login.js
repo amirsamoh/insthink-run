@@ -12,7 +12,7 @@
   // ปลายทางหลังล็อกอิน — รับเฉพาะชื่อไฟล์ .html ในเว็บเรา (กัน open redirect)
   const next = (() => {
     const n = new URLSearchParams(location.search).get('next') || '';
-    return /^[a-z0-9_-]+\.html(\?[\w=&%-]*)?$/i.test(n) ? n : 'index.html';
+    return /^[a-z0-9_-]+\.html(\?[\w=&%-]*)?$/i.test(n) ? n : 'register.html';
   })();
 
   if (Auth.loggedIn()) location.replace(next);

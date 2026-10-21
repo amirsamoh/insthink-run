@@ -1,6 +1,6 @@
 /**
  * =====================================================================
- *  หน้า "ของฉัน" (profile.html?bib=R0001)
+ *  หน้า "ของฉัน" (profile.html?bib=R001)
  *  - ยืนยันตัวตน: บัญชีที่ล็อกอิน / token ในเครื่อง / ลิงก์อีเมล (?t=) / เบอร์โทร 4 ตัวท้าย
  *  - ชำระเงิน: PromptPay QR ตามยอดจริง + แนบสลิป (ย่อรูปก่อนส่ง)
  *  - นักวิ่ง: E-BIB (QR ใช้งานได้เมื่อชำระแล้ว) + เส้นทาง + IG Story
@@ -10,7 +10,7 @@
 (function () {
   const CFG = window.APP_CONFIG;
   const U = window.U;
-  const { $, esc, toast, busy, myBibs, pkg, pkgByPrefix, delivery, money, PAY_LABEL, payPill, checkinLabel, fmtDate } = U;
+  const { $, esc, toast, busy, loading, myBibs, pkg, pkgByPrefix, delivery, money, PAY_LABEL, payPill, checkinLabel, fmtDate } = U;
 
   const params = new URLSearchParams(location.search);
   const bib = (params.get('bib') || '').toUpperCase();
@@ -213,6 +213,7 @@
     const btn = $('#btnSendSlip');
     busy(btn, true, 'กำลังส่งสลิป…');
     try {
+      loading(true, 'กำลังส่งสลิป…', 'อาจใช้เวลา 5–15 วินาที กรุณาอย่าปิดหน้านี้');
       const { runner: r } = await API.call('uploadSlip', Object.assign({ bib, image: slipData }, auth));
       runner = Object.assign(runner, r);
       slipData = '';
@@ -224,6 +225,7 @@
     } catch (err) {
       toast(err.message, 'err');
     } finally {
+      loading(false);
       busy(btn, false);
     }
   });
@@ -240,7 +242,7 @@
     x.drawImage(cv, 80, 110, 440, 440);
     x.fillStyle = '#1B3B67'; x.font = 'italic 800 52px Kanit, sans-serif'; x.fillText(money(runner.amount), 300, 625);
     x.fillStyle = '#5E6573'; x.font = '24px Kanit, sans-serif'; x.fillText(runner.bib + ' · ' + (CFG.PAYMENT.payeeName || CFG.EVENT.name), 300, 675);
-    c.toBlob((b) => download(b, 'INSTHINK-' + runner.bib + '-PromptPay.png'), 'image/png');
+    c.toBlob((b) => U.saveImage(b, 'INSTHINK-' + runner.bib + '-PromptPay.png'), 'image/png');
   });
 
   /* ---------- IG Story ---------- */
@@ -273,33 +275,31 @@
       try { await navigator.share({ files: [file], title: CFG.EVENT.name, text: CFG.EVENT.hashtag }); }
       catch (e) { if (e.name !== 'AbortError') toast('แชร์ไม่สำเร็จ ใช้ปุ่มดาวน์โหลดแทน', 'err'); }
     } else {
-      download(storyBlob, storyName());
-      toast('อุปกรณ์นี้แชร์ตรงไม่ได้ — ดาวน์โหลดรูปให้แล้ว นำไปลง Story ได้เลย', 'ok');
+      U.saveImage(storyBlob, storyName());   // แชร์ตรงไม่ได้ → บันทึกรูปแล้วนำไปลง Story เอง
     }
   });
-  $('#btnDownload').addEventListener('click', () => storyBlob && download(storyBlob, storyName()));
+  $('#btnDownload').addEventListener('click', () => storyBlob && U.saveImage(storyBlob, storyName()));
 
   // บันทึกการ์ด E-BIB เป็นรูป
   $('#btnSaveBib').addEventListener('click', async () => {
     const btn = $('#btnSaveBib');
-    busy(btn, true, 'กำลังบันทึก…');
+    busy(btn, true, 'กำลังสร้างรูป…');
+    loading(true, 'กำลังสร้างรูป E-BIB…');
     try {
       if (document.fonts) await document.fonts.ready;
-      const canvas = await html2canvas($('#ebib'), { scale: 2, backgroundColor: '#ffffff', logging: false });
-      canvas.toBlob((b) => download(b, 'INSTHINK-' + runner.bib + '-EBIB.png'), 'image/png');
+      const el = $('#ebib');
+      // จับภาพที่ขนาดคงที่ 420px (มือถือจอเล็กก็ได้รูปเท่ากัน) · scale 2 = คมชัด
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true, width: el.offsetWidth, height: el.offsetHeight, scrollX: 0, scrollY: -window.scrollY });
+      const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
+      if (!blob) throw new Error('canvas empty');
+      loading(false);
+      await U.saveImage(blob, 'INSTHINK-' + runner.bib + '-EBIB.png');
     } catch (e) {
+      console.error(e);
       toast('บันทึกไม่สำเร็จ ลองแคปหน้าจอแทน', 'err');
     } finally {
+      loading(false);
       busy(btn, false);
     }
   });
-
-  function download(blob, name) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-  }
 })();
