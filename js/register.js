@@ -54,8 +54,14 @@
     <label class="opt"><input type="radio" name="delivery" value="${esc(d.code)}" ${i === 0 ? 'checked' : ''}>
       <div class="box"><b>${esc(d.label)}</b><span>${d.fee ? '+' + money(d.fee) : 'ฟรี'}</span></div></label>`).join('');
 
+  const drinkImg = (v) => { const f = (CFG.DRINK_IMG || {})[v]; return f ? `<img src="img/drinks/${esc(f)}.webp" alt="">` : ''; };
+  $('#drinkList').classList.add('drink-list');
   $('#drinkList').innerHTML = CFG.DRINKS.map((v) => `
-    <label class="chip"><input type="radio" name="drink" value="${esc(v)}"><span>${esc(v)}</span></label>`).join('');
+    <label class="drink"><input type="radio" name="drink" value="${esc(v)}"><span>
+      <i class="thumb">${drinkImg(v)}</i>
+      <span class="info"><b>${esc(v)}</b><small>หวานปกติ ${esc(CFG.SWEETNESS || '100%')}</small></span>
+      <em class="tick" aria-hidden="true"></em>
+    </span></label>`).join('');
 
   $('#zipcode').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ''); });
 
@@ -76,7 +82,16 @@
     $('#addressBox').classList.toggle('hidden', d.code !== 'SHIP');
 
     const price = p ? p.price : 0;
-    $('#summary').innerHTML = `
+    const dk = p && p.runner ? radio('drink') : '';
+    const stack = p && p.runner ? `
+      <div class="sum-stack">
+        <div class="sum-main">
+          <i class="thumb">${dk ? drinkImg(dk) : ''}</i>
+          <div class="info"><b>${dk ? esc(dk) : 'ยังไม่ได้เลือกเครื่องดื่ม'}</b><small>${esc(p.title)}${dk ? ' · หวานปกติ ' + esc(CFG.SWEETNESS || '100%') : ''}</small></div>
+          <span class="amt">${money(price + d.fee)}</span>
+        </div>
+      </div>` : '';
+    $('#summary').innerHTML = stack + `
       <div class="row"><span>${p ? esc(p.title) : '<span class="muted">ยังไม่ได้เลือกแพ็กเกจ</span>'}</span><span>${money(price)}</span></div>
       <div class="row"><span>${esc(d.label)}</span><span>${d.fee ? money(d.fee) : 'ฟรี'}</span></div>
       <div class="row total"><span>ยอดชำระ</span><b>${money(price + d.fee)}</b></div>`;
