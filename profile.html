@@ -53,19 +53,20 @@
               <div class="amount-big" id="payAmount">—</div>
               <div class="muted small" id="payFor"></div>
             </div>
-            <ol class="small muted" style="margin:0;padding-left:18px;line-height:1.8">
-              <li>บันทึกรูป QR หรือสแกนด้วยแอปธนาคาร</li>
-              <li>ตรวจยอดเงินให้ตรง แล้วโอน</li>
-              <li>แนบสลิปด้านล่าง — ระบบยืนยันการชำระให้ทันที ไม่ต้องรอแอดมิน</li>
-            </ol>
-            <button class="btn btn-sm" id="btnSaveQr" type="button" style="justify-self:start">บันทึกรูป QR</button>
-            <label class="upload" id="uploadBox">
-              <input type="file" id="slipFile" accept="image/*">
-              <img id="slipPreview" class="hidden" alt="ตัวอย่างสลิป">
-              <b id="uploadLabel">แตะเพื่อเลือกรูปสลิป</b>
-              <span class="muted small">JPG / PNG · ระบบย่อขนาดให้อัตโนมัติ</span>
-            </label>
-            <button class="btn btn-primary hidden" id="btnSendSlip" type="button">ส่งสลิป</button>
+            <!-- 3 ขั้นตอน: เน้นขั้นที่ 3 (แนบสลิป) ให้เห็นชัดว่าต้องทำ -->
+            <div class="pay-steps">
+              <div class="pstep"><i>1</i><div><b>บันทึกรูป QR หรือสแกน</b><span>เปิดแอปธนาคาร → สแกน / เลือกรูป QR</span>
+                <button class="btn btn-sm" id="btnSaveQr" type="button">บันทึกรูป QR</button></div></div>
+              <div class="pstep"><i>2</i><div><b>โอนเงินตามยอด</b><span>ตรวจยอดให้ตรง แล้ว <u>เก็บสลิปไว้</u></span></div></div>
+              <div class="pstep must" id="slipStep"><i>3</i><div><b>แนบสลิปการโอน <em>ต้องทำ</em></b><span>ถ้าไม่แนบสลิป ระบบจะยังไม่ยืนยันการสมัคร และยังไม่ได้ E-BIB</span>
+                <label class="upload" id="uploadBox">
+                  <input type="file" id="slipFile" accept="image/*">
+                  <img id="slipPreview" class="hidden" alt="ตัวอย่างสลิป">
+                  <b id="uploadLabel">แตะเพื่อเลือกรูปสลิป</b>
+                  <span class="muted small">JPG / PNG · ระบบย่อขนาดให้อัตโนมัติ</span>
+                </label>
+                <button class="btn btn-primary btn-block hidden" id="btnSendSlip" type="button">ส่งสลิป</button></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -127,6 +128,9 @@
       </div>
     </section>
   </main>
+
+  <!-- แถบล่าง (มือถือ): เตือนให้แนบสลิป ขณะยังไม่ชำระ -->
+  <button class="slip-bar hidden" id="slipBar" type="button">โอนแล้ว? <b>แนบสลิปเลย</b></button>
 
   <!-- ยืนยันตัวตนเมื่อเปิดจากเครื่องอื่น -->
   <div class="modal hidden" id="verifyModal">

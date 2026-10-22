@@ -127,6 +127,7 @@
 
   function renderPayment(p, d, paid) {
     $('#payCard').classList.toggle('hidden', paid);
+    setTimeout(() => updateSlipBar(), 0);
     if (paid) return;
 
     const n = $('#payNotice');
@@ -208,6 +209,25 @@
     $('#pCheckpoints').textContent = CFG.ROUTE.checkpoints.join('  ·  ');
   }
 
+  /* ---------- เตือนให้แนบสลิป ---------- */
+  function remindSlip() {
+    const box = $('#slipStep');
+    if (!box || $('#payCard').classList.contains('hidden')) return;
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+    toast('โอนเงินแล้ว อย่าลืมแนบสลิปตรงนี้นะ', 'ok');
+  }
+  $('#slipBar').addEventListener('click', remindSlip);
+  // แถบล่างโผล่เมื่อยังไม่ชำระ และช่องแนบสลิปไม่อยู่ในจอ
+  let slipInView = false;
+  const updateSlipBar = () => {
+    const unpaid = runner && runner.paymentStatus !== 'PAID' && !$('#payCard').classList.contains('hidden');
+    $('#slipBar').classList.toggle('hidden', !unpaid || slipInView);
+  };
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([en]) => { slipInView = en.isIntersecting; updateSlipBar(); }).observe($('#slipStep'));
+  }
+
   /* ---------- แนบสลิป ---------- */
   $('#slipFile').addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -250,15 +270,18 @@
     const cv = $('#ppQr canvas');
     if (!cv) return;
     // วาด QR ลงการ์ดพื้นขาวพร้อมยอดเงิน แล้วดาวน์โหลด
-    const c = document.createElement('canvas'); c.width = 600; c.height = 720;
+    const c = document.createElement('canvas'); c.width = 600; c.height = 760;
     const x = c.getContext('2d');
-    x.fillStyle = '#fff'; x.fillRect(0, 0, 600, 720);
+    x.fillStyle = '#fff'; x.fillRect(0, 0, 600, 760);
     x.fillStyle = '#113566'; x.fillRect(0, 0, 600, 80);
     x.fillStyle = '#fff'; x.font = 'bold 32px Kanit, sans-serif'; x.textAlign = 'center'; x.fillText('PromptPay', 300, 52);
     x.drawImage(cv, 80, 110, 440, 440);
     x.fillStyle = '#1B3B67'; x.font = 'italic 800 52px Kanit, sans-serif'; x.fillText(money(runner.amount), 300, 625);
-    x.fillStyle = '#5E6573'; x.font = '24px Kanit, sans-serif'; x.fillText(runner.bib + ' · ' + (CFG.PAYMENT.payeeName || CFG.EVENT.name), 300, 675);
-    c.toBlob((b) => U.saveImage(b, 'INSTHINK-' + runner.bib + '-PromptPay.png'), 'image/png');
+    x.fillStyle = '#5E6573'; x.font = '24px Kanit, sans-serif'; x.fillText(runner.bib + ' · ' + (CFG.PAYMENT.payeeName || CFG.EVENT.name), 300, 668);
+    // แถบเตือนในรูป QR เอง (คนมักเปิดรูปนี้ในแอปธนาคาร แล้วลืมกลับมาแนบสลิป)
+    x.fillStyle = '#8CD43E'; x.fillRect(0, 690, 600, 70);
+    x.fillStyle = '#0A1430'; x.font = 'bold 25px Kanit, sans-serif'; x.fillText('โอนแล้ว กลับมาแนบสลิปที่หน้าเว็บด้วย', 300, 735);
+    c.toBlob((b) => U.saveImage(b, 'INSTHINK-' + runner.bib + '-PromptPay.png', remindSlip), 'image/png');
   });
 
   /* ---------- IG Story ---------- */

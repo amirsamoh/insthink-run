@@ -49,13 +49,14 @@
    * มือถือ: เปิดหน้ารูปเต็มจอ (กดค้างที่รูปเพื่อบันทึก) + ปุ่ม "บันทึก / แชร์" ที่เปิดแผงแชร์ของเครื่อง
    * (มือถือหลายรุ่น และเบราว์เซอร์ในแอป LINE / IG / FB ไม่ยอมให้ดาวน์โหลดไฟล์ตรง ๆ)
    */
-  async function saveImage(blob, name) {
+  async function saveImage(blob, name, onDone) {
     if (!blob) return;
     if (!isMobile()) {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = name;
       document.body.appendChild(a); a.click();
       setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      if (onDone) setTimeout(onDone, 600);
       return;
     }
     const url = await blobToDataUrl(blob);
@@ -76,7 +77,7 @@
       </div></div>`;
     document.body.appendChild(sheet);
     sheet.addEventListener('click', async (e) => {
-      if (e.target.closest('[data-close]') || e.target === sheet) return sheet.remove();
+      if (e.target.closest('[data-close]') || e.target === sheet) { sheet.remove(); if (onDone) onDone(); return; }
       if (e.target.closest('[data-dl]')) {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob); a.download = name;

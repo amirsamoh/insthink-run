@@ -724,3 +724,21 @@ footer.site-foot .foot-btns { display: flex; gap: 10px; flex-wrap: wrap; justify
 @media (min-width: 720px) { .cf { padding: 34px 0 22px; } .cf-stage { --w: 290px; } .cf-card { transform: translateX(calc(-50% + var(--o) * var(--w) * .78)) scale(calc(1 - var(--a) * .14)); } }
 @media (prefers-reduced-motion: reduce) { .cf-card { transition: none; } }
 .cf-card.light.flat > img { padding: 8% 2% 24%; }
+
+/* ---------- ขั้นตอนชำระเงิน (เน้นขั้นแนบสลิป) ---------- */
+.pay-steps { display: grid; gap: 10px; }
+.pstep { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; padding: 12px; border-radius: 16px; background: var(--surface-2); }
+.pstep > i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--night); color: #fff; font: 700 normal 15px/1 var(--font); }
+.pstep > div { display: grid; gap: 4px; min-width: 0; }
+.pstep b { font-size: 15px; }
+.pstep span { font-size: 13px; color: var(--muted); }
+.pstep .btn { justify-self: start; margin-top: 4px; }
+.pstep.must { background: #F3FBEA; box-shadow: 0 0 0 2px var(--lime) inset; }
+.pstep.must > i { background: var(--lime); color: var(--night); }
+.pstep.must em { font-style: normal; font-size: 11px; font-weight: 600; color: #fff; background: #D9480F; padding: 3px 8px; border-radius: 99px; margin-left: 6px; vertical-align: 2px; }
+.pstep.must .upload { margin-top: 6px; background: #fff; border-color: var(--lime); }
+.pstep.flash { animation: slipflash 1.6s ease-out 2; }
+@keyframes slipflash { 0%, 100% { box-shadow: 0 0 0 2px var(--lime) inset; } 40% { box-shadow: 0 0 0 2px var(--lime) inset, 0 0 0 8px rgba(140,212,62,.35); } }
+.slip-bar { position: fixed; z-index: 60; left: 16px; right: 16px; bottom: calc(14px + env(safe-area-inset-bottom)); padding: 14px 18px; border: 0; border-radius: 99px; background: var(--night); color: #fff; font: 400 15px var(--font); box-shadow: 0 14px 30px rgba(10,20,48,.35); cursor: pointer; }
+.slip-bar b { color: var(--lime); font-weight: 600; margin-left: 4px; }
+@media (min-width: 760px) { .slip-bar { left: auto; right: 24px; width: auto; } }
