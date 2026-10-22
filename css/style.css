@@ -515,8 +515,9 @@ html { scroll-behavior: smooth; }
 .hero2-art .bandana-shot { position: absolute; width: 300px; max-width: none; right: -30px; bottom: -40px; border-radius: 26px; transform: rotate(-10deg); box-shadow: 0 30px 60px -20px rgba(0,0,0,.6); }
 .hero2 .hero-stars { position: absolute; left: 0; top: 20px; right: auto; }
 .hero2 .hero-stars img { height: 46px; filter: brightness(0) invert(1); opacity: .9; }
-.spark { position: absolute; width: 22px; height: 22px; background: var(--lime); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 3s ease-in-out infinite; }
-.spark.s1 { left: 36%; top: 30%; } .spark.s2 { left: 8%; bottom: 26%; width: 14px; height: 14px; animation-delay: 1s; } .spark.s3 { right: 12%; top: 4%; width: 16px; height: 16px; background: #fff; animation-delay: 2s; }
+.spark { position: absolute; color: var(--lime); font-size: 22px; line-height: 1; animation: twinkle 3s ease-in-out infinite; }
+.spark.s1 { left: 36%; top: 30%; } .spark.s2 { left: 8%; bottom: 26%; font-size: 14px; animation-delay: 1s; } .spark.s3 { right: 12%; top: 4%; font-size: 16px; color: #fff; animation-delay: 2s; }
+@media (min-width: 820px) { .spark.s3 { top: 15%; right: 40%; z-index: 3; } }   /* เดสก์ท็อป: เลื่อนลงไม่ให้ทับดาว 3 ดวงที่เป็นสัญลักษณ์งาน */
 @keyframes twinkle { 50% { opacity: .3; transform: scale(.7); } }
 @media (min-width: 820px) {
   .hero2 { grid-template-columns: 1.15fr 1fr; padding: 54px 48px; min-height: 520px; align-items: center; }
