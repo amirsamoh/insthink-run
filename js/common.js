@@ -118,6 +118,40 @@
     };
   }
 
+  /**
+   * วาดวงกลมรูปโปรไฟล์ลง <canvas> เอง (ไม่พึ่ง html2canvas) — รูปไม่มี/โหลดไม่ได้ → วงกลมกรมท่า + ตัวอักษรแรก
+   * size = เส้นผ่านศูนย์กลางรวมขอบ (px) · border = ขอบขาว · ring = เส้นกรมท่านอกสุด
+   */
+  async function avatarCanvas(runner, size, border, ring) {
+    const S = 3, px = size * S;
+    const c = document.createElement('canvas'); c.width = c.height = px;
+    const g = c.getContext('2d');
+    const R = px / 2, ringPx = (ring || 0) * S, bPx = (border || 0) * S;
+    g.fillStyle = '#1B3B67'; g.beginPath(); g.arc(R, R, R, 0, Math.PI * 2); g.fill();            // ring
+    g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(R, R, R - ringPx, 0, Math.PI * 2); g.fill();   // border
+    const r2 = R - ringPx - bPx;
+    g.save(); g.beginPath(); g.arc(R, R, r2, 0, Math.PI * 2); g.clip();
+    g.fillStyle = '#1B3B67'; g.fillRect(0, 0, px, px);
+    let drawn = false;
+    if (runner && runner.photo) {
+      const im = await new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = runner.photo; });
+      if (im && im.naturalWidth) {
+        const side = Math.min(im.naturalWidth, im.naturalHeight);
+        g.drawImage(im, (im.naturalWidth - side) / 2, (im.naturalHeight - side) / 2, side, side, R - r2, R - r2, r2 * 2, r2 * 2);
+        drawn = true;
+      } else console.warn('avatar: รูปโปรไฟล์โหลดไม่ได้');
+    }
+    g.restore();
+    if (!drawn) {
+      const ch = String((runner && (runner.nickname || runner.firstName)) || '?').charAt(0).toUpperCase();
+      g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = 'italic 800 ' + Math.round(r2 * 1.0) + 'px Kanit, sans-serif';
+      g.fillText(ch, R, R + r2 * 0.06);
+    }
+    c.style.cssText = 'display:block;width:' + size + 'px;height:' + size + 'px';
+    return c;
+  }
+
   /** แจ้งเตือนอัตโนมัติเมื่อสคริปต์ของหน้าเว็บพัง (แทนที่จะเงียบ แล้วฟอร์มรีโหลดเอง) */
   window.addEventListener('error', (e) => { if (e.message) toast('หน้าเว็บมีข้อผิดพลาด: ' + e.message, 'err'); });
   window.addEventListener('unhandledrejection', (e) => toast('เกิดข้อผิดพลาด: ' + ((e.reason && e.reason.message) || e.reason), 'err'));
@@ -323,6 +357,6 @@
   window.U = {
     $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
-    promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, canvasifyImages, sweetLabel, routeSvg, starSvg, fmtDate,
+    promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, canvasifyImages, avatarCanvas, sweetLabel, routeSvg, starSvg, fmtDate,
   };
 })();

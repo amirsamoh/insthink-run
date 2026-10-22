@@ -115,10 +115,12 @@
       fitText(el.querySelector('.s-bib .num span'), 780, 250);   // เลข BIB พอดีการ์ด
       fitText(el.querySelector('.s-title'), 940, 200);
 
+      const av = await window.U.avatarCanvas(runner, 132, 6, 0);
+      const swapAvatar = (doc) => { const t = doc.querySelector('#story .s-avatar'); if (t) { t.innerHTML = ''; t.style.cssText = 'width:132px;height:132px;border:0;background:none;overflow:visible;display:block'; const c2 = doc.createElement('canvas'); c2.width = av.width; c2.height = av.height; c2.getContext('2d').drawImage(av, 0, 0); c2.style.cssText = av.style.cssText; t.appendChild(c2); } };
       const canvas = await html2canvas(el, {
         width: 1080, height: 1920, scale: 1, x: 0, y: 0, scrollX: 0, scrollY: 0,
         windowWidth: 1080, windowHeight: 1920,
-        backgroundColor: '#0F2244', useCORS: true, onclone: window.U.canvasifyImages(el), logging: false,
+        backgroundColor: '#0F2244', useCORS: true, onclone: (doc) => { window.U.canvasifyImages(el)(doc); swapAvatar(doc); }, logging: false,
       });
       return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     } finally {
