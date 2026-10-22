@@ -63,20 +63,28 @@
           <h2 class="block-title">Race <span class="g">Kit</span></h2>
           <p class="muted">ทุกชิ้นรวมในค่าสมัคร 256 บาท · ซื้อผ้าโพกหัวอย่างเดียวได้ 190 บาท</p>
         </div>
-        <div class="slide-nav">
-          <button class="round" type="button" data-slide="-1" aria-label="ก่อนหน้า">‹</button>
-          <button class="round dark" type="button" data-slide="1" aria-label="ถัดไป">›</button>
-        </div>
       </div>
-      <div class="slider" id="goodsSlider">
-        <figure class="slide"><img class="cut flat" src="img/bandana-flat.webp" alt="ผ้าโพกหัว INSTHINK Bandana" loading="lazy">
-          <figcaption><b>ผ้าโพกหัว Bandana</b><span>ลายภูเขาและคลื่น 日本山 · Free size</span></figcaption></figure>
-        <figure class="slide"><img src="img/stickers.webp" alt="สติกเกอร์ Limited Edition" loading="lazy">
-          <figcaption><b>สติกเกอร์ Limited Edition</b><span>เฉพาะนักวิ่ง</span></figcaption></figure>
-        <figure class="slide wide"><div class="band-img"><img src="img/wristband.jpg" alt="ริสแบน INSTHINK" loading="lazy"></div>
-          <figcaption><b>ริสแบน (Wristband)</b><span>เฉพาะนักวิ่ง · INSTHINK Community Coffee Run</span></figcaption></figure>
-        <figure class="slide meal"><img src="img/meal.webp" alt="ข้าวยำบุฟเฟ่ต์และเครื่องดื่ม INSTHINK Coffee" loading="lazy">
-          <figcaption><b>ข้าวยำบุฟเฟ่ต์ + เครื่องดื่ม</b><span>ลาเต้ อเมริกาโน่ ชาพีชพิชชี่ และอื่น ๆ 1 แก้ว</span></figcaption></figure>
+      <!-- Coverflow: การ์ดกลางใหญ่ ข้างๆ เล็ก/จาง เลื่อนเองอัตโนมัติ + ปุ่มซ้ายขวา + ปัดได้ -->
+      <div class="cf" id="kitFlow" aria-roledescription="carousel" aria-label="ของที่ได้รับ">
+        <div class="cf-stage">
+          <figure class="cf-card light"><img src="img/bandana-flat.webp" alt="ผ้าโพกหัว INSTHINK Bandana">
+            <span class="cf-tag">ทุกแพ็กเกจ</span><span class="cf-no">01</span>
+            <figcaption><b>ผ้าโพกหัว Bandana</b><span><i>Free size</i><i>ลาย 日本山</i></span></figcaption></figure>
+          <figure class="cf-card light"><img src="img/stickers.webp" alt="สติกเกอร์ Limited Edition">
+            <span class="cf-tag">เฉพาะนักวิ่ง</span><span class="cf-no">02</span>
+            <figcaption><b>สติกเกอร์ Limited</b><span><i>Limited Edition</i><i>1 แผ่น</i></span></figcaption></figure>
+          <figure class="cf-card band"><div class="band-img"><img src="img/wristband.jpg" alt="ริสแบน INSTHINK"></div>
+            <span class="cf-tag">เฉพาะนักวิ่ง</span><span class="cf-no">03</span>
+            <figcaption><b>ริสแบน</b><span><i>Wristband</i><i>Coffee Run</i></span></figcaption></figure>
+          <figure class="cf-card"><img src="img/meal.webp" alt="ข้าวยำบุฟเฟ่ต์และเครื่องดื่ม INSTHINK Coffee">
+            <span class="cf-tag">เฉพาะนักวิ่ง</span><span class="cf-no">04</span>
+            <figcaption><b>ข้าวยำ + เครื่องดื่ม</b><span><i>บุฟเฟ่ต์</i><i>1 แก้ว</i></span></figcaption></figure>
+        </div>
+        <div class="cf-ctrl">
+          <button class="cf-btn" type="button" data-cf="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <div class="cf-dots" role="tablist"></div>
+          <button class="cf-btn" type="button" data-cf="1" aria-label="ถัดไป"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
       </div>
     </section>
 
