@@ -517,7 +517,24 @@ html { scroll-behavior: smooth; }
 .hero2 .hero-stars img { height: 46px; filter: brightness(0) invert(1); opacity: .9; }
 .spark { position: absolute; color: var(--lime); font-size: 22px; line-height: 1; animation: twinkle 3s ease-in-out infinite; }
 .spark.s1 { left: 36%; top: 30%; } .spark.s2 { left: 8%; bottom: 26%; font-size: 14px; animation-delay: 1s; } .spark.s3 { right: 12%; top: 4%; font-size: 16px; color: #fff; animation-delay: 2s; }
-@media (min-width: 820px) { .spark.s3 { top: 15%; right: 40%; z-index: 3; } }   /* เดสก์ท็อป: เลื่อนลงไม่ให้ทับดาว 3 ดวงที่เป็นสัญลักษณ์งาน */
+@media (min-width: 820px) { .spark.s3 { top: 15%; right: 40%; z-index: 3; } }
+/* ดาวในโซนรูป (เพิ่ม 2 ดวง) */
+.spark.s7 { right: 5%; top: 48%; font-size: 10px; color: #fff; animation-delay: .8s; animation-duration: 2.2s; z-index: 3; }
+.spark.s9 { right: 20%; bottom: 6%; font-size: 16px; animation-delay: 2.2s; animation-duration: 3s; z-index: 3; }
+.spark { z-index: 2; }
+/* ดาวในโซนข้อความ (อยู่หลังตัวหนังสือ วางในช่องว่าง ไม่ทับข้อความ) */
+.hero-sparks { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.hero-sparks .spark { z-index: 1; }
+.spark.t1 { right: 7%; top: 2.5%; font-size: 14px; color: #fff; animation-delay: .5s; animation-duration: 2.4s; }
+.spark.t2 { right: 12%; top: 17%; font-size: 18px; animation-delay: 1.5s; animation-duration: 3.4s; }
+.spark.t3 { right: 24%; top: 25.5%; font-size: 11px; color: #fff; animation-delay: 2.5s; animation-duration: 2.8s; }
+.spark.t4 { right: 8%; top: 44%; font-size: 15px; animation-delay: 1.8s; animation-duration: 3.6s; }
+@media (min-width: 820px) {
+  .spark.t1 { right: auto; left: 40%; top: 9%; }
+  .spark.t2 { right: auto; left: 45%; top: 34%; }
+  .spark.t3 { right: auto; left: 38%; top: 55%; font-size: 13px; }
+  .spark.t4 { right: auto; left: 31%; top: 95%; }
+}
 @keyframes twinkle { 50% { opacity: .3; transform: scale(.7); } }
 @media (min-width: 820px) {
   .hero2 { grid-template-columns: 1.15fr 1fr; padding: 54px 48px; min-height: 520px; align-items: center; }
@@ -537,7 +554,9 @@ html { scroll-behavior: smooth; }
 /* ---------- Marquee ---------- */
 .marquee { margin-top: 44px; background: var(--night); color: #fff; overflow: hidden; transform: rotate(-2deg) scale(1.04); padding: 14px 0; }
 .marquee .track { display: flex; gap: 22px; width: max-content; animation: marq 26s linear infinite; font: 800 italic 26px/1 var(--font); text-transform: uppercase; white-space: nowrap; }
-.marquee i { display: inline-block; width: 16px; height: 16px; background: var(--lime); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); vertical-align: middle; font-style: normal; }
+.marquee .track { align-items: center; }
+.marquee i { display: inline-flex; align-items: center; justify-content: center; height: 26px; color: var(--lime); font: 400 normal 22px/1 system-ui, sans-serif; }
+.marquee .jp { font-style: normal; font-weight: 700; letter-spacing: .04em; color: #fff; }
 @keyframes marq { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .marquee .track, .spark { animation: none; } html { scroll-behavior: auto; } }
 
@@ -704,3 +723,4 @@ footer.site-foot .foot-btns { display: flex; gap: 10px; flex-wrap: wrap; justify
 .cf-dots button.on { width: 22px; background: var(--lime); }
 @media (min-width: 720px) { .cf { padding: 34px 0 22px; } .cf-stage { --w: 290px; } .cf-card { transform: translateX(calc(-50% + var(--o) * var(--w) * .78)) scale(calc(1 - var(--a) * .14)); } }
 @media (prefers-reduced-motion: reduce) { .cf-card { transition: none; } }
+.cf-card.light.flat > img { padding: 8% 2% 24%; }
