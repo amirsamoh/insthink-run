@@ -143,6 +143,9 @@
     token(bib) { const f = myBibs.all().find((x) => x.bib === bib); return f ? f.token : ''; },
   };
 
+  /** ความหวาน: ข้อมูลเก่าเก็บเป็น '100%' → แสดงเป็น หวานปกติ */
+  const sweetLabel = (v) => (!v || v === '100%' ? 'หวานปกติ' : v);
+
   /* ---------- แพ็กเกจ / สถานะ ---------- */
   const pkg = (code) => CFG.PACKAGES.find((p) => p.code === code) || CFG.PACKAGES[0];
   const pkgByPrefix = (bib) => CFG.PACKAGES.find((p) => p.prefix === String(bib || '').charAt(0)) || CFG.PACKAGES[0];
@@ -320,6 +323,6 @@
   window.U = {
     $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
-    promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, canvasifyImages, routeSvg, starSvg, fmtDate,
+    promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, canvasifyImages, sweetLabel, routeSvg, starSvg, fmtDate,
   };
 })();

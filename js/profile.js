@@ -165,7 +165,7 @@
       rows.push(['การจัดส่ง', runner.shipStatus === 'SHIPPED' ? 'ส่งแล้ว · ' + (runner.trackingNo || '') : 'รอจัดส่ง']);
       if (runner.address) rows.push(['ที่อยู่จัดส่ง', runner.address + ' ' + (runner.zipcode || ''), true]);
     }
-    if (p.runner) rows.push(['เครื่องดื่ม', runner.drink + ' · หวาน ' + (runner.sweetness || '100%') + ' (หวานปกติ)'], ['แพ้อาหาร', runner.note || '-']);
+    if (p.runner) rows.push(['เครื่องดื่ม', runner.drink + ' · ' + U.sweetLabel(runner.sweetness)], ['แพ้อาหาร', runner.note || '-']);
     $('#detail').innerHTML = rows.map(([k, v, wide]) => `<div class="${wide ? 'wide' : ''}"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
   }
 

@@ -59,9 +59,11 @@
   $('#drinkList').innerHTML = CFG.DRINKS.map((v) => `
     <label class="drink"><input type="radio" name="drink" value="${esc(v)}"><span>
       <i class="thumb">${drinkImg(v)}</i>
-      <span class="info"><b>${esc(v)}</b><small>หวานปกติ ${esc(CFG.SWEETNESS || '100%')}</small></span>
-      <em class="tick" aria-hidden="true"></em>
+      <span class="info"><b>${esc(v)}</b></span>
     </span></label>`).join('');
+  const sweets = CFG.SWEET_OPTIONS || ['หวานปกติ'];
+  $('#sweetList').innerHTML = sweets.map((v) => `
+    <label class="chip"><input type="radio" name="sweetness" value="${esc(v)}"${v === CFG.SWEETNESS ? ' checked' : ''}><span>${esc(v)}</span></label>`).join('');
 
   $('#zipcode').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ''); });
 
@@ -87,7 +89,7 @@
       <div class="sum-stack">
         <div class="sum-main">
           <i class="thumb">${dk ? drinkImg(dk) : ''}</i>
-          <div class="info"><b>${dk ? esc(dk) : 'ยังไม่ได้เลือกเครื่องดื่ม'}</b><small>${esc(p.title)}${dk ? ' · หวานปกติ ' + esc(CFG.SWEETNESS || '100%') : ''}</small></div>
+          <div class="info"><b>${dk ? esc(dk) : 'ยังไม่ได้เลือกเครื่องดื่ม'}</b><small>${esc(p.title)}${dk ? ' · ' + esc(radio('sweetness')) : ''}</small></div>
           <span class="amt">${money(price + d.fee)}</span>
         </div>
       </div>` : '';
@@ -102,7 +104,7 @@
 
   /* ---------- ตรวจฟอร์ม ---------- */
   function collect() {
-    const d = { package: radio('package'), drink: radio('drink'), delivery: radio('delivery') };
+    const d = { package: radio('package'), drink: radio('drink'), sweetness: radio('sweetness'), delivery: radio('delivery') };
     ['note', 'address', 'zipcode'].forEach((k) => { d[k] = $('#' + k).value.trim(); });
     d.consent = $('#consent').checked;
     return d;

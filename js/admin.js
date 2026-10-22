@@ -333,7 +333,7 @@
 
   /* ---------- ส่งออก CSV (เปิดใน Excel ภาษาไทยได้ เพราะใส่ BOM) ---------- */
   $('#csvBtn').addEventListener('click', () => {
-    const cols = ['bib', 'package', 'firstName', 'lastName', 'nickname', 'gender', 'phone', 'email', 'drink',
+    const cols = ['bib', 'package', 'firstName', 'lastName', 'nickname', 'gender', 'phone', 'email', 'drink', 'sweetness',
       'delivery', 'address', 'zipcode', 'amount', 'paymentStatus', 'paidAt', 'shipStatus', 'trackingNo', 'status', 'checkinAt', 'checkinBy', 'note', 'eventId', 'createdAt'];
     const cell = (v) => {
       let s = String(v == null ? '' : v);
