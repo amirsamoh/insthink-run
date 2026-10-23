@@ -6,12 +6,21 @@
  */
 (function () {
   const CFG = window.APP_CONFIG;
-  const { $, $$ } = window.U;
+  const U = window.U;
+  const { $, $$ } = U;
 
   $('#evEdition').textContent = CFG.EVENT.edition;
   $('#evDate').textContent = CFG.EVENT.dateLabel;
   $('#evTime').textContent = CFG.EVENT.startTime + ' น.';
   $('#evLoc').textContent = CFG.EVENT.location;
+  // ปุ่มนำทาง (Google Maps) — ไม่มีลิงก์ = ซ่อนปุ่ม
+  if (CFG.EVENT.mapUrl) { $('#evLocLink').href = CFG.EVENT.mapUrl; $('#mapBtn').href = CFG.EVENT.mapUrl; }
+  else { $('#mapBtn').remove(); $('#evLocLink').removeAttribute('href'); }
+
+  // ตารางเวลาวันงาน
+  $('#tlDate').textContent = CFG.EVENT.dateLabel + ' · ' + CFG.EVENT.location;
+  $('#timeline').innerHTML = (CFG.EVENT.schedule || []).map((s) => `<li class="${s.time === CFG.EVENT.startTime ? 'key' : ''}">
+    <time>${U.esc(s.time || '')}</time><i></i><div><b>${U.esc(s.title)}</b>${s.desc ? `<span>${U.esc(s.desc)}</span>` : ''}</div></li>`).join('');
   $('#stTime').textContent = CFG.EVENT.startTime;
   $('#heroStars').innerHTML = '<img src="img/stars-navy.png" alt="">';
 

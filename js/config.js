@@ -19,6 +19,13 @@ window.APP_CONFIG = {
     distanceKm: 6,
     hashtag: '#INSTHINKRUNCLUB',
     instagram: '@insthink.runclub',          // TODO: IG ของงาน
+    mapUrl: 'https://maps.app.goo.gl/tKYUkMPTCtGo2Yte6',   // ปุ่ม "นำทางไปจุดสตาร์ต" (Google Maps)
+    /** ตารางเวลาวันงาน (แสดงในหน้าแรก + รูป Story) — time เว้นว่างได้ */
+    schedule: [
+      { time: '05:40', title: 'เช็คอิน', desc: 'โชว์ QR ใน E-BIB ที่จุดลงทะเบียน รับริสแบนและผ้าโพกหัว' },
+      { time: '06:00', title: 'ปล่อยตัว 6K', desc: 'ออกตัวพร้อมกันที่จุดสตาร์ต INSTHINK LOOP' },
+      { time: 'หลังวิ่ง', title: 'ข้าวยำบุฟเฟ่ต์ + เครื่องดื่ม', desc: 'รับเครื่องดื่มตามที่เลือกไว้ และถ่ายรูปกับเพื่อนๆ' },
+    ],
   },
 
   /** แพ็กเกจ — prefix = ตัวอักษรนำหน้าเลข (R001 นักวิ่ง / M001 ออเดอร์ผ้าโพกหัว) */

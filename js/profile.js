@@ -10,14 +10,15 @@
 (function () {
   const CFG = window.APP_CONFIG;
   const U = window.U;
-  const { $, esc, toast, busy, loading, myBibs, pkg, pkgByPrefix, delivery, money, PAY_LABEL, payPill, checkinLabel, fmtDate } = U;
+  const { $, $$, esc, toast, busy, loading, myBibs, pkg, pkgByPrefix, delivery, money, PAY_LABEL, payPill, checkinLabel, fmtDate } = U;
 
   const params = new URLSearchParams(location.search);
   const bib = (params.get('bib') || '').toUpperCase();
   let auth = {};          // { token } หรือ { phone4 }
   let runner = null;
   let slipData = '';
-  let storyBlob = null;
+  let storyBlobs = [];    // รูป Story 3 หน้า
+  let post = { on: false, feedback: null };   // โหมดหลังจบงาน
 
   /* ---------- ไม่มีเลขใน URL → รายการในเครื่อง ---------- */
   if (!bib) {
@@ -52,9 +53,11 @@
   async function load(a) {
     U.loading(true, 'กำลังโหลดข้อมูล…', 'รอสักครู่');
     try {
-      const { runner: r } = await API.call('get', Object.assign({ bib }, a));
+      const res = await API.call('get', Object.assign({ bib }, a));
+      const r = res.runner;
       auth = a;
       runner = r;
+      post = { on: !!res.postEvent, feedback: res.feedback || null };
       if (r.token) { myBibs.add(r.bib, r.token); auth = { token: r.token }; }
       render();
     } finally { U.loading(false); }
@@ -117,6 +120,8 @@
 
     renderPayment(p, d, paid);
     renderDetail(p, d);
+    renderInvite();
+    renderPost(p, paid);
 
     // นักวิ่ง: E-BIB / เส้นทาง / Story — ออเดอร์ผ้าโพกหัวไม่มีส่วนนี้
     $('#bibCol').classList.toggle('hidden', !p.runner);
@@ -173,6 +178,7 @@
   function renderBib(p, d, paid) {
     $('#bDist').textContent = CFG.EVENT.distanceKm + 'K';
     $('#bNum').textContent = runner.bib;
+    $('#bNumBack').textContent = runner.bib;
     $('#bName').textContent = runner.firstName + ' ' + runner.lastName;
     $('#bNick').textContent = runner.nickname ? '“' + runner.nickname + '”' : '';
     $('#bBandana').textContent = d.code === 'SHIP' ? 'จัดส่ง' : 'รับที่งาน';
@@ -207,7 +213,113 @@
     $('#pRouteName').textContent = CFG.ROUTE.name;
     $('#pRoute').innerHTML = U.routeSvg();
     $('#pCheckpoints').textContent = CFG.ROUTE.checkpoints.join('  ·  ');
+    if (CFG.EVENT.mapUrl) $('#pMapBtn').href = CFG.EVENT.mapUrl; else $('#pMapBtn').remove();
+    $('#bibHint').textContent = paid && runner.token ? 'แตะการ์ดเพื่อพลิกดู QR · แสดงที่จุดลงทะเบียนเพื่อเช็คอินและรับผ้าโพกหัว' : $('#bibHint').textContent;
   }
+
+  /* ---------- E-BIB พลิกการ์ด ---------- */
+  const flipCard = () => {
+    const el = $('#ebib');
+    el.classList.toggle('is-back');
+    el.setAttribute('aria-label', el.classList.contains('is-back') ? 'ด้านหลัง: QR เช็คอิน · แตะเพื่อกลับด้านหน้า' : 'แตะเพื่อพลิกดู QR');
+  };
+  $('#ebib').addEventListener('click', flipCard);
+  $('#ebib').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipCard(); } });
+  $('#btnFlip').addEventListener('click', flipCard);
+  // เอียงการ์ดตามเมาส์เล็กน้อย (คอมพิวเตอร์)
+  if (window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const wrap = $('#ebibFlip');
+    wrap.addEventListener('pointermove', (e) => {
+      const b = wrap.getBoundingClientRect();
+      const x = (e.clientX - b.left) / b.width - 0.5, y = (e.clientY - b.top) / b.height - 0.5;
+      wrap.style.setProperty('--rx', (-y * 6).toFixed(2) + 'deg'); wrap.style.setProperty('--ry', (x * 8).toFixed(2) + 'deg');
+      wrap.style.setProperty('--mx', ((x + 0.5) * 100).toFixed(1) + '%');
+    });
+    wrap.addEventListener('pointerleave', () => { wrap.style.setProperty('--rx', '0deg'); wrap.style.setProperty('--ry', '0deg'); });
+  }
+
+  /* ---------- ชวนเพื่อน ---------- */
+  function renderInvite() {
+    const url = U.inviteUrl(runner.bib);
+    $('#inviteUrl').value = url;
+    const n = Number(runner.invited || 0);
+    $('#inviteCount').innerHTML = n ? 'ชวนแล้ว <b>' + n + '</b> คน' : '';
+  }
+  const inviteText = () => 'มาวิ่ง 6K ด้วยกันที่ ' + CFG.EVENT.name + ' · ' + CFG.EVENT.location + ' ได้ผ้าโพกหัว ริสแบน สติกเกอร์ และข้าวยำบุฟเฟ่ต์ สมัครผ่านลิงก์นี้ได้เลย';
+  $('#btnCopyInvite').addEventListener('click', async () => {
+    const inp = $('#inviteUrl');
+    try { await navigator.clipboard.writeText(inp.value); }
+    catch (e) { inp.select(); try { document.execCommand('copy'); } catch (e2) { /* ignore */ } }
+    toast('คัดลอกลิงก์ชวนเพื่อนแล้ว', 'ok');
+  });
+  $('#btnShareInvite').addEventListener('click', async () => {
+    const url = $('#inviteUrl').value;
+    if (navigator.share) {
+      try { await navigator.share({ title: CFG.EVENT.name, text: inviteText(), url }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
+    try { await navigator.clipboard.writeText(inviteText() + '\n' + url); toast('คัดลอกข้อความ + ลิงก์แล้ว นำไปวางในแชทได้เลย', 'ok'); }
+    catch (e) { toast('กดค้างที่ลิงก์เพื่อคัดลอก', 'err'); }
+  });
+
+  /* ---------- หลังจบงาน: Finisher + แบบประเมิน ---------- */
+  const FB_TEXT = ['', 'ต้องปรับปรุง', 'พอใช้', 'ดี', 'ดีมาก', 'ประทับใจสุดๆ'];
+  let fbRating = 0;
+  let finBlob = null;
+  function paintStars() {
+    $('#fbStars').innerHTML = [1, 2, 3, 4, 5].map((i) => `<button type="button" role="radio" aria-checked="${i === fbRating}" aria-label="${i} ดาว" data-star="${i}" class="${i <= fbRating ? 'on' : ''}">${U.starSvg()}</button>`).join('');
+    $('#fbLabel').textContent = fbRating ? FB_TEXT[fbRating] : 'แตะดาวเพื่อให้คะแนน';
+  }
+  function renderPost(p, paid) {
+    const box = $('#postEvent');
+    box.classList.toggle('hidden', !(post.on && paid));
+    if (!post.on || !paid) return;
+    $('#finisherCard').classList.toggle('hidden', !p.runner);
+    const finished = runner.status === 'CHECKED_IN';
+    $('#finisherBody').classList.toggle('hidden', !finished);
+    $('#finisherLocked').classList.toggle('hidden', finished);
+    try { $('#finTime').value = localStorage.getItem('irc_fin_' + runner.bib) || ''; } catch (e) { /* ignore */ }
+    if (post.feedback) {
+      fbRating = post.feedback.rating; $('#fbComment').value = post.feedback.comment || '';
+      $('#fbDone').classList.remove('hidden'); $('#fbSend').textContent = 'บันทึกการแก้ไข';
+    }
+    paintStars();
+  }
+  $('#fbStars').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-star]'); if (!b) return;
+    fbRating = Number(b.dataset.star); paintStars();
+  });
+  $('#fbForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!fbRating) { toast('แตะดาวเพื่อให้คะแนนก่อน', 'err'); return; }
+    const btn = $('#fbSend');
+    busy(btn, true, 'กำลังส่ง…');
+    try {
+      const { feedback } = await API.call('feedback', Object.assign({ bib, rating: fbRating, comment: $('#fbComment').value.trim() }, auth));
+      post.feedback = feedback;
+      $('#fbDone').classList.remove('hidden');
+      btn.dataset.label = 'บันทึกการแก้ไข';
+      toast('ขอบคุณสำหรับแบบประเมิน!', 'ok');
+    } catch (err) { toast(err.message, 'err'); }
+    finally { busy(btn, false); }
+  });
+  $('#btnFinisher').addEventListener('click', async () => {
+    const btn = $('#btnFinisher');
+    const t = $('#finTime').value.trim();
+    if (t && !/^\d{1,2}:\d{2}(:\d{2})?$/.test(t)) { toast('รูปแบบเวลา เช่น 38:12 หรือ 1:02:30', 'err'); return; }
+    try { localStorage.setItem('irc_fin_' + runner.bib, t); } catch (e) { /* ignore */ }
+    busy(btn, true, 'กำลังสร้างรูป…');
+    try {
+      finBlob = await Finisher.build(runner, { time: t });
+      const box = $('#finPreview');
+      box.querySelector('img').src = URL.createObjectURL(finBlob);
+      box.classList.remove('hidden');
+      $('#btnFinSave').classList.remove('hidden');
+      btn.dataset.label = 'สร้างใหม่';
+    } catch (e) { console.error(e); toast('สร้างรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'err'); }
+    finally { busy(btn, false); }
+  });
+  $('#btnFinSave').addEventListener('click', () => finBlob && U.saveImage(finBlob, 'INSTHINK-' + runner.bib + '-FINISHER.png'));
 
   /* ---------- เตือนให้แนบสลิป ---------- */
   function remindSlip() {
@@ -284,18 +396,30 @@
     c.toBlob((b) => U.saveImage(b, 'INSTHINK-' + runner.bib + '-PromptPay.png', remindSlip), 'image/png');
   });
 
-  /* ---------- IG Story ---------- */
-  const storyName = () => 'INSTHINK-' + runner.bib + '-story.png';
+  /* ---------- IG Story 3 หน้า ---------- */
+  const storyName = (i) => 'INSTHINK-' + runner.bib + '-story-' + (i + 1) + '.png';
+  let storyIdx = 0;
+  const track = $('#storyTrack');
+  const paintDots = () => { $('#storyDots').innerHTML = storyBlobs.map((_, i) => `<button type="button" class="${i === storyIdx ? 'on' : ''}" data-go="${i}" aria-label="รูปที่ ${i + 1}"></button>`).join(''); };
+  track.addEventListener('scroll', () => {
+    const i = Math.round(track.scrollLeft / Math.max(1, track.firstElementChild ? track.firstElementChild.offsetWidth + 14 : 1));
+    if (i !== storyIdx) { storyIdx = Math.max(0, Math.min(storyBlobs.length - 1, i)); paintDots(); }
+  }, { passive: true });
+  $('#storyDots').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-go]'); if (!b) return;
+    const el = track.children[Number(b.dataset.go)];
+    if (el) track.scrollTo({ left: el.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+  });
 
   $('#btnStory').addEventListener('click', async () => {
     if (!runner) return;
     const btn = $('#btnStory');
     busy(btn, true, 'กำลังสร้างรูป…');
     try {
-      storyBlob = await Story.build(runner);
-      const box = $('#storyPreview');
-      box.querySelector('img').src = URL.createObjectURL(storyBlob);
-      box.classList.remove('hidden');
+      storyBlobs = await Story.buildAll(runner);
+      track.innerHTML = storyBlobs.map((b, i) => `<figure><img src="${URL.createObjectURL(b)}" alt="รูป Story หน้า ${i + 1}"><figcaption>${i + 1} / ${storyBlobs.length}</figcaption></figure>`).join('');
+      storyIdx = 0; track.scrollLeft = 0; paintDots();
+      $('#storyPreview').classList.remove('hidden');
       $('#storyActions').classList.remove('hidden');
       btn.dataset.label = 'สร้างใหม่';
     } catch (e) {
@@ -306,18 +430,20 @@
     }
   });
 
-  // Web Share API: บนมือถือเปิดแผงแชร์ → เลือก Instagram → Story
+  // Web Share API: แชร์ทั้ง 3 รูปพร้อมกัน → เลือก Instagram → Story
   $('#btnShare').addEventListener('click', async () => {
-    if (!storyBlob) return;
-    const file = new File([storyBlob], storyName(), { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: CFG.EVENT.name, text: CFG.EVENT.hashtag }); }
-      catch (e) { if (e.name !== 'AbortError') toast('แชร์ไม่สำเร็จ ใช้ปุ่มดาวน์โหลดแทน', 'err'); }
+    if (!storyBlobs.length) return;
+    const files = storyBlobs.map((b, i) => new File([b], storyName(i), { type: 'image/png' }));
+    if (navigator.canShare && navigator.canShare({ files })) {
+      try { await navigator.share({ files, title: CFG.EVENT.name, text: CFG.EVENT.hashtag }); }
+      catch (e) { if (e.name !== 'AbortError') toast('แชร์ไม่สำเร็จ ใช้ปุ่มบันทึกทีละรูปแทน', 'err'); }
+    } else if (!U.isMobile()) {
+      storyBlobs.forEach((b, i) => setTimeout(() => U.saveImage(b, storyName(i)), i * 400));   // คอมพิวเตอร์: ดาวน์โหลดทั้ง 3 ไฟล์
     } else {
-      U.saveImage(storyBlob, storyName());   // แชร์ตรงไม่ได้ → บันทึกรูปแล้วนำไปลง Story เอง
+      U.saveImage(storyBlobs[storyIdx], storyName(storyIdx));
     }
   });
-  $('#btnDownload').addEventListener('click', () => storyBlob && U.saveImage(storyBlob, storyName()));
+  $('#btnDownload').addEventListener('click', () => storyBlobs[storyIdx] && U.saveImage(storyBlobs[storyIdx], storyName(storyIdx)));
 
   // บันทึกการ์ด E-BIB เป็นรูป
   $('#btnSaveBib').addEventListener('click', async () => {
@@ -341,7 +467,17 @@
       };
       const swapAvatar = (doc) => { const t = doc.querySelector('#bAvatar'); if (t) { t.innerHTML = ''; const c2 = doc.createElement('canvas'); c2.width = av.width; c2.height = av.height; c2.getContext('2d').drawImage(av, 0, 0); c2.style.cssText = av.style.cssText; t.appendChild(c2); } };
       // จับภาพที่ขนาดคงที่ 420px (มือถือจอเล็กก็ได้รูปเท่ากัน) · scale 2 = คมชัด
-      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true, onclone: (doc) => { U.canvasifyImages(el)(doc); swapAvatar(doc); swapQr(doc); }, width: el.offsetWidth, height: el.offsetHeight, scrollX: 0, scrollY: -window.scrollY });
+      // ฉากที่จับภาพ: รวม 2 ด้านของการ์ดเป็นใบเดียว (ด้านหน้าบน + QR ล่าง) แบบเดิม
+      const flat = (doc) => {
+        const c = doc.querySelector('#ebib'); if (!c) return;
+        c.classList.remove('flipcard', 'is-back'); c.classList.add('flat');
+        const w = doc.querySelector('#ebibFlip'); if (w) w.style.cssText = 'transform:none;perspective:none';
+      };
+      const before = el.classList.contains('is-back');
+      el.classList.remove('flipcard', 'is-back'); el.classList.add('flat');   // วัดขนาดจริงของแบบรวม
+      const W = el.offsetWidth, H = el.offsetHeight;
+      el.classList.remove('flat'); el.classList.add('flipcard'); if (before) el.classList.add('is-back');
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true, onclone: (doc) => { flat(doc); U.canvasifyImages(el)(doc); swapAvatar(doc); swapQr(doc); }, width: W, height: H, scrollX: 0, scrollY: -window.scrollY });
       const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
       if (!blob) throw new Error('canvas empty');
       loading(false);

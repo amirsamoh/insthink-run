@@ -8,6 +8,7 @@
  */
 (function () {
   const CFG = window.APP_CONFIG;
+  const U = window.U;
   const { $, $$, esc, toast, busy, loading, myBibs, pkg, delivery, money, starSvg, avatarHtml } = window.U;
 
   /* ---------- ข้อมูลงาน (หัวหน้าสมัคร) ---------- */
@@ -102,12 +103,15 @@
   $('#regForm').addEventListener('change', update);
   paintMember(member);
   update();
+  const refCode = U.ref.get();
+  if (refCode) { $('#refNote').innerHTML = 'เพื่อนของคุณ <b>' + U.esc(refCode) + '</b> ชวนมาวิ่งด้วยกัน'; $('#refNote').classList.remove('hidden'); }
 
   /* ---------- ตรวจฟอร์ม ---------- */
   function collect() {
     const d = { package: radio('package'), drink: radio('drink'), sweetness: radio('sweetness'), delivery: radio('delivery') };
     ['note', 'address', 'zipcode'].forEach((k) => { d[k] = $('#' + k).value.trim(); });
     d.consent = $('#consent').checked;
+    d.ref = U.ref.get();   // ลิงก์ชวนเพื่อน (ถ้ามี)
     return d;
   }
 
@@ -158,7 +162,8 @@
     try {
       loading(true, 'กำลังบันทึกใบสมัคร…', 'กรุณารอสักครู่ อย่าปิดหน้านี้');
       const { runner } = await API.call('register', d);
-      myBibs.add(runner.bib, runner.token);   // เครื่องนี้เปิดหน้าได้โดยไม่ต้องยืนยัน
+      myBibs.add(runner.bib, runner.token);
+      U.ref.clear();   // เครื่องนี้เปิดหน้าได้โดยไม่ต้องยืนยัน
       location.href = 'profile.html?bib=' + encodeURIComponent(runner.bib) + '&new=1';
     } catch (err) {
       loading(false);

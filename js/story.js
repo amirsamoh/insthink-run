@@ -70,15 +70,16 @@
 
   const loadImg = (img) => (img.complete && img.naturalWidth ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r; }));
 
-  /** ประกอบ DOM ของ Story แล้วคืนค่า Blob (PNG) */
-  async function build(runner) {
-    const el = document.getElementById('story');
-    const km = CFG.EVENT.distanceKm;
-
-    el.innerHTML = `
-      ${backgroundSvg()}
+  const pinSvg = (c) => `<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`;
+  const head = () => `${backgroundSvg()}
       <img class="s-logo" src="img/logo-white.png" alt="">
-      <div class="s-date">${esc(CFG.EVENT.dateLabel)}<small>${esc(CFG.EVENT.location)}</small></div>
+      <div class="s-date">${esc(CFG.EVENT.dateLabel)}<small>${esc(CFG.EVENT.location)}</small></div>`;
+  const foot = (n) => `<div class="s-foot"><span>${esc(CFG.EVENT.instagram)}</span><span class="s-page">${n} / 3</span><span>${esc(CFG.EVENT.hashtag)}</span></div>`;
+
+  /** หน้า 1: I'm running — รูปโปรไฟล์ + เส้นทาง + การ์ด BIB */
+  function slideBib(runner) {
+    const km = CFG.EVENT.distanceKm;
+    return `${head()}
       <div class="s-title">I'm<br><span class="o">running</span></div>
       <div class="s-runner">
         <span class="s-avatar">${runner.photo ? `<img src="${esc(runner.photo)}" alt="">` : esc(String(runner.nickname || runner.firstName || '?').charAt(0).toUpperCase())}</span>
@@ -98,36 +99,91 @@
         <div class="num"><span>${esc(runner.bib)}</span></div>
         <div class="nm"><span>${esc(runner.nickname || runner.firstName)}</span><span>${esc(CFG.EVENT.dateLabel)}</span></div>
       </div>
-      <div class="s-foot"><span>${esc(CFG.EVENT.instagram)}</span><span>${esc(CFG.EVENT.hashtag)}</span></div>`;
+      ${foot(1)}`;
+  }
 
+  /** หน้า 2: Race Kit — รูปของที่ได้รับ 4 ชิ้น (ใช้ background-image เพราะ html2canvas ไม่รองรับ object-fit) */
+  function slideKit() {
+    const kit = [
+      ['img/bandana-flat.webp', 'ผ้าโพกหัว Bandana', 'light'],
+      ['img/stickers.webp', 'สติกเกอร์ Limited', ''],
+      ['img/wristband.webp', 'ริสแบน', ''],
+      ['img/meal.webp', 'ข้าวยำ + เครื่องดื่ม', ''],
+    ];
+    const price = (CFG.PACKAGES.find((p) => p.runner) || {}).price;
+    return `${head()}
+      <div class="s-title">Race<br><span class="o">kit</span></div>
+      <div class="k-grid">${kit.map(([src, name, cls], i) => `<div class="k-tile ${cls}"><div class="k-img" style="background-image:url('${src}')"></div><span class="k-no">0${i + 1}</span><span class="k-name">${esc(name)}</span></div>`).join('')}</div>
+      <div class="k-note"><b>${CFG.EVENT.distanceKm}K RUN</b> · ของที่ระลึกทั้งหมดรวมในค่าสมัคร ${price} บาท</div>
+      ${foot(2)}`;
+  }
+
+  /** หน้า 3: Race Day — ตารางเวลา + สถานที่ + ชวนเพื่อนด้วยลิงก์ของเจ้าของ */
+  function slideDay(runner) {
+    const url = window.U.inviteUrl(runner.bib).replace(/^https?:\/\//, '');
+    return `${head()}
+      <div class="s-title">Race<br><span class="o">day</span></div>
+      <div class="d-when"><b>${esc(CFG.EVENT.dateLabel)}</b><span>${pinSvg('#8FB4E8')}${esc(CFG.EVENT.location)}</span></div>
+      <ol class="d-tl">${(CFG.EVENT.schedule || []).map((x) => `<li class="${x.time === CFG.EVENT.startTime ? 'key' : ''}"><time>${esc(x.time || '')}</time><i></i><div><b>${esc(x.title)}</b>${x.desc ? `<span>${esc(x.desc)}</span>` : ''}</div></li>`).join('')}</ol>
+      <div class="d-cta">
+        <div class="d-cta-t">มาวิ่งด้วยกัน<small>สมัครผ่านลิงก์ของ ${esc(runner.nickname || runner.firstName)}</small></div>
+        <div class="d-url">${esc(url)}</div>
+      </div>
+      ${foot(3)}`;
+  }
+
+  /** จับภาพ .story ปัจจุบันเป็น Blob */
+  async function capture(el, runner) {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    await Promise.all(Array.from(el.querySelectorAll('img')).map(loadImg));
+    // รอรูปพื้นหลัง (background-image) ให้โหลดเสร็จ
+    const bgs = Array.from(el.querySelectorAll('.k-img')).map((d) => (d.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/) || [])[1]).filter(Boolean);
+    await Promise.all(bgs.map((src) => new Promise((r) => { const i = new Image(); i.onload = i.onerror = r; i.src = src; })));
+    await new Promise((r) => setTimeout(r, 80));
+    const num = el.querySelector('.s-bib .num span');
+    if (num) fitText(num, 780, 250);   // เลข BIB พอดีการ์ด
+    fitText(el.querySelector('.s-title'), 940, 200);
+
+    let swapAvatar = () => {};
+    if (el.querySelector('.s-avatar')) {
+      const av = await window.U.avatarCanvas(runner, 132, 6, 0);
+      swapAvatar = (doc) => { const t = doc.querySelector('#story .s-avatar'); if (t) { t.innerHTML = ''; t.style.cssText = 'width:132px;height:132px;border:0;background:none;overflow:visible;display:block'; const c2 = doc.createElement('canvas'); c2.width = av.width; c2.height = av.height; c2.getContext('2d').drawImage(av, 0, 0); c2.style.cssText = av.style.cssText; t.appendChild(c2); } };
+    }
+    const canvas = await html2canvas(el, {
+      width: 1080, height: 1920, scale: 1, x: 0, y: 0, scrollX: 0, scrollY: 0,
+      windowWidth: 1080, windowHeight: 1920,
+      backgroundColor: '#0F2244', useCORS: true, onclone: (doc) => { window.U.canvasifyImages(el)(doc); swapAvatar(doc); }, logging: false,
+    });
+    return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+  }
+
+  /** สร้าง Story ทั้ง 3 หน้า → [Blob, Blob, Blob] */
+  async function buildAll(runner) {
+    const el = document.getElementById('story');
     // overlay บังจอระหว่างย้าย stage มาที่ (0,0) ให้ html2canvas วัดตำแหน่งถูก
     const overlay = document.createElement('div');
     overlay.className = 'render-overlay';
-    overlay.innerHTML = '<span class="spinner"></span><span>Creating your story…</span>';
+    overlay.innerHTML = '<span class="spinner"></span><span id="storyProg">Creating your story… 1/3</span>';
     document.body.appendChild(overlay);
     const stage = el.parentElement;
     stage.classList.add('rendering');
-
     try {
-      if (document.fonts && document.fonts.ready) await document.fonts.ready;
-      await Promise.all(Array.from(el.querySelectorAll('img')).map(loadImg));
-      await new Promise((r) => setTimeout(r, 80));
-      fitText(el.querySelector('.s-bib .num span'), 780, 250);   // เลข BIB พอดีการ์ด
-      fitText(el.querySelector('.s-title'), 940, 200);
-
-      const av = await window.U.avatarCanvas(runner, 132, 6, 0);
-      const swapAvatar = (doc) => { const t = doc.querySelector('#story .s-avatar'); if (t) { t.innerHTML = ''; t.style.cssText = 'width:132px;height:132px;border:0;background:none;overflow:visible;display:block'; const c2 = doc.createElement('canvas'); c2.width = av.width; c2.height = av.height; c2.getContext('2d').drawImage(av, 0, 0); c2.style.cssText = av.style.cssText; t.appendChild(c2); } };
-      const canvas = await html2canvas(el, {
-        width: 1080, height: 1920, scale: 1, x: 0, y: 0, scrollX: 0, scrollY: 0,
-        windowWidth: 1080, windowHeight: 1920,
-        backgroundColor: '#0F2244', useCORS: true, onclone: (doc) => { window.U.canvasifyImages(el)(doc); swapAvatar(doc); }, logging: false,
-      });
-      return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+      const out = [];
+      const slides = [slideBib, slideKit, slideDay];
+      for (let i = 0; i < slides.length; i++) {
+        const p = document.getElementById('storyProg'); if (p) p.textContent = 'Creating your story… ' + (i + 1) + '/' + slides.length;
+        el.innerHTML = slides[i](runner);
+        out.push(await capture(el, runner));
+      }
+      return out;
     } finally {
       stage.classList.remove('rendering');
       overlay.remove();
     }
   }
 
-  window.Story = { build };
+  /** (เดิม) หน้าเดียว */
+  async function build(runner) { return (await buildAll(runner))[0]; }
+
+  window.Story = { build, buildAll };
 })();

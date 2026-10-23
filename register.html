@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#FFFFFF">
+  <script>try{var t=localStorage.getItem('irc_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;if(t==='dark')document.querySelector('meta[name=theme-color]').content='#070D1F'}catch(e){}</script>
   <title>สมัครวิ่ง · INSTHINK RUN CLUB</title>
   <meta name="description" content="สมัครวิ่ง 6K กับ INSTHINK RUN CLUB รับผ้าโพกหัว Bandana และ E-BIB ออนไลน์">
   <link rel="icon" href="img/logo.png">
@@ -39,6 +40,7 @@
     </section>
 
     <form id="regForm" class="hidden" novalidate autocomplete="on" onsubmit="return false">
+      <div class="ref-note hidden" id="refNote"></div>
 
       <!-- 01 แพ็กเกจ -->
       <h2 class="section-title"><span class="num">01</span>เลือกแพ็กเกจ</h2>

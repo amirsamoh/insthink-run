@@ -28,6 +28,7 @@
     $('#topActions').classList.remove('hidden');
     setupFilters();
     await refresh();
+    loadFeedback();
     schedule();
   }
 
@@ -68,7 +69,32 @@
   }
   $('#auto').addEventListener('change', schedule);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && $('#auto').checked && key) refresh(); });
-  $('#refreshBtn').addEventListener('click', refresh);
+  $('#refreshBtn').addEventListener('click', () => { refresh(); loadFeedback(); });
+
+  /* ---------- หลังจบงาน: สวิตช์ + ผลแบบประเมิน ---------- */
+  async function loadFeedback() {
+    try {
+      const d = await API.call('feedbackList', { key });
+      $('#postToggle').checked = !!d.postEvent;
+      const list = d.list.filter((x) => !f.event || x.eventId === f.event);
+      const avg = list.length ? list.reduce((s, x) => s + x.rating, 0) / list.length : 0;
+      const dist = [5, 4, 3, 2, 1].map((n) => [n, list.filter((x) => x.rating === n).length]);
+      $('#fbSum').innerHTML = list.length
+        ? `<div class="fb-avg"><b>${avg.toFixed(1)}</b><span>${'★'.repeat(Math.round(avg))}${'☆'.repeat(5 - Math.round(avg))}</span><small>${list.length} คนตอบ</small></div>
+           <div class="hbars">${dist.map(([n, c]) => `<div class="hbar"><span class="lbl">${n} ดาว</span><div class="track"><div class="fill" style="width:${(c / list.length) * 100}%;background:var(--lime)"></div></div><span class="val">${c}</span></div>`).join('')}</div>`
+        : '<p class="muted small" style="margin:12px 0 0">ยังไม่มีผลแบบประเมิน</p>';
+      $('#fbList').innerHTML = list.filter((x) => x.comment).slice(0, 30).map((x) => `<div class="fb-item"><div><b>${esc(x.bib)}</b> ${esc(x.name)} <span class="fb-st">${'★'.repeat(x.rating)}</span></div><p>${esc(x.comment)}</p></div>`).join('');
+    } catch (err) { $('#fbSum').innerHTML = '<p class="muted small">โหลดผลแบบประเมินไม่ได้: ' + esc(err.message) + '</p>'; }
+  }
+  $('#postToggle').addEventListener('change', async (e) => {
+    const on = e.target.checked;
+    if (!confirm(on ? 'เปิดโหมดหลังจบงาน?\nผู้สมัครจะเห็นรูป Finisher และแบบประเมินทันที' : 'ปิดโหมดหลังจบงาน?')) { e.target.checked = !on; return; }
+    try {
+      const d = await API.call('setFlag', { key, name: 'POST_EVENT', value: on });
+      e.target.checked = d.postEvent;
+      toast(d.postEvent ? 'เปิดโหมดหลังจบงานแล้ว' : 'ปิดโหมดหลังจบงานแล้ว', 'ok');
+    } catch (err) { e.target.checked = !on; toast(err.message, 'err'); }
+  });
 
   /* ---------- สถิติ ---------- */
   const isRun = (r) => pkg(r.package).runner;
@@ -123,6 +149,15 @@
       <div><span>ซื้อผ้าโพกหัวอย่างเดียว</span><b>${paid.filter((r) => !isRun(r)).length}</b></div>`;
 
     hbars($('#drinkBars'), CFG.DRINKS, paidRunners, 'drink', { colors: Object.fromEntries(CFG.DRINKS.map((d) => [d, 'var(--sky)'])) });
+    // ชวนเพื่อน: นับรายการที่มี ref (ทุกแพ็กเกจ) แยกตามคนชวน
+    const byRef = {};
+    rows.forEach((r) => { if (r.ref) byRef[r.ref] = (byRef[r.ref] || 0) + 1; });
+    const top = Object.entries(byRef).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const who = (b) => rows.find((x) => x.bib === b) || {};
+    $('#inviteTop').innerHTML = top.length
+      ? '<ol class="rank">' + top.map(([b, n], i) => `<li><i>${i + 1}</i><span><b>${esc(b)}</b> ${esc(who(b).nickname || who(b).firstName || '')}</span><em>${n} คน</em></li>`).join('') + '</ol><p class="muted small" style="margin:8px 0 0">สมัครผ่านลิงก์ชวนเพื่อนรวม ' + rows.filter((r) => r.ref).length + ' รายการ</p>'
+      : '<p class="muted small" style="margin:12px 0 0">ยังไม่มีใครสมัครผ่านลิงก์ชวนเพื่อน</p>';
+
     const allergy = paidRunners.filter((r) => r.note && !/^(ไม่แพ้|ไม่มี|-|no)/i.test(r.note));
     $('#allergyList').innerHTML = allergy.length
       ? allergy.map((r) => `<div><b>${esc(r.bib)}</b> ${esc(r.nickname || r.firstName)} — ${esc(r.note)}</div>`).join('')
@@ -144,7 +179,7 @@
     sel.innerHTML = '<option value="">ทุกอีเวนต์</option>' + ids.map((v) => `<option value="${esc(v)}">${esc(v)}${v === CFG.EVENT.id ? ' (รอบนี้)' : ''}</option>`).join('');
     sel.value = f.event;
   }
-  $('#fEvent').addEventListener('change', (e) => { f.event = e.target.value; renderStats(); renderTable(); });
+  $('#fEvent').addEventListener('change', (e) => { f.event = e.target.value; renderStats(); renderTable(); loadFeedback(); });
 
   $('#fText').addEventListener('input', (e) => { f.text = e.target.value.trim().toLowerCase(); renderTable(); });
   [['#fPkg', 'pkg'], ['#fPay', 'pay'], ['#fDel', 'del'], ['#fIn', 'inn']].forEach(([s, k]) =>
@@ -334,7 +369,7 @@
   /* ---------- ส่งออก CSV (เปิดใน Excel ภาษาไทยได้ เพราะใส่ BOM) ---------- */
   $('#csvBtn').addEventListener('click', () => {
     const cols = ['bib', 'package', 'firstName', 'lastName', 'nickname', 'gender', 'phone', 'email', 'drink', 'sweetness',
-      'delivery', 'address', 'zipcode', 'amount', 'paymentStatus', 'paidAt', 'shipStatus', 'trackingNo', 'status', 'checkinAt', 'checkinBy', 'note', 'eventId', 'createdAt'];
+      'delivery', 'address', 'zipcode', 'amount', 'paymentStatus', 'paidAt', 'shipStatus', 'trackingNo', 'status', 'checkinAt', 'checkinBy', 'note', 'ref', 'eventId', 'createdAt'];
     const cell = (v) => {
       let s = String(v == null ? '' : v);
       if (/^[=+\-@]/.test(s)) s = "'" + s;   // กันสูตรใน Excel

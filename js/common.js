@@ -326,6 +326,61 @@
   }
 
   /** เติม header (เมนู + บัญชี) และปุ่ม Admin ท้ายเว็บ ให้ทุกหน้า */
+  /* ---------- ลิงก์ชวนเพื่อน: ?ref=R001 → จำไว้ในเครื่อง 30 วัน แล้วแนบตอนสมัคร ---------- */
+  const REF_KEY = 'irc_ref';
+  (function captureRef() {
+    try {
+      const v = (new URLSearchParams(location.search).get('ref') || '').toUpperCase();
+      if (/^[A-Z]\d{3,5}$/.test(v)) localStorage.setItem(REF_KEY, JSON.stringify({ code: v, at: Date.now() }));
+    } catch (e) { /* ignore */ }
+  })();
+  const ref = {
+    get() {
+      try {
+        const o = JSON.parse(localStorage.getItem(REF_KEY) || 'null');
+        return o && Date.now() - o.at < 30 * 864e5 ? o.code : '';
+      } catch (e) { return ''; }
+    },
+    clear() { try { localStorage.removeItem(REF_KEY); } catch (e) { /* ignore */ } },
+  };
+  /** ลิงก์ชวนเพื่อนของ BIB นี้ (ชี้ไปหน้าแรกของเว็บ) */
+  const inviteUrl = (bib) => location.origin + location.pathname.replace(/[^/]*$/, '') + '?ref=' + encodeURIComponent(bib);
+
+  /* ---------- ธีมมืด / สว่าง (จำในเครื่อง · ค่าเริ่มต้นตามระบบของเครื่อง) ---------- */
+  const THEME_KEY = 'irc_theme';
+  const theme = {
+    saved() { try { return localStorage.getItem(THEME_KEY) || ''; } catch (e) { return ''; } },
+    current() { return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'; },
+    set(t) {
+      document.documentElement.dataset.theme = t;
+      try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* ignore */ }
+      const m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute('content', t === 'dark' ? '#070D1F' : '#FFFFFF');
+    },
+  };
+  (function initTheme() {
+    if (document.documentElement.dataset.theme) return;   // ตั้งไว้แล้วจากสคริปต์ใน <head>
+    const t = theme.saved() || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.dataset.theme = t;
+  })();
+  const themeIcon = () => (theme.current() === 'dark'
+    ? '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7z"/></svg>');
+
+  /* ---------- เอฟเฟกต์เลื่อนหน้า: องค์ประกอบค่อยๆ ลอยขึ้นเมื่อเลื่อนมาถึง ---------- */
+  function reveal(root) {
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const els = $$('[data-reveal]', root || document);
+    if (reduce || !('IntersectionObserver' in window)) { els.forEach((e) => e.classList.add('in')); return; }
+    const io = new IntersectionObserver((ents) => ents.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    }), { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    els.forEach((e, i) => {
+      if (e.dataset.reveal === 'stagger') Array.from(e.children).forEach((c, j) => c.style.setProperty('--d', (j * 70) + 'ms'));
+      io.observe(e);
+    });
+  }
+
   function mountChrome() {
     const nav = $('[data-nav]');
     if (nav) {
@@ -337,8 +392,23 @@
         : `<a class="btn btn-sm btn-dark" href="login.html">เข้าสู่ระบบ</a>`;
       nav.innerHTML = `
         <a class="brand" href="index.html" aria-label="INSTHINK RUN CLUB"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></a>
-        <nav class="nav-links">${links.map(([h, t]) => `<a href="${h}" class="${here === h ? 'on' : ''}">${t}</a>`).join('')}${acct}</nav>`;
+        <nav class="nav-links">${links.map(([h, t]) => `<a href="${h}" class="${here === h ? 'on' : ''}">${t}</a>`).join('')}<button class="theme-btn" type="button" data-theme-btn aria-label="สลับโหมดมืด / สว่าง">${themeIcon()}</button>${acct}</nav>`;
     }
+    // ปุ่มสลับธีม (หน้า admin/checkin ไม่มี data-nav → แทรกไว้ใน header)
+    const head = $('.site-head');
+    if (head && !head.querySelector('[data-theme-btn]')) {
+      const b = document.createElement('button');
+      b.className = 'theme-btn'; b.type = 'button'; b.setAttribute('data-theme-btn', ''); b.setAttribute('aria-label', 'สลับโหมดมืด / สว่าง');
+      b.innerHTML = themeIcon();
+      head.insertBefore(b, head.children[1] || null);
+    }
+    $$('[data-theme-btn]').forEach((b) => b.addEventListener('click', () => {
+      document.documentElement.classList.add('theme-anim');
+      theme.set(theme.current() === 'dark' ? 'light' : 'dark');
+      $$('[data-theme-btn]').forEach((x) => { x.innerHTML = themeIcon(); });
+      setTimeout(() => document.documentElement.classList.remove('theme-anim'), 450);
+    }));
+    reveal();
     // Footer มาตรฐาน (โลโก้ขาว + สโลแกน + ปุ่ม Admin) ทุกหน้าที่มี <footer class="site-foot">
     const foot = $('footer.site-foot');
     if (foot && !foot.querySelector('.admin-link')) {
@@ -359,5 +429,6 @@
     $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
     promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, canvasifyImages, avatarCanvas, sweetLabel, routeSvg, starSvg, fmtDate,
+    ref, inviteUrl, theme, reveal,
   };
 })();
