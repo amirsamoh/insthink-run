@@ -149,7 +149,7 @@
       g.font = 'italic 800 ' + Math.round(r2 * 1.0) + 'px Kanit, sans-serif';
       g.fillText(ch, R, R + r2 * 0.06);
     }
-    c.style.cssText = 'display:block;width:' + size + 'px;height:' + size + 'px';
+    c.style.cssText = 'display:block;margin:0 auto;width:' + size + 'px;height:' + size + 'px';
     return c;
   }
 
@@ -179,7 +179,7 @@
   };
 
   /** ความหวาน: ข้อมูลเก่าเก็บเป็น '100%' → แสดงเป็น หวานปกติ */
-  const sweetLabel = (v) => (!v || v === '100%' ? 'หวานปกติ' : v);
+  const sweetLabel = (v) => (!v || v === '100%' ? 'หวานปกติ' : v === 'หวานหน่อย' ? 'หวานน้อย' : v);
 
   /* ---------- แพ็กเกจ / สถานะ ---------- */
   const pkg = (code) => CFG.PACKAGES.find((p) => p.code === code) || CFG.PACKAGES[0];

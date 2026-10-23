@@ -329,9 +329,19 @@
       const el = $('#ebib');
       await Promise.all(Array.from(el.querySelectorAll('img')).map((im) => (im.complete && im.naturalWidth ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
       const av = await U.avatarCanvas(runner, 112, 3, 2);   // วงกลมโปรไฟล์: วาดเอง ไม่ให้ html2canvas วาด
+      // QR: คัดลอกพิกเซลจาก canvas ต้นฉบับใส่ canvas ใหม่ในฉากที่จับภาพ (บางเครื่อง html2canvas คัดลอก canvas ไม่ติด)
+      const qrSrc = $('#bQr canvas');
+      const swapQr = (doc) => {
+        const t = doc.querySelector('#bQr');
+        if (!t || !qrSrc || !qrSrc.width) return;
+        const c2 = doc.createElement('canvas'); c2.width = qrSrc.width; c2.height = qrSrc.height;
+        c2.getContext('2d').drawImage(qrSrc, 0, 0);
+        c2.style.cssText = 'display:block;width:116px;height:116px';
+        t.innerHTML = ''; t.appendChild(c2);
+      };
       const swapAvatar = (doc) => { const t = doc.querySelector('#bAvatar'); if (t) { t.innerHTML = ''; const c2 = doc.createElement('canvas'); c2.width = av.width; c2.height = av.height; c2.getContext('2d').drawImage(av, 0, 0); c2.style.cssText = av.style.cssText; t.appendChild(c2); } };
       // จับภาพที่ขนาดคงที่ 420px (มือถือจอเล็กก็ได้รูปเท่ากัน) · scale 2 = คมชัด
-      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true, onclone: (doc) => { U.canvasifyImages(el)(doc); swapAvatar(doc); }, width: el.offsetWidth, height: el.offsetHeight, scrollX: 0, scrollY: -window.scrollY });
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true, onclone: (doc) => { U.canvasifyImages(el)(doc); swapAvatar(doc); swapQr(doc); }, width: el.offsetWidth, height: el.offsetHeight, scrollX: 0, scrollY: -window.scrollY });
       const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
       if (!blob) throw new Error('canvas empty');
       loading(false);

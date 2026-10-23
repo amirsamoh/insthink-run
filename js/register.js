@@ -47,6 +47,7 @@
           <div class="price">${p.price}<small>฿</small></div>
         </div>
         <ul>${p.includes.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>
+        <span class="pick"><span class="no">เลือกแพ็กเกจนี้</span><span class="yes">เลือกแล้ว</span></span>
       </div>
     </label>`).join('');
 

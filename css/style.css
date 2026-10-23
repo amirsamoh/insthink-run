@@ -742,3 +742,24 @@ footer.site-foot .foot-btns { display: flex; gap: 10px; flex-wrap: wrap; justify
 .slip-bar { position: fixed; z-index: 60; left: 16px; right: 16px; bottom: calc(14px + env(safe-area-inset-bottom)); padding: 14px 18px; border: 0; border-radius: 99px; background: var(--night); color: #fff; font: 400 15px var(--font); box-shadow: 0 14px 30px rgba(10,20,48,.35); cursor: pointer; }
 .slip-bar b { color: var(--lime); font-weight: 600; margin-left: 4px; }
 @media (min-width: 760px) { .slip-bar { left: auto; right: 24px; width: auto; } }
+
+/* ---------- แพ็กเกจ: บอกชัดว่าต้องแตะเลือก ---------- */
+.pkg-hint { margin: -4px 0 12px; font-size: 14px; color: var(--navy); font-weight: 500; }
+.pkg .box { display: flex; flex-direction: column; cursor: pointer; }
+.pkg ul { flex: 1; }
+.pkg .pick { margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 14px; border-radius: 99px; border: 1.5px solid var(--navy); color: var(--navy); font-weight: 600; font-size: 15px; transition: all .18s; }
+.pkg .pick .yes { display: none; }
+.pkg .pick .yes::before { content: ''; display: inline-block; width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A1430' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat; }
+@media (hover: hover) { .pkg:hover .pick { background: var(--navy-tint); } }
+.pkg input:checked + .box { background: var(--night); border-color: var(--night); color: #fff; }
+.pkg input:checked + .box .ttl { color: #AFC0DD; }
+.pkg input:checked + .box .price { color: #fff; }
+.pkg input:checked + .box li::before { background: var(--lime); }
+.pkg input:checked + .box .pick { background: var(--lime); border-color: var(--lime); color: var(--night); }
+.pkg input:checked + .box .pick .no { display: none; }
+.pkg input:checked + .box .pick .yes { display: inline; }
+.pkg input:checked + .box::after { opacity: .1; background: repeating-linear-gradient(115deg, #fff 0 6px, transparent 6px 16px); }
+/* ยังไม่ได้เลือก: ปุ่มเลือกกระพริบเบาๆ ให้รู้ว่ากดได้ */
+.packages:not(:has(input:checked)) .pick { animation: pickpulse 2s ease-in-out infinite; }
+@keyframes pickpulse { 50% { box-shadow: 0 0 0 6px rgba(27,59,103,.12); } }
+@media (prefers-reduced-motion: reduce) { .packages .pick { animation: none !important; } }
