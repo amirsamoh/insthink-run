@@ -110,8 +110,19 @@
       <h2 class="block-title">Top <span class="g">inviters</span></h2>
       <p class="muted" style="max-width:460px" id="lbIntro"></p>
       <div class="lb-card">
-        <div class="lb-prize"><small>รางวัล</small><b id="lbPrize"></b></div>
+        <div class="lb-prize" id="lbPrizeBox">
+          <figure class="lb-media" id="lbMedia">
+            <img class="m-photo" id="lbPrizeImg" alt="นายแบบสวมหมวกวิ่ง INSTHINK RUN CLUB" hidden>
+          </figure>
+          <div class="lb-txt"><span class="lb-top">TOP <i id="lbN">5</i></span><small>รางวัล</small><b id="lbPrize"></b></div>
+          <span class="lb-badge" id="lbBadge" hidden></span>
+          <span id="lbPrizeNote"></span>
+          <a class="lb-go" href="register.html" aria-label="สมัครวิ่ง"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+        </div>
+        <div class="lb-meta"><span class="lb-scarce" id="lbScarce"></span></div>
+        <div class="lb-me" id="lbMe" hidden></div>
         <ol class="lb-list" id="lbList"></ol>
+        <div class="lb-news" id="lbNews" hidden aria-live="polite"></div>
         <p class="lb-rule" id="lbRule"></p>
         <a class="btn btn-primary" href="register.html" id="lbCta">สมัครวิ่ง แล้วรับลิงก์ชวนเพื่อน</a>
       </div>

@@ -29,24 +29,107 @@
   $('#homeRouteName').textContent = CFG.ROUTE.name;
   $('#homeRouteLoc').textContent = CFG.EVENT.location + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.';
 
-  /* ---------- กระดานผู้นำ: ชวนเพื่อนมากที่สุด Top N (อัปเดตเองทุกครั้งที่เปิดหน้า) ---------- */
+  /* ---------- กระดานผู้นำ: ชวนเพื่อนมากที่สุด Top N ---------- */
   (function leaderboard() {
-    const R = CFG.REFERRAL || {}; const n = R.topN || 5;
-    $('#lbIntro').textContent = 'ชวนเพื่อนมาวิ่งผ่านลิงก์ของคุณ ' + n + ' อันดับที่ชวนได้มากที่สุดรับรางวัลพิเศษ';
-    $('#lbPrize').textContent = R.prize || 'รางวัลพิเศษ';
+    const R = CFG.REFERRAL || {}; let n = R.topN || 5;
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const box = $('#lbPrizeBox'); if (!box) return;
+    const prize = R.prize || 'รางวัลพิเศษ';
+    $('#lbPrize').textContent = prize;
+    $('#lbPrizeNote').textContent = R.prizeNote || '';
     $('#lbRule').textContent = R.rule || '';
+    if (R.badge) { const bd = $('#lbBadge'); bd.textContent = R.badge; bd.hidden = false; }
+    if (R.prizeImg) { const im = $('#lbPrizeImg'); im.src = R.prizeImg; im.hidden = false; }
+    const setN = (v) => { $('#lbN').textContent = v; };
+    const intro = () => { $('#lbIntro').textContent = 'ชวนเพื่อนมาวิ่งผ่านลิงก์ของคุณ ' + n + ' อันดับที่ชวนได้มากที่สุดรับ ' + prize; };
+    intro(); setN(n);
+    $('#lbScarce').textContent = 'LIMITED · มีเพียง ' + n + ' ใบเท่านั้น';
+
+    /* (3) ตัวเลข TOP N ไล่ขึ้นทีละตัวตอนเลื่อนเข้าจอ */
+    if (!reduce && 'IntersectionObserver' in window) {
+      setN(0);
+      const io = new IntersectionObserver((es) => {
+        if (!es[0].isIntersecting) return; io.disconnect();
+        let c = 0; const t = setInterval(() => { c++; setN(Math.min(c, n)); if (c >= n) clearInterval(t); }, 150);
+      }, { threshold: 0.4 });
+      io.observe(box);
+    }
+
+    /* (4) Parallax: รูปขยับช้ากว่าการเลื่อนหน้าจอ + ขยับตามเมาส์บนเดสก์ท็อป */
+    if (!reduce) {
+      let raf = 0;
+      const tick = () => {
+        raf = 0; const r = box.getBoundingClientRect(), vh = innerHeight;
+        if (r.bottom < -80 || r.top > vh + 80) return;
+        const off = (r.top + r.height / 2 - vh / 2) / vh;       // -1..1
+        box.style.setProperty('--py', Math.max(-16, Math.min(16, off * -26)).toFixed(1) + 'px');
+      };
+      addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
+      addEventListener('resize', tick); tick();
+      box.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return; const r = box.getBoundingClientRect();
+        box.style.setProperty('--px', (((e.clientX - r.left) / r.width - .5) * -14).toFixed(1) + 'px');
+      });
+      box.addEventListener('pointerleave', () => box.style.setProperty('--px', '0px'));
+    }
+
+    let me = null;
     const draw = (top) => {
       const rows = [];
       for (let i = 0; i < n; i++) {
         const o = top[i];
         rows.push(o
-          ? `<li class="${i < 3 ? 'p' + (i + 1) : ''}"><i>${i + 1}</i><span>${U.esc(o.nickname || o.bib)}</span><em>${o.count}<small> คน</small></em></li>`
+          ? `<li class="${i < 3 ? 'p' + (i + 1) : ''} ${me && me.bib && o.bib === me.bib ? 'me' : ''}"><i>${i + 1}</i><span>${U.esc(o.nickname || o.bib)}${me && me.bib && o.bib === me.bib ? ' <small class="you">คุณ</small>' : ''}</span><em>${o.count}<small> คน</small></em></li>`
           : `<li class="empty"><i>${i + 1}</i><span>ว่าง · รอคุณขึ้นมา</span><em>–</em></li>`);
       }
       $('#lbList').innerHTML = rows.join('');
     };
+
+    /* (8) การ์ดอันดับของฉัน (เฉพาะคนที่ล็อกอิน) */
+    const drawMe = (m, topN) => {
+      const el = $('#lbMe'); if (!m) { el.hidden = true; return; }
+      let html = '';
+      if (!m.hasRun) html = '<span>สมัครวิ่งก่อน เพื่อรับลิงก์ชวนเพื่อนและลุ้นรับ' + U.esc(prize) + '</span><a class="lb-me-btn" href="register.html">สมัครวิ่ง</a>';
+      else {
+        const lead = m.inTop ? 'คุณอยู่อันดับ <b>' + m.rank + '</b> · ชวนแล้ว ' + m.count + ' คน — รักษาอันดับไว้!'
+          : m.count > 0 ? 'คุณอยู่อันดับ <b>' + m.rank + '</b> · ชวนอีก <b>' + m.need + '</b> คนเข้า Top ' + topN
+          : 'ยังไม่มีเพื่อนชำระเงินผ่านลิงก์ของคุณ · ชวนอีก <b>' + m.need + '</b> คนเข้า Top ' + topN;
+        html = '<span>' + lead + '</span><button class="lb-me-btn" type="button" id="lbCopy">คัดลอกลิงก์ชวน</button>';
+      }
+      el.innerHTML = html; el.hidden = false;
+      const cp = $('#lbCopy');
+      if (cp) cp.addEventListener('click', async () => {
+        const url = U.inviteUrl(m.bib);
+        try { await navigator.clipboard.writeText(url); } catch (e) { const t = document.createElement('input'); t.value = url; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e2) { /* ignore */ } t.remove(); }
+        cp.textContent = 'คัดลอกแล้ว'; setTimeout(() => { cp.textContent = 'คัดลอกลิงก์ชวน'; }, 1800);
+      });
+    };
+
+    /* (9) ข่าวไต่อันดับ: เทียบกับครั้งล่าสุดที่เครื่องนี้เห็น (เฉพาะข้อมูลจริงจากชีต) */
+    const news = (top) => {
+      const KEY = 'irc_lb_prev'; let prev = null;
+      try { prev = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { /* ignore */ }
+      if (prev && prev.length) {
+        const lines = [];
+        top.forEach((o) => {
+          const p = prev.find((x) => x.bib === o.bib), nm = U.esc(o.nickname || o.bib);
+          if (!p) lines.push('<b>' + nm + '</b> เข้าสู่ Top ' + n + ' อันดับ ' + o.rank);
+          else if (o.rank < p.rank) lines.push('<b>' + nm + '</b> แซงขึ้นอันดับ ' + o.rank);
+        });
+        if (lines.length) {
+          const el = $('#lbNews'); el.innerHTML = lines.slice(0, 2).map((l) => '<div>' + l + '</div>').join(''); el.hidden = false;
+          setTimeout(() => { el.classList.add('fade'); setTimeout(() => { el.hidden = true; }, 700); }, 9000);
+        }
+      }
+      try { localStorage.setItem(KEY, JSON.stringify(top.map((o) => ({ bib: o.bib, rank: o.rank })))); } catch (e) { /* ignore */ }
+    };
+
     draw([]);
-    window.API.call('leaderboard', {}).then((d) => draw((d && d.top) || [])).catch(() => { /* ไม่ต้องรบกวนผู้ใช้ถ้าโหลดไม่ได้ */ });
+    window.API.call('leaderboard', {}).then((d) => {
+      d = d || {}; me = d.me || null;
+      if (d.topN && d.topN !== n) { n = d.topN; setN(n); intro(); $('#lbScarce').textContent = 'LIMITED · มีเพียง ' + n + ' ใบเท่านั้น'; }
+      draw(d.top || []); drawMe(me, n); news(d.top || []);
+    }).catch(() => { /* ไม่ต้องรบกวนผู้ใช้ถ้าโหลดไม่ได้ */ });
   })();
 
   /* ---------- Race Kit: coverflow เลื่อนเองทุก 2.5 วิ (หยุดชั่วคราวขณะนิ้วแตะ) ---------- */

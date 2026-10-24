@@ -1083,3 +1083,147 @@ footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity:
 /* ป้ายสถานะ: ใช้กล่องห่อ text-align:center เพื่อให้อยู่กึ่งกลางทั้งบนหน้าเว็บและตอนบันทึกรูป (html2canvas ไม่รองรับ margin:auto บน inline-flex) */
 .ebib .ebib-status { display: block; width: 100%; text-align: center; margin: 14px 0 0; }
 .ebib .ebib-status .ebib-ribbon { margin: 0; align-self: auto; vertical-align: top; }
+
+/* รางวัล Top inviters: รูปหมวก */
+.lb-prize { grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+.lb-prize > div { display: grid; gap: 6px; min-width: 0; }
+.lb-prize b { font-size: 24px; }
+.lb-prize span { font: 400 14px/1.3 var(--font); color: #C6D5EC; }
+.lb-prize img { width: 150px; max-width: 42vw; height: auto; display: block; filter: drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
+.lb-prize img[hidden] { display: none; }
+.lb-prize img { box-sizing: border-box; padding: 8px 10px 4px; border-radius: 22px; background: radial-gradient(90% 80% at 50% 35%, #F4F7FF, #B9C8E6); filter: none; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); }
+/* รูปหมวก: ไม่มีกรอบ — ใช้แสงฟ้ารอบรูปให้หมวกสีเข้มเด่นบนพื้นมืด */
+.lb-prize img { padding: 0; border-radius: 0; background: none; box-shadow: none; width: 170px; filter: drop-shadow(0 0 1.5px rgba(255,255,255,.55)) drop-shadow(0 0 22px rgba(143,180,232,.55)) drop-shadow(0 14px 14px rgba(0,0,0,.45)); }
+/* รูปหมวก: ไม่มีเงา/แสง/กรอบ */
+.lb-prize img { filter: none; box-shadow: none; }
+
+/* ===== รางวัล Top inviters: สไตล์ product-hero (วงแหวนซ้อนชั้น + หมวกเอียงเด่นทะลุกรอบ) ===== */
+#leaderboard .lb-card { margin-top: 56px; }
+#leaderboard .lb-prize { position: relative; display: block; min-height: 236px; padding: 0; border: 0; isolation: isolate; }
+#leaderboard .lb-prize::before {
+  content: ''; position: absolute; inset: 0; z-index: -2; border-radius: 24px;
+  background:
+    radial-gradient(circle at 76% 58%, rgba(143,195,245,.55) 0, rgba(46,111,224,0) 22%),
+    radial-gradient(circle at 76% 58%, #2E6FE0 0 30%, #2559B8 30% 31%, #1E4A9C 31% 52%, #183C82 52% 53%, #12306B 53% 78%, transparent 78.4%),
+    linear-gradient(135deg, #0F2550, #0B1A3C);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
+}
+#leaderboard .lb-prize::after {   /* วงแหวนเส้นบาง ๆ รอบนอก */
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 24px; pointer-events: none;
+  background: radial-gradient(circle at 76% 58%, transparent 0 56%, rgba(127,221,245,.35) 56.2%, transparent 56.8%, transparent 70%, rgba(127,221,245,.18) 70.2%, transparent 70.8%);
+}
+#leaderboard .lb-prize > div { position: absolute; left: 20px; top: 24px; bottom: 22px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; max-width: 54%; gap: 0; }
+#leaderboard .lb-prize small { font: 700 11px/1 var(--font); letter-spacing: .26em; color: #8FC3F5; }
+#leaderboard .lb-prize b { font: 800 italic 30px/1.02 var(--font); color: #fff; letter-spacing: -.01em; margin-top: 10px; text-transform: none; }
+#leaderboard .lb-prize span {
+  margin-top: auto; display: inline-block; padding: 9px 16px; border-radius: 99px; background: var(--lime); color: #0A1430;
+  font: 700 13px/1 var(--font); letter-spacing: .02em; white-space: nowrap;
+}
+#leaderboard .lb-prize img {
+  position: absolute; z-index: 2; right: -22px; top: -42px; width: 290px; max-width: none; height: auto; display: block;
+  transform: rotate(-10deg); filter: drop-shadow(0 24px 22px rgba(3,10,30,.65));
+}
+#leaderboard .lb-prize { min-height: 250px; }
+#leaderboard .lb-prize > div { max-width: 48%; }
+#leaderboard .lb-prize b { font-size: 23px; line-height: 1.08; }
+#leaderboard .lb-prize img { width: 236px; right: -26px; top: 10px; transform: rotate(-9deg); }
+#leaderboard .lb-prize::before, #leaderboard .lb-prize::after { background-position: 0 0; }
+
+/* ===== รางวัล Top inviters: สไตล์การ์ดสินค้าโทนสว่าง (ลายน้ำตัวใหญ่ + เส้นวงกลมบาง + สินค้าคร่อมพื้นสองระดับ) ===== */
+#leaderboard .lb-card { margin-top: 24px; }
+#leaderboard .lb-prize { position: relative; display: block; height: 330px; min-height: 0; padding: 0; border: 0; border-radius: 26px; overflow: hidden; isolation: isolate;
+  background: linear-gradient(180deg, #E9EDF6 0 74%, #FAFBFD 74% 100%); color: #0A1430; box-shadow: 0 22px 40px -22px rgba(0,0,0,.7); }
+#leaderboard .lb-prize::before {   /* ลายน้ำชื่อแบรนด์ตัวใหญ่จาง ๆ */
+  content: 'INSTHINK'; position: absolute; inset: auto; left: -4%; top: 20%; z-index: -2; background: none; box-shadow: none; border-radius: 0;
+  font: 800 italic 128px/1 var(--font); letter-spacing: -.03em; color: rgba(27,59,103,.075); white-space: nowrap; }
+#leaderboard .lb-prize::after {    /* เส้นวงกลมบางหลังสินค้า */
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 0; pointer-events: none;
+  background: repeating-radial-gradient(circle at 72% 42%, transparent 0 34px, rgba(27,59,103,.14) 34px 35px); -webkit-mask-image: radial-gradient(circle at 72% 42%, #000 0 62%, transparent 72%); mask-image: radial-gradient(circle at 72% 42%, #000 0 62%, transparent 72%); }
+#leaderboard .lb-prize > div { position: absolute; left: 20px; top: 20px; bottom: auto; max-width: 56%; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 0; }
+#leaderboard .lb-prize > div::before { content: 'TOP 5'; font: 800 italic 54px/.95 var(--font); color: #0A1430; letter-spacing: -.02em; }
+#leaderboard .lb-prize small { order: 2; margin-top: 10px; font: 700 10.5px/1 var(--font); letter-spacing: .28em; color: #1B3B67; padding-top: 8px; border-top: 3px solid var(--lime); }
+#leaderboard .lb-prize b { order: 3; margin-top: 8px; font: 500 18px/1.25 var(--font); font-style: normal; color: #0A1430; letter-spacing: 0; }
+#leaderboard .lb-prize span { position: absolute; left: 20px; bottom: 22px; margin: 0; padding: 0; background: none; border-radius: 0; color: #5E6573; font: 500 13px/1.2 var(--font); }
+#leaderboard .lb-prize span:empty { display: none; }
+#leaderboard .lb-prize img { position: absolute; z-index: 2; right: -34px; top: 84px; width: 282px; max-width: none; height: auto; transform: rotate(-8deg); filter: drop-shadow(0 26px 18px rgba(10,20,48,.35)); }
+#leaderboard .lb-go { position: absolute; z-index: 3; right: 16px; bottom: 14px; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: #1B3B67; border: 1.5px solid #1B3B67; background: #fff; text-decoration: none; }
+#leaderboard .lb-prize b { font-size: 16px; font-weight: 600; max-width: 150px; }
+#leaderboard .lb-prize img { top: 96px; width: 270px; right: -30px; }
+#leaderboard .lb-prize span { left: 20px; bottom: 20px; font-size: 13px; font-weight: 600; color: #1B3B67; }
+
+/* ===== รางวัล Top inviters: โปสเตอร์ภาพนายแบบสวมหมวก + ข้อความซ้อนบนภาพ ===== */
+#leaderboard .lb-prize { height: 360px; background: #0F2244; color: #fff; box-shadow: 0 22px 40px -22px rgba(0,0,0,.7); }
+#leaderboard .lb-prize::before {      /* ไล่เฉดมืดจากล่างขึ้นบน ให้ตัวหนังสืออ่านชัดและกลืนกับการ์ดสีเข้ม */
+  content: ''; position: absolute; inset: 0; z-index: 3; font: 0 / 0 var(--font); color: transparent; border-radius: 0; pointer-events: none; -webkit-text-stroke: 0;
+  background: linear-gradient(180deg, rgba(10,20,48,.28) 0, rgba(10,20,48,0) 26%, rgba(10,20,48,.35) 52%, rgba(10,20,48,.94) 100%); }
+#leaderboard .lb-prize::after { content: none; }
+#leaderboard .lb-prize img { position: absolute; inset: 0; z-index: 1; right: auto; top: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 56% 14%; transform: none; filter: none; }
+#leaderboard .lb-prize > div { z-index: 4; left: 20px; right: 20px; top: auto; bottom: 66px; max-width: none; }
+#leaderboard .lb-prize > div::before { color: #fff; font-size: 60px; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+#leaderboard .lb-prize small { color: #CFE3FF; border-top-color: var(--lime); }
+#leaderboard .lb-prize b { color: #fff; font-size: 17px; max-width: none; }
+#leaderboard .lb-prize span { z-index: 4; color: var(--lime); left: 20px; bottom: 26px; }
+#leaderboard .lb-go { z-index: 4; color: #0A1430; background: var(--lime); border-color: var(--lime); }
+
+/* ป้าย LIMITED EDITION บนรูปรางวัล */
+#leaderboard .lb-prize span.lb-badge { position: absolute; z-index: 5; left: 16px; top: 16px; bottom: auto; display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px 8px 11px; border-radius: 99px;
+  background: var(--lime); color: #0A1430; font: 800 italic 11.5px/1 var(--font); letter-spacing: .16em; box-shadow: 0 8px 20px -8px rgba(0,0,0,.6); }
+#leaderboard .lb-prize span.lb-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #0A1430; }
+#leaderboard .lb-prize span.lb-badge[hidden] { display: none; }
+
+/* ===== รางวัล v20: ลูกเล่น (Ken Burns · ประกายป้าย · ตัวเลขไล่ · parallax · สลับรูปหมวก · นับถอยหลัง · อันดับของฉัน · ข่าวไต่อันดับ) ===== */
+#leaderboard .lb-prize { --py: 0px; --px: 0px; }
+#leaderboard .lb-media { position: absolute; inset: 0; z-index: 1; margin: 0; overflow: hidden; border-radius: inherit; background: #0F2244; transition: background .5s; }
+#leaderboard .lb-prize .lb-media img { position: absolute; inset: -6% -4%; width: 108%; height: 112%; z-index: 1; object-fit: cover; object-position: 56% 14%; translate: var(--px) var(--py); transition: opacity .55s ease; }
+#leaderboard .lb-prize .lb-media img[hidden] { display: none; }
+#leaderboard .lb-prize .m-photo { animation: lbKen 20s ease-in-out infinite alternate; }
+@keyframes lbKen { from { transform: scale(1) translateY(0); } to { transform: scale(1.09) translateY(-1.2%); } }
+@keyframes lbFloat { 0%,100% { transform: rotate(-8deg) translateY(0); } 50% { transform: rotate(-6deg) translateY(-7px); } }
+#leaderboard .lb-prize.cap-view .m-photo { opacity: 0; }
+#leaderboard .lb-prize.cap-view .m-cap { opacity: 1; }
+#leaderboard .lb-prize.cap-view .lb-media {
+  background: repeating-radial-gradient(circle at 50% 38%, transparent 0 38px, rgba(143,195,245,.18) 38px 39px), radial-gradient(circle at 50% 38%, #2E6FE0, #17428f 45%, #0B1A3C 85%); }
+
+#leaderboard .lb-txt::before { content: none !important; }
+#leaderboard .lb-prize .lb-top { position: static; display: block; margin: 0; padding: 0; background: none; font: 800 italic 60px/.95 var(--font); color: #fff; letter-spacing: -.02em; text-shadow: 0 2px 18px rgba(0,0,0,.35); font-variant-numeric: tabular-nums; }
+#leaderboard .lb-prize .lb-top i { font-style: inherit; display: inline-block; min-width: .62em; }
+
+/* ประกายแสงวิ่งผ่านป้าย LIMITED EDITION */
+#leaderboard .lb-prize span.lb-badge { overflow: hidden; }
+#leaderboard .lb-prize span.lb-badge::after { content: ''; position: absolute; top: -20%; bottom: -20%; width: 40%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.85), transparent); transform: skewX(-18deg); animation: lbShine 4.6s ease-in-out 1.2s infinite; }
+@keyframes lbShine { 0%, 62% { left: -60%; } 100% { left: 130%; } }
+
+/* ปุ่มสลับรูป */
+#leaderboard .lb-flip { position: absolute; z-index: 5; right: 14px; top: 14px; display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 99px; border: 1px solid rgba(255,255,255,.3);
+  background: rgba(10,20,48,.55); color: #fff; font: 600 12px/1 var(--font); cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+#leaderboard .lb-flip em { font-style: normal; }
+#leaderboard .lb-flip:active { transform: scale(.96); }
+#leaderboard .lb-prize .lb-go { z-index: 5; }
+
+/* แถบ LIMITED + นับถอยหลัง */
+.lb-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: -4px; font: 700 12px/1.3 var(--font); letter-spacing: .08em; }
+.lb-scarce { color: var(--lime); text-transform: uppercase; display: inline-flex; align-items: center; gap: 8px; }
+.lb-scarce::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--lime); animation: lbPulse 1.8s ease-out infinite; }
+@keyframes lbPulse { 0% { box-shadow: 0 0 0 0 rgba(140,212,62,.6); } 100% { box-shadow: 0 0 0 10px rgba(140,212,62,0); } }
+.lb-count { color: #CFE3FF; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.lb-count[hidden], .lb-me[hidden], .lb-news[hidden] { display: none; }
+
+/* อันดับของฉัน */
+.lb-me { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 16px; background: rgba(140,212,62,.14); border: 1px solid rgba(140,212,62,.45); font: 500 14px/1.4 var(--font); }
+.lb-me b { color: var(--lime); font-weight: 800; }
+.lb-me-btn { flex: none; padding: 9px 14px; border-radius: 99px; border: 0; background: var(--lime); color: #0A1430; font: 700 13px/1 var(--font); cursor: pointer; text-decoration: none; white-space: nowrap; }
+.lb-list li.me { outline: 2px solid var(--lime); outline-offset: -2px; }
+.lb-list .you { display: inline-block; margin-left: 6px; padding: 3px 7px; border-radius: 99px; background: var(--lime); color: #0A1430; font: 700 10px/1 var(--font); vertical-align: middle; }
+
+/* ข่าวไต่อันดับ */
+.lb-news { display: grid; gap: 6px; padding: 10px 14px; border-radius: 14px; background: rgba(127,221,245,.12); border: 1px solid rgba(127,221,245,.3); font: 400 13.5px/1.35 var(--font); color: #E6F2FF; transition: opacity .6s; animation: lbIn .5s ease; }
+.lb-news b { color: #7FDDF5; }
+.lb-news::before { content: 'อัปเดตอันดับ'; font: 700 10px/1 var(--font); letter-spacing: .22em; color: #7FDDF5; text-transform: uppercase; }
+.lb-news.fade { opacity: 0; }
+@keyframes lbIn { from { opacity: 0; transform: translateY(6px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  #leaderboard .lb-prize .m-photo, #leaderboard .lb-prize .m-cap, #leaderboard .lb-prize span.lb-badge::after, .lb-scarce::before, .lb-news { animation: none !important; }
+  #leaderboard .lb-prize .lb-media img { translate: none; }
+}
+#leaderboard .lb-prize .lb-media img.m-cap { inset: auto; left: 8%; top: 9%; width: 84%; height: 56%; object-fit: contain; }
