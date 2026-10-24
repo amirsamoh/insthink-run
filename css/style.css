@@ -985,3 +985,7 @@ a.map-chip svg { color: var(--navy); flex: none; }
 [data-theme="dark"] .drink input:checked + span .thumb { background: #EEF2F8; }
 [data-theme="dark"] .opt input:checked + .box { box-shadow: inset 0 0 0 1px var(--navy); }
 [data-theme="dark"] .pkg input:checked + .box .pick { box-shadow: none; }
+
+/* พื้นหลัง Story แบบรูปที่ออกแบบเอง */
+.story .s-bg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background-size: cover; background-position: center; }
+.story .s-shade { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }

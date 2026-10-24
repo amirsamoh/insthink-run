@@ -71,7 +71,14 @@
   const loadImg = (img) => (img.complete && img.naturalWidth ? Promise.resolve() : new Promise((r) => { img.onload = r; img.onerror = r; }));
 
   const pinSvg = (c) => `<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`;
-  const head = () => `${backgroundSvg()}
+  /** พื้นหลังของแต่ละหน้า: รูปที่ออกแบบเอง (img/story-bg-N.webp 1080×1920) + ชั้นสีกรมท่าโปร่งแสงให้ตัวอักษรอ่านชัด
+   ไม่มีรูป → ใช้พื้นหลังที่โค้ดวาดเอง (backgroundSvg) */
+  const BG = { 1: 'img/story-bg-1.webp', 2: 'img/story-bg-3.webp', 3: 'img/story-bg-2.webp' };
+  const SHADE = { 1: .12, 2: .12, 3: .10 };
+  const bgLayer = (n) => (BG[n]
+    ? `<div class="s-bg" style="background-image:url('${BG[n]}')"></div><div class="s-shade" style="background:linear-gradient(180deg,rgba(7,15,40,${SHADE[n] + .18}) 0%,rgba(7,15,40,${SHADE[n]}) 40%,rgba(7,15,40,${SHADE[n] + .3}) 100%)"></div>`
+    : backgroundSvg());
+  const head = (n) => `${bgLayer(n)}
       <img class="s-logo" src="img/logo-white.png" alt="">
       <div class="s-date">${esc(CFG.EVENT.dateLabel)}<small>${esc(CFG.EVENT.location)}</small></div>`;
   const foot = (n) => `<div class="s-foot"><span>${esc(CFG.EVENT.instagram)}</span><span class="s-page">${n} / 3</span><span>${esc(CFG.EVENT.hashtag)}</span></div>`;
@@ -79,7 +86,7 @@
   /** หน้า 1: I'm running — รูปโปรไฟล์ + เส้นทาง + การ์ด BIB */
   function slideBib(runner) {
     const km = CFG.EVENT.distanceKm;
-    return `${head()}
+    return `${head(1)}
       <div class="s-title">I'm<br><span class="o">running</span></div>
       <div class="s-runner">
         <span class="s-avatar">${runner.photo ? `<img src="${esc(runner.photo)}" alt="">` : esc(String(runner.nickname || runner.firstName || '?').charAt(0).toUpperCase())}</span>
@@ -111,7 +118,7 @@
       ['img/meal.webp', 'ข้าวยำ + เครื่องดื่ม', ''],
     ];
     const price = (CFG.PACKAGES.find((p) => p.runner) || {}).price;
-    return `${head()}
+    return `${head(2)}
       <div class="s-title">Race<br><span class="o">kit</span></div>
       <div class="k-grid">${kit.map(([src, name, cls], i) => `<div class="k-tile ${cls}"><div class="k-img" style="background-image:url('${src}')"></div><span class="k-no">0${i + 1}</span><span class="k-name">${esc(name)}</span></div>`).join('')}</div>
       <div class="k-note"><b>${CFG.EVENT.distanceKm}K RUN</b> · ของที่ระลึกทั้งหมดรวมในค่าสมัคร ${price} บาท</div>
@@ -121,7 +128,7 @@
   /** หน้า 3: Race Day — ตารางเวลา + สถานที่ + ชวนเพื่อนด้วยลิงก์ของเจ้าของ */
   function slideDay(runner) {
     const url = window.U.inviteUrl(runner.bib).replace(/^https?:\/\//, '');
-    return `${head()}
+    return `${head(3)}
       <div class="s-title">Race<br><span class="o">day</span></div>
       <div class="d-when"><b>${esc(CFG.EVENT.dateLabel)}</b><span>${pinSvg('#8FB4E8')}${esc(CFG.EVENT.location)}</span></div>
       <ol class="d-tl">${(CFG.EVENT.schedule || []).map((x) => `<li class="${x.time === CFG.EVENT.startTime ? 'key' : ''}"><time>${esc(x.time || '')}</time><i></i><div><b>${esc(x.title)}</b>${x.desc ? `<span>${esc(x.desc)}</span>` : ''}</div></li>`).join('')}</ol>
@@ -137,7 +144,7 @@
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     await Promise.all(Array.from(el.querySelectorAll('img')).map(loadImg));
     // รอรูปพื้นหลัง (background-image) ให้โหลดเสร็จ
-    const bgs = Array.from(el.querySelectorAll('.k-img')).map((d) => (d.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/) || [])[1]).filter(Boolean);
+    const bgs = Array.from(el.querySelectorAll('.k-img,.s-bg')).map((d) => (d.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/) || [])[1]).filter(Boolean);
     await Promise.all(bgs.map((src) => new Promise((r) => { const i = new Image(); i.onload = i.onerror = r; i.src = src; })));
     await new Promise((r) => setTimeout(r, 80));
     const num = el.querySelector('.s-bib .num span');
