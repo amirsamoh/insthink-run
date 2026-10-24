@@ -996,3 +996,57 @@ a.map-chip svg { color: var(--navy); flex: none; }
   --line: #E4E7EE; --line-2: #CBD1DA; --surface: #FFFFFF; --surface-2: #F7F8FA;
   color: #0A0A0A;
 }
+
+
+/* ---------------- Sponsors ---------------- */
+.sponsors { margin-top: 64px; border-radius: 28px; padding: 30px 22px 34px; background: var(--grad-night); color: #C9D6F0; text-align: center; display: grid; gap: 18px; justify-items: center; }
+.sponsors picture, .sponsors img { display: block; width: 100%; max-width: 1000px; height: auto; }
+.sponsors img { opacity: .95; }
+footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity: .8; }
+[data-theme="dark"] .site-foot > img.foot-spons { filter: none; }
+.sponsors { box-shadow: 0 0 0 1px rgba(255,255,255,.06); }
+
+/* E-BIB: สปอนเซอร์ (ด้านหน้าซ่อนตอนบันทึกรูป เพื่อไม่ให้ซ้ำกับด้านหลัง) */
+.ebib-spons { margin: 12px 18px 0; padding-top: 12px; border-top: 2px dashed var(--line-2); text-align: center; }
+.ebib-spons small { display: block; font: 700 10px/1 var(--font); letter-spacing: .22em; color: var(--muted); margin-bottom: 8px; }
+.ebib-spons img { display: block; width: 86%; max-width: 360px; height: auto; margin: 0 auto; }
+.ebib.flat .ebib-spons.f { display: none !important; }
+.ebib-spons.f { margin-top: 6px; margin-bottom: 4px; }
+
+/* Story: สปอนเซอร์ท้ายภาพ */
+.story .s-spons { position: absolute; left: 80px; right: 80px; bottom: 130px; padding: 24px 40px 28px; border-radius: 30px; background: rgba(8,16,40,.55); border: 2px solid rgba(255,255,255,.14); text-align: center; }
+.story .s-spons small { display: block; font: 700 22px/1 var(--font); letter-spacing: .3em; color: #C6D5EC; margin-bottom: 18px; }
+.story .s-spons img { display: block; width: 700px; height: auto; margin: 0 auto; }
+
+/* Story: จัดเลย์เอาต์ใหม่ให้เหลือที่ท้ายภาพสำหรับสปอนเซอร์ (เนื้อหาต้องจบก่อน y≈1560) */
+.story .s-spons { bottom: 118px; padding: 20px 40px 24px; background: rgba(8,16,40,.5); border-radius: 28px; }
+.story .s-spons small { font-size: 20px; margin-bottom: 14px; }
+.story .s-spons img { width: 720px; }
+.story .s-route { top: 830px; height: 320px; }
+.story .s-route svg { width: 480px; height: 280px; top: 20px; }
+.story .s-route .rinfo { top: 30px; }
+.story .s-route .rinfo .k { font-size: 140px; }
+.story .s-route .rinfo .k small { font-size: 52px; }
+.story .s-route .rinfo .n { font-size: 30px; margin-top: 10px; }
+.story .s-route .rinfo .t { font-size: 24px; }
+.story .s-bib { top: 1180px; height: 370px; }
+.story .s-bib .top { height: 84px; }
+.story .s-bib .top img { height: 52px; }
+.story .s-bib .band { height: 14px; }
+.story .s-bib .num { top: 104px; height: 190px; font-size: 215px; }
+.story .s-bib .nm { bottom: 22px; font-size: 28px; }
+.story .k-grid { top: 690px; gap: 24px; }
+.story .k-tile { height: 380px; }
+.story .k-tile.light .k-img { inset: 24px 20px 80px; }
+.story .k-note { top: 1496px; }
+.story .d-cta { top: 1370px; height: 180px; padding: 28px 44px; }
+.story .d-cta-t { font-size: 52px; }
+.story .d-cta-t small { font-size: 26px; margin-top: 8px; }
+.story .d-url { bottom: 22px; font-size: 28px; }
+.story .d-tl { top: 900px; }
+.story .d-tl li { padding-bottom: 38px; }
+
+/* Sponsor v2: ไม่มีกรอบ วางโลโก้โดด ๆ */
+.story .s-spons { background: none; border: 0; padding: 0; border-radius: 0; bottom: 124px; }
+.story .s-spons img { width: 760px; }
+.ebib-spons { border-top: 0; padding-top: 4px; }

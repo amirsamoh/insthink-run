@@ -81,7 +81,8 @@
   const head = (n) => `${bgLayer(n)}
       <img class="s-logo" src="img/logo-white.png" alt="">
       <div class="s-date">${esc(CFG.EVENT.dateLabel)}<small>${esc(CFG.EVENT.location)}</small></div>`;
-  const foot = (n) => `<div class="s-foot"><span>${esc(CFG.EVENT.instagram)}</span><span class="s-page">${n} / 3</span><span>${esc(CFG.EVENT.hashtag)}</span></div>`;
+  const foot = (n) => `<div class="s-spons"><small>SUPPORTED BY</small><img src="img/sponsors-grid-white.webp" alt=""></div>
+    <div class="s-foot"><span>${esc(CFG.EVENT.instagram)}</span><span class="s-page">${n} / 3</span><span>${esc(CFG.EVENT.hashtag)}</span></div>`;
 
   /** หน้า 1: I'm running — รูปโปรไฟล์ + เส้นทาง + การ์ด BIB */
   function slideBib(runner) {

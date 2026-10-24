@@ -423,6 +423,7 @@
     if (foot && !foot.querySelector('.admin-link')) {
       foot.innerHTML = `<div class="foot-in">
         <img src="img/logo-white.png" alt="INSTHINK RUN CLUB">
+        ${document.querySelector('.sponsors') ? '' : '<img class="foot-spons" src="img/sponsors-row-white.webp" alt="ผู้สนับสนุน" loading="lazy">'}
         <div class="tagline">Insthink · Community · Coffee Run</div>
         <div class="foot-btns">
           <a class="btn btn-sm admin-link" href="admin.html">Admin</a>
