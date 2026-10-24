@@ -989,3 +989,10 @@ a.map-chip svg { color: var(--navy); flex: none; }
 /* พื้นหลัง Story แบบรูปที่ออกแบบเอง */
 .story .s-bg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background-size: cover; background-position: center; }
 .story .s-shade { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+
+/* การ์ดสีขาวที่ต้องคงสีเดิมในโหมดมืด (E-BIB และการ์ด PromptPay: ใช้สีค่าของโหมดสว่างเสมอ — รูปที่บันทึกจึงเหมือนกันทั้งสองโหมด) */
+.ebib, .ebib-flip, .pp-card {
+  --ink: #0A0A0A; --navy: #1B3B67; --muted: #5E6573;
+  --line: #E4E7EE; --line-2: #CBD1DA; --surface: #FFFFFF; --surface-2: #F7F8FA;
+  color: #0A0A0A;
+}

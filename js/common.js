@@ -212,8 +212,13 @@
       colorDark: dark || '#0A0A0A', colorLight: light || '#FFFFFF',
       correctLevel: QRCode.CorrectLevel.M,
     });
-    const img = el.querySelector('img'); if (img) img.remove();   // qrcodejs ใส่ทั้ง canvas และ img
-    const cv = el.querySelector('canvas'); if (cv) cv.style.display = 'block';
+    // qrcodejs ใส่ทั้ง canvas และ img แล้ว "ซ่อน canvas / โชว์ img" แบบอะซิงก์ทีหลัง (ครั้งแรกที่ตรวจ data-URI)
+    // → เก็บแต่ canvas และบังคับให้โชว์ซ้ำหลังมันทำงานเสร็จ ไม่งั้น QR จะหายแต่ตอนดาวน์โหลดยังได้
+    const fix = () => {
+      const img = el.querySelector('img'); if (img) img.remove();
+      const cv = el.querySelector('canvas'); if (cv) cv.style.display = 'block';
+    };
+    fix(); [0, 60, 250, 800].forEach((t) => setTimeout(fix, t));
   }
 
   function renderBarcode(svg, bib, opts) {
