@@ -1080,3 +1080,6 @@ footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity:
 .ebib .ebib-ribbon::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.3); }
 .ebib .ebib-ribbon.wait { background: var(--warn); }
 .ebib .ebib-ribbon.hidden { display: none; }
+/* ป้ายสถานะ: ใช้กล่องห่อ text-align:center เพื่อให้อยู่กึ่งกลางทั้งบนหน้าเว็บและตอนบันทึกรูป (html2canvas ไม่รองรับ margin:auto บน inline-flex) */
+.ebib .ebib-status { display: block; width: 100%; text-align: center; margin: 14px 0 0; }
+.ebib .ebib-status .ebib-ribbon { margin: 0; align-self: auto; vertical-align: top; }
