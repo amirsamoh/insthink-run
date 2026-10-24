@@ -1074,3 +1074,9 @@ footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity:
 .rank li.top i { background: var(--lime); color: #0A1430; }
 .rank details summary { cursor: pointer; }
 .rank details { flex: 1; min-width: 0; } .rank li em { margin-left: auto; font-style: normal; font-weight: 700; white-space: nowrap; }
+
+/* สถานะบน E-BIB: เปลี่ยนจากริบบิ้นเฉียงมุมขวา (ทับป้าย 6K และถูกตัดขอบ) เป็นป้ายสถานะมนกึ่งกลาง ใต้แถบลาย */
+.ebib .ebib-ribbon { position: static; transform: none; align-self: center; display: inline-flex; align-items: center; gap: 8px; margin: 14px auto 0; padding: 8px 18px 8px 14px; border-radius: 99px; font: 800 italic 13px/1 var(--font); letter-spacing: .14em; color: #fff; background: var(--ok); width: auto; }
+.ebib .ebib-ribbon::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.3); }
+.ebib .ebib-ribbon.wait { background: var(--warn); }
+.ebib .ebib-ribbon.hidden { display: none; }

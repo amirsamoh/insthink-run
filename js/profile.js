@@ -393,13 +393,19 @@
     const x = c.getContext('2d');
     x.fillStyle = '#fff'; x.fillRect(0, 0, 600, 760);
     x.fillStyle = '#113566'; x.fillRect(0, 0, 600, 80);
-    x.fillStyle = '#fff'; x.font = 'bold 32px Kanit, sans-serif'; x.textAlign = 'center'; x.fillText('PromptPay', 300, 52);
+    // iOS Safari รีเซ็ต textAlign เมื่อเปลี่ยน font → ตั้งตำแหน่งกึ่งกลางใหม่ทุกครั้ง + ย่อฟอนต์ถ้าข้อความยาวเกินกรอบ
+    const T = (text, font, color, y, size, maxW) => {
+      let sz = size; x.font = font.replace('{s}', sz);
+      while (maxW && x.measureText(text).width > maxW && sz > 14) { sz -= 1; x.font = font.replace('{s}', sz); }
+      x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillStyle = color; x.fillText(text, 300, y);
+    };
+    T('PromptPay', 'bold {s}px Kanit, sans-serif', '#fff', 52, 32, 520);
     x.drawImage(cv, 80, 110, 440, 440);
-    x.fillStyle = '#1B3B67'; x.font = 'italic 800 52px Kanit, sans-serif'; x.fillText(money(runner.amount), 300, 625);
-    x.fillStyle = '#5E6573'; x.font = '24px Kanit, sans-serif'; x.fillText(runner.bib + ' · ' + (CFG.PAYMENT.payeeName || CFG.EVENT.name), 300, 668);
+    T(money(runner.amount), 'italic 800 {s}px Kanit, sans-serif', '#1B3B67', 625, 52, 520);
+    T(runner.bib + ' · ' + (CFG.PAYMENT.payeeName || CFG.EVENT.name), '{s}px Kanit, sans-serif', '#5E6573', 668, 24, 540);
     // แถบเตือนในรูป QR เอง (คนมักเปิดรูปนี้ในแอปธนาคาร แล้วลืมกลับมาแนบสลิป)
     x.fillStyle = '#8CD43E'; x.fillRect(0, 690, 600, 70);
-    x.fillStyle = '#0A1430'; x.font = 'bold 25px Kanit, sans-serif'; x.fillText('โอนแล้ว กลับมาแนบสลิปที่หน้าเว็บด้วย', 300, 735);
+    T('โอนแล้ว กลับมาแนบสลิปที่หน้าเว็บด้วย', 'bold {s}px Kanit, sans-serif', '#0A1430', 735, 25, 540);
     c.toBlob((b) => U.saveImage(b, 'INSTHINK-' + runner.bib + '-PromptPay.png', remindSlip), 'image/png');
   });
 
