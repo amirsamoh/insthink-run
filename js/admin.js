@@ -52,6 +52,7 @@
       $('#updated').textContent = 'อัปเดต ' + new Date().toLocaleTimeString('th-TH');
       renderStats();
       renderTable();
+      loadReferrals();
     } catch (err) {
       $('#updated').textContent = 'เชื่อมต่อไม่ได้';
       toast(err.message, 'err');
@@ -70,6 +71,18 @@
   $('#auto').addEventListener('change', schedule);
   document.addEventListener('visibilitychange', () => { if (!document.hidden && $('#auto').checked && key) refresh(); });
   $('#refreshBtn').addEventListener('click', () => { refresh(); loadFeedback(); });
+
+  /* ---------- ชวนเพื่อน: อันดับ + เพื่อนที่ชวนมา (นับเฉพาะชำระเงินแล้ว) ---------- */
+  async function loadReferrals() {
+    try {
+      const d = await API.call('referralList', { key });
+      const list = d.list;
+      const pay = { PAID: 'ชำระแล้ว', UNPAID: 'ยังไม่จ่าย', SLIP_UPLOADED: 'รอตรวจ', REJECTED: 'สลิปไม่ผ่าน' };
+      $('#inviteTop').innerHTML = list.length
+        ? '<ol class="rank">' + list.slice(0, 15).map((o, i) => `<li class="${o.rank && o.rank <= d.topN ? 'top' : ''}"><i>${o.rank || '–'}</i><details><summary><b>${esc(o.bib)}</b> ${esc(o.nickname || o.name)}</summary><div class="small muted" style="margin-top:6px">${o.friends.map((x) => `${esc(x.bib)} ${esc(x.name)} · <b style="color:${x.counted ? 'var(--ok,#1a7f4b)' : 'var(--warn)'}">${x.counted ? 'นับ' : pay[x.paymentStatus] || x.paymentStatus}</b>`).join('<br>')}</div></details><em>${o.count} คน${o.pending ? ` <small class="muted">(+${o.pending} รอจ่าย)</small>` : ''}</em></li>`).join('') + `</ol><p class="muted small" style="margin:8px 0 0">นับเฉพาะเพื่อนที่ชำระเงินแล้ว · แพ็กเกจวิ่ง · 1 บัญชี = 1 คน · เสมอกันดูใครถึงยอดก่อน · กดชื่อเพื่อดูรายชื่อเพื่อน${d.endAt ? ' · นับถึง ' + esc(d.endAt) : ''}</p>`
+        : '<p class="muted small" style="margin:12px 0 0">ยังไม่มีใครสมัครผ่านลิงก์ชวนเพื่อน</p>';
+    } catch (err) { $('#inviteTop').innerHTML = '<p class="muted small">โหลดอันดับไม่ได้: ' + esc(err.message) + '</p>'; }
+  }
 
   /* ---------- หลังจบงาน: สวิตช์ + ผลแบบประเมิน ---------- */
   async function loadFeedback() {
@@ -149,15 +162,6 @@
       <div><span>ซื้อผ้าโพกหัวอย่างเดียว</span><b>${paid.filter((r) => !isRun(r)).length}</b></div>`;
 
     hbars($('#drinkBars'), CFG.DRINKS, paidRunners, 'drink', { colors: Object.fromEntries(CFG.DRINKS.map((d) => [d, 'var(--sky)'])) });
-    // ชวนเพื่อน: นับรายการที่มี ref (ทุกแพ็กเกจ) แยกตามคนชวน
-    const byRef = {};
-    rows.forEach((r) => { if (r.ref) byRef[r.ref] = (byRef[r.ref] || 0) + 1; });
-    const top = Object.entries(byRef).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const who = (b) => rows.find((x) => x.bib === b) || {};
-    $('#inviteTop').innerHTML = top.length
-      ? '<ol class="rank">' + top.map(([b, n], i) => `<li><i>${i + 1}</i><span><b>${esc(b)}</b> ${esc(who(b).nickname || who(b).firstName || '')}</span><em>${n} คน</em></li>`).join('') + '</ol><p class="muted small" style="margin:8px 0 0">สมัครผ่านลิงก์ชวนเพื่อนรวม ' + rows.filter((r) => r.ref).length + ' รายการ</p>'
-      : '<p class="muted small" style="margin:12px 0 0">ยังไม่มีใครสมัครผ่านลิงก์ชวนเพื่อน</p>';
-
     const allergy = paidRunners.filter((r) => r.note && !/^(ไม่แพ้|ไม่มี|-|no)/i.test(r.note));
     $('#allergyList').innerHTML = allergy.length
       ? allergy.map((r) => `<div><b>${esc(r.bib)}</b> ${esc(r.nickname || r.firstName)} — ${esc(r.note)}</div>`).join('')

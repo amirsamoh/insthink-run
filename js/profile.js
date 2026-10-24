@@ -244,6 +244,13 @@
     $('#inviteUrl').value = url;
     const n = Number(runner.invited || 0);
     $('#inviteCount').innerHTML = n ? 'ชวนแล้ว <b>' + n + '</b> คน' : '';
+    const top = runner.inviteTop || (CFG.REFERRAL && CFG.REFERRAL.topN) || 5;
+    const pend = Number(runner.invitePending || 0);
+    let msg = '';
+    if (runner.inviteRank) msg = runner.inviteRank <= top ? 'ตอนนี้คุณอยู่อันดับ <b>' + runner.inviteRank + '</b> ของกระดานผู้นำ (Top ' + top + ' รับรางวัลพิเศษ)' : 'ตอนนี้คุณอยู่อันดับ <b>' + runner.inviteRank + '</b> · ชวนเพิ่มเพื่อไต่เข้า Top ' + top;
+    else msg = 'ชวนเพื่อนที่ชำระเงินแล้ว เพื่อขึ้นกระดานผู้นำ · Top ' + top + ' รับรางวัลพิเศษ';
+    if (pend) msg += '<br><span class="muted">มีเพื่อน ' + pend + ' คนสมัครแล้วแต่ยังไม่ชำระเงิน (ยังไม่นับ)</span>';
+    $('#inviteRank').innerHTML = msg;
   }
   const inviteText = () => 'มาวิ่ง 6K ด้วยกันที่ ' + CFG.EVENT.name + ' · ' + CFG.EVENT.location + ' ได้ผ้าโพกหัว ริสแบน สติกเกอร์ และข้าวยำบุฟเฟ่ต์ สมัครผ่านลิงก์นี้ได้เลย';
   $('#btnCopyInvite').addEventListener('click', async () => {

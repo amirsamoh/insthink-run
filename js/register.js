@@ -100,6 +100,21 @@
       <div class="row"><span>${esc(d.label)}</span><span>${d.fee ? money(d.fee) : 'ฟรี'}</span></div>
       <div class="row total"><span>ยอดชำระ</span><b>${money(price + d.fee)}</b></div>`;
   }
+  /* ---------- สมัครวิ่งแล้ว (มีผ้าโพกหัวในแพ็กเกจ) แต่เลือก BANDANA ONLY → เตือนก่อนซื้อซ้ำ ---------- */
+  let myRun = null;   // รายการ RUNNER ของบัญชีนี้ในรอบนี้ (ถ้ามี)
+  const MSG = (r) => 'แพ็กเกจวิ่งของคุณ (BIB ' + r.bib + ') มีผ้าโพกหัวแล้ว ต้องการซื้อเพิ่มใช่ไหม';
+  function dupNote() {
+    const p = radio('package') ? pkg(radio('package')) : null;
+    const show = !!(myRun && p && !p.runner);
+    const el = $('#dupNote');
+    el.classList.toggle('hidden', !show);
+    if (show) el.innerHTML = '<b>' + esc(MSG(myRun)) + '</b><br><span class="small">ถ้าต้องการซื้อเป็นของฝากหรือเพิ่มอีกผืน ทำต่อได้เลย รายการนี้จะแยกชำระเงินต่างหาก</span>';
+  }
+  API.call('myRegs', {}).then(({ regs }) => {
+    myRun = (regs || []).find((r) => r.package === 'RUN' && (r.eventId || CFG.EVENT.id) === CFG.EVENT.id) || null;
+    dupNote();
+  }).catch(() => { /* ไม่มีผลต่อการสมัคร */ });
+  $('#regForm').addEventListener('change', dupNote);
   $('#regForm').addEventListener('change', update);
   paintMember(member);
   update();
@@ -156,6 +171,8 @@
     e.preventDefault();
     const d = collect();
     if (!validate(d)) return;
+    const pk = pkg(d.package);
+    if (myRun && pk && !pk.runner && !confirm(MSG(myRun) + '\n\nกด "ตกลง" เพื่อสั่งซื้อผ้าโพกหัวเพิ่ม (' + money(pk.price) + ')')) return;
 
     const btn = $('#submitBtn');
     busy(btn, true, 'กำลังบันทึก…');

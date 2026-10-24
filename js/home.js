@@ -29,6 +29,26 @@
   $('#homeRouteName').textContent = CFG.ROUTE.name;
   $('#homeRouteLoc').textContent = CFG.EVENT.location + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.';
 
+  /* ---------- กระดานผู้นำ: ชวนเพื่อนมากที่สุด Top N (อัปเดตเองทุกครั้งที่เปิดหน้า) ---------- */
+  (function leaderboard() {
+    const R = CFG.REFERRAL || {}; const n = R.topN || 5;
+    $('#lbIntro').textContent = 'ชวนเพื่อนมาวิ่งผ่านลิงก์ของคุณ ' + n + ' อันดับที่ชวนได้มากที่สุดรับรางวัลพิเศษ';
+    $('#lbPrize').textContent = R.prize || 'รางวัลพิเศษ';
+    $('#lbRule').textContent = R.rule || '';
+    const draw = (top) => {
+      const rows = [];
+      for (let i = 0; i < n; i++) {
+        const o = top[i];
+        rows.push(o
+          ? `<li class="${i < 3 ? 'p' + (i + 1) : ''}"><i>${i + 1}</i><span>${U.esc(o.nickname || o.bib)}</span><em>${o.count}<small> คน</small></em></li>`
+          : `<li class="empty"><i>${i + 1}</i><span>ว่าง · รอคุณขึ้นมา</span><em>–</em></li>`);
+      }
+      $('#lbList').innerHTML = rows.join('');
+    };
+    draw([]);
+    window.API.call('leaderboard', {}).then((d) => draw((d && d.top) || [])).catch(() => { /* ไม่ต้องรบกวนผู้ใช้ถ้าโหลดไม่ได้ */ });
+  })();
+
   /* ---------- Race Kit: coverflow เลื่อนเองทุก 2.5 วิ (หยุดชั่วคราวขณะนิ้วแตะ) ---------- */
   (function coverflow() {
     const root = $('#kitFlow'); if (!root) return;
