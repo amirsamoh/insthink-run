@@ -25,7 +25,7 @@
   $('#heroStars').innerHTML = '<img src="img/stars-navy.png" alt="">';
 
   // เส้นทาง
-  $('#homeRoute').innerHTML = window.U.routeSvg({ stroke: '#5FD3EE', dash: '#0A1430', start: '#0A1430', grid: 'rgba(255,255,255,.06)', width: 2.4 });
+  $('#homeRoute').innerHTML = window.U.routeSvg({ stroke: '#7FDDF5', ghost: 'rgba(255,255,255,.38)', glow: false, start: '#0A1430', grid: 'rgba(255,255,255,.06)', width: 2.6 });
   $('#homeRouteName').textContent = CFG.ROUTE.name;
   $('#homeRouteLoc').textContent = CFG.EVENT.location + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.';
 

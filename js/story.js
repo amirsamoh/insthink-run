@@ -93,7 +93,7 @@
         <span class="s-rname">${esc(runner.nickname || runner.firstName)}<small>${esc(runner.firstName)} ${esc(runner.lastName)}</small></span>
       </div>
       <div class="s-route">
-        ${routeSvg({ stroke: '#FFFFFF', dash: '#0F2244', start: '#0F2244', grid: 'rgba(255,255,255,.07)', width: 2.6 })}
+        ${routeSvg({ stroke: '#FFFFFF', ghost: 'rgba(255,255,255,.38)', glow: false, start: '#0F2244', grid: 'rgba(255,255,255,.07)', width: 2.8 })}
         <div class="rinfo">
           <div class="k">${km}<small>KM</small></div>
           <div class="n">${esc(CFG.ROUTE.name)}</div>

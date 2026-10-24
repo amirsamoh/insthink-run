@@ -299,18 +299,22 @@
 
   /* ---------- เส้นทางวิ่ง → SVG ---------- */
   function routeSvg(opts) {
-    const o = Object.assign({ stroke: '#1B3B67', dash: '#FFFFFF', width: 3.2, glow: true, grid: 'rgba(15,34,68,.08)', start: '#FFFFFF' }, opts || {});
+    // เส้นเรียบทึบตามรูปเส้นทางจริง + เส้นรองจางๆ (ขอบเรือง + เงาเส้นเยื้อง) + จุดสตาร์ตแบบวงแหวน
+    const o = Object.assign({ stroke: '#1B3B67', width: 2.1, ghost: 'rgba(94,101,115,.45)', ghostWidth: 0.55, glow: false, grid: 'rgba(15,34,68,.08)', start: '#FFFFFF' }, opts || {});
     const route = CFG.ROUTE;
     const pts = route.points.map((p) => p.join(',')).join(' ');
     const [sx, sy] = route.points[0];
     const grid = Array.from({ length: 9 }, (_, i) => `<line x1="${(i + 1) * 10}" y1="0" x2="${(i + 1) * 10}" y2="100"/><line x1="0" y1="${(i + 1) * 10}" x2="100" y2="${(i + 1) * 10}"/>`).join('');
+    // เส้นรอง: ถนนรอบๆ ที่ไม่ได้วิ่ง (เทา/ขาวจางๆ อยู่ใต้เส้นหลัก)
+    const ghost = (route.ghost || []).map((g) => `<polyline points="${g.map((p) => p.join(',')).join(' ')}" fill="none" stroke="${o.ghost}" stroke-width="${o.ghostWidth}" stroke-linejoin="round" stroke-linecap="round"/>`).join('');
+    const line = (extra) => `<polyline points="${pts}" fill="none" stroke-linejoin="round" stroke-linecap="round" ${extra}/>`;
     return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
       <g stroke="${o.grid}" stroke-width=".3">${grid}</g>
-      ${o.glow ? `<polyline points="${pts}" fill="none" stroke="${o.stroke}" stroke-opacity=".18" stroke-width="${o.width * 3}" stroke-linejoin="round" stroke-linecap="round"/>` : ''}
-      <polyline points="${pts}" fill="none" stroke="${o.stroke}" stroke-width="${o.width}" stroke-linejoin="round" stroke-linecap="round"/>
-      <polyline points="${pts}" fill="none" stroke="${o.dash}" stroke-width="${o.width * 0.28}" stroke-dasharray="1.5 3" stroke-linecap="round"/>
-      <circle cx="${sx}" cy="${sy}" r="4.2" fill="${o.start}" stroke="${o.stroke}" stroke-width="1.6"/>
-      <circle cx="${sx}" cy="${sy}" r="1.6" fill="${o.stroke}"/>
+      ${ghost}
+      ${o.glow ? line(`stroke="${o.stroke}" stroke-opacity=".16" stroke-width="${o.width * 3.4}"`) : ''}
+      ${line(`stroke="${o.stroke}" stroke-width="${o.width}"`)}
+      <circle cx="${sx}" cy="${sy}" r="3.7" fill="${o.start}" stroke="${o.stroke}" stroke-width=".9"/>
+      <circle cx="${sx}" cy="${sy}" r="1.9" fill="${o.stroke}"/>
     </svg>`;
   }
 
