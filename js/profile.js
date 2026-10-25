@@ -464,34 +464,14 @@
     busy(btn, true, 'กำลังสร้างรูป…');
     loading(true, 'กำลังสร้างรูป E-BIB…');
     try {
-      await U.fontsReady();
-      const el = $('#ebib');
-      await Promise.all(Array.from(el.querySelectorAll('img')).map((im) => U.imgReady(im, 6000)));
-      const av = await U.avatarCanvas(runner, 112, 3, 2);   // วงกลมโปรไฟล์: วาดเอง ไม่ให้ html2canvas วาด
-      // QR: คัดลอกพิกเซลจาก canvas ต้นฉบับใส่ canvas ใหม่ในฉากที่จับภาพ (บางเครื่อง html2canvas คัดลอก canvas ไม่ติด)
-      const qrSrc = $('#bQr canvas');
-      const swapQr = (doc) => {
-        const t = doc.querySelector('#bQr');
-        if (!t || !qrSrc || !qrSrc.width) return;
-        const c2 = doc.createElement('canvas'); c2.width = qrSrc.width; c2.height = qrSrc.height;
-        c2.getContext('2d').drawImage(qrSrc, 0, 0);
-        c2.style.cssText = 'display:block;width:116px;height:116px';
-        t.innerHTML = ''; t.appendChild(c2);
-      };
-      const swapAvatar = (doc) => { const t = doc.querySelector('#bAvatar'); if (t) { t.innerHTML = ''; const c2 = doc.createElement('canvas'); c2.width = av.width; c2.height = av.height; c2.getContext('2d').drawImage(av, 0, 0); c2.style.cssText = av.style.cssText; t.appendChild(c2); } };
-      // จับภาพที่ขนาดคงที่ 420px (มือถือจอเล็กก็ได้รูปเท่ากัน) · scale 2 = คมชัด
-      // ฉากที่จับภาพ: รวม 2 ด้านของการ์ดเป็นใบเดียว (ด้านหน้าบน + QR ล่าง) แบบเดิม
-      const flat = (doc) => {
-        const c = doc.querySelector('#ebib'); if (!c) return;
-        c.classList.remove('flipcard', 'is-back'); c.classList.add('flat');
-        const w = doc.querySelector('#ebibFlip'); if (w) w.style.cssText = 'transform:none;perspective:none';
-      };
-      const before = el.classList.contains('is-back');
-      el.classList.remove('flipcard', 'is-back'); el.classList.add('flat');   // วัดขนาดจริงของแบบรวม
-      const W = el.offsetWidth, H = el.offsetHeight;
-      el.classList.remove('flat'); el.classList.add('flipcard'); if (before) el.classList.add('is-back');
-      const canvas = await U.capture(el, { scale: 2, backgroundColor: '#ffffff', onclone: (doc) => { flat(doc); U.canvasifyImages(el)(doc); swapAvatar(doc); swapQr(doc); }, width: W, height: H, scrollX: 0, scrollY: -window.scrollY });
-      const blob = await U.canvasToBlob(canvas);
+      const t = (id) => ($(id) ? $(id).textContent.trim() : '');
+      const rib = $('#bRibbon');
+      const blob = await window.Draw.ebib(runner, {
+        dist: t('#bDist'), bib: runner.bib, name: t('#bName'), nick: t('#bNick'),
+        status: (rib && rib.textContent.trim()) || 'CONFIRMED',
+        bandana: t('#bBandana'), food: t('#bFood'), drink: t('#bDrink'), start: t('#bStart'),
+        qr: $('#bQr canvas'),
+      });
       if (!blob) throw new Error('canvas empty');
       loading(false);
       await U.saveImage(blob, 'INSTHINK-' + runner.bib + '-EBIB.png');

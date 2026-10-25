@@ -459,7 +459,7 @@
           <a class="btn btn-sm admin-link" href="admin.html">Admin</a>
           <a class="btn btn-sm admin-link" href="checkin.html">Staff เช็คอิน</a>
         </div>
-        <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')} · v20.5</div>
+        <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')} · v20.6</div>
       </div>`;
     }
   }

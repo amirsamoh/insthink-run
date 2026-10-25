@@ -165,29 +165,17 @@
     return await window.U.canvasToBlob(canvas);
   }
 
-  /** สร้าง Story ทั้ง 3 หน้า → [Blob, Blob, Blob] */
+  /** สร้าง Story ทั้ง 3 หน้า → [Blob, Blob, Blob]  (วาดด้วย Canvas ตรง ๆ ผ่าน js/draw.js) */
   async function buildAll(runner) {
-    const el = document.getElementById('story');
-    // overlay บังจอระหว่างย้าย stage มาที่ (0,0) ให้ html2canvas วัดตำแหน่งถูก
     const overlay = document.createElement('div');
     overlay.className = 'render-overlay';
     overlay.innerHTML = '<span class="spinner"></span><span id="storyProg">Creating your story… 1/3</span>';
     document.body.appendChild(overlay);
-    const stage = el.parentElement;
-    stage.classList.add('rendering');
     try {
-      const out = [];
-      const slides = [slideBib, slideKit, slideDay];
-      for (let i = 0; i < slides.length; i++) {
-        const p = document.getElementById('storyProg'); if (p) p.textContent = 'Creating your story… ' + (i + 1) + '/' + slides.length;
-        el.innerHTML = slides[i](runner);
-        out.push(await capture(el, runner));
-      }
+      const out = await window.Draw.story(runner, (i) => { const p = document.getElementById('storyProg'); if (p) p.textContent = 'Creating your story… ' + (i + 1) + '/3'; });
+      if (out.some((b) => !b)) throw new Error('canvas empty');
       return out;
-    } finally {
-      stage.classList.remove('rendering');
-      overlay.remove();
-    }
+    } finally { overlay.remove(); }
   }
 
   /** (เดิม) หน้าเดียว */
