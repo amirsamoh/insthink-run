@@ -464,9 +464,9 @@
     busy(btn, true, 'กำลังสร้างรูป…');
     loading(true, 'กำลังสร้างรูป E-BIB…');
     try {
-      if (document.fonts) await document.fonts.ready;
+      await U.fontsReady();
       const el = $('#ebib');
-      await Promise.all(Array.from(el.querySelectorAll('img')).map((im) => (im.complete && im.naturalWidth ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
+      await Promise.all(Array.from(el.querySelectorAll('img')).map((im) => U.imgReady(im, 6000)));
       const av = await U.avatarCanvas(runner, 112, 3, 2);   // วงกลมโปรไฟล์: วาดเอง ไม่ให้ html2canvas วาด
       // QR: คัดลอกพิกเซลจาก canvas ต้นฉบับใส่ canvas ใหม่ในฉากที่จับภาพ (บางเครื่อง html2canvas คัดลอก canvas ไม่ติด)
       const qrSrc = $('#bQr canvas');
@@ -490,14 +490,14 @@
       el.classList.remove('flipcard', 'is-back'); el.classList.add('flat');   // วัดขนาดจริงของแบบรวม
       const W = el.offsetWidth, H = el.offsetHeight;
       el.classList.remove('flat'); el.classList.add('flipcard'); if (before) el.classList.add('is-back');
-      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true, onclone: (doc) => { flat(doc); U.canvasifyImages(el)(doc); swapAvatar(doc); swapQr(doc); }, width: W, height: H, scrollX: 0, scrollY: -window.scrollY });
-      const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
+      const canvas = await U.capture(el, { scale: 2, backgroundColor: '#ffffff', onclone: (doc) => { flat(doc); U.canvasifyImages(el)(doc); swapAvatar(doc); swapQr(doc); }, width: W, height: H, scrollX: 0, scrollY: -window.scrollY });
+      const blob = await U.canvasToBlob(canvas);
       if (!blob) throw new Error('canvas empty');
       loading(false);
       await U.saveImage(blob, 'INSTHINK-' + runner.bib + '-EBIB.png');
     } catch (e) {
       console.error(e);
-      toast('บันทึกไม่สำเร็จ ลองแคปหน้าจอแทน', 'err');
+      toast(/นานเกินไป/.test(e.message || '') ? 'สร้างรูปนานเกินไป ลองปิดแท็บอื่นแล้วกดใหม่ หรือแคปหน้าจอแทน' : 'บันทึกไม่สำเร็จ ลองแคปหน้าจอแทน', 'err');
     } finally {
       loading(false);
       busy(btn, false);

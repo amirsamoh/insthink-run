@@ -119,6 +119,36 @@
     };
   }
 
+  /* ---------- ตัวช่วยจับภาพ (html2canvas) ที่ "ไม่ค้าง": มี timeout ทุกขั้นตอน + ปิดแอนิเมชัน/เงา/blur ในฉากที่จับภาพ ---------- */
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const withTimeout = (p, ms, msg) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(msg || 'timeout')), ms))]);
+  /** รอฟอนต์ไม่เกิน 2.5 วินาที (ฟอนต์จาก Google บนเน็ตช้า/ถูกบล็อกจะไม่ทำให้ค้างอีก) */
+  const fontsReady = () => (document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready.catch(() => {}), sleep(2500)]) : Promise.resolve());
+  /** รอรูปโหลด (ไม่เกิน ms) — รูปเสีย/ช้าจะข้ามไปแทนที่จะรอตลอดไป */
+  const imgReady = (im, ms) => (im.complete && im.naturalWidth ? Promise.resolve() : Promise.race([new Promise((r) => { im.addEventListener('load', r, { once: true }); im.addEventListener('error', r, { once: true }); }), sleep(ms || 6000)]));
+  /** ในฉากที่ clone: ซ่อนทุกอย่างที่ไม่ใช่ตัวที่จะจับภาพ (ลดงานของ html2canvas) — ใช้เมื่อตำแหน่งตัวที่จับไม่ขึ้นกับ element อื่น */
+  function isolateClone(doc, id) {
+    let node = doc.getElementById(id);
+    while (node && node !== doc.body) {
+      Array.from(node.parentNode.children).forEach((sib) => { if (sib !== node && !/^(SCRIPT|STYLE|LINK)$/.test(sib.tagName)) sib.style.display = 'none'; });
+      node = node.parentNode;
+    }
+  }
+  const CAPTURE_CSS = '*,*::before,*::after{animation:none!important;transition:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}';
+  async function capture(el, opts, timeoutMs) {
+    const userClone = opts && opts.onclone;
+    const o = Object.assign({ logging: false, useCORS: true, imageTimeout: 8000, removeContainer: true }, opts, {
+      onclone: (doc, node) => {
+        const s = doc.createElement('style'); s.textContent = CAPTURE_CSS; doc.head.appendChild(s);
+        if (userClone) userClone(doc, node);
+      },
+    });
+    try { return await withTimeout(window.html2canvas(el, o), timeoutMs || 60000, 'สร้างรูปนานเกินไป'); }
+    catch (e) { throw e; }
+  }
+  /** จับภาพเสร็จแล้วคืนหน่วยความจำของ canvas ทันที (iPhone จำกัดหน่วยความจำ canvas) */
+  const canvasToBlob = (cv) => new Promise((res) => cv.toBlob((b) => { cv.width = cv.height = 0; res(b); }, 'image/png'));
+
   /**
    * วาดวงกลมรูปโปรไฟล์ลง <canvas> เอง (ไม่พึ่ง html2canvas) — รูปไม่มี/โหลดไม่ได้ → วงกลมกรมท่า + ตัวอักษรแรก
    * size = เส้นผ่านศูนย์กลางรวมขอบ (px) · border = ขอบขาว · ring = เส้นกรมท่านอกสุด
@@ -439,6 +469,6 @@
     $, $$, esc, toast, busy, normPhone, myBibs, pkg, pkgByPrefix, delivery, money,
     PAY_LABEL, payPill, checkinLabel, qrPayload, parseQr, renderQR, renderBarcode,
     promptPayPayload, compressImage, loading, saveImage, isMobile, compressAvatar, avatarHtml, canvasifyImages, avatarCanvas, sweetLabel, routeSvg, starSvg, fmtDate,
-    ref, inviteUrl, theme, reveal,
+    ref, inviteUrl, theme, reveal, sleep, withTimeout, fontsReady, imgReady, isolateClone, capture, canvasToBlob,
   };
 })();

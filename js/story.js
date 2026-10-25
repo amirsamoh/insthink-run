@@ -142,11 +142,11 @@
 
   /** จับภาพ .story ปัจจุบันเป็น Blob */
   async function capture(el, runner) {
-    if (document.fonts && document.fonts.ready) await document.fonts.ready;
-    await Promise.all(Array.from(el.querySelectorAll('img')).map(loadImg));
+    await window.U.fontsReady();
+    await Promise.all(Array.from(el.querySelectorAll('img')).map((im) => window.U.imgReady(im, 6000)));
     // รอรูปพื้นหลัง (background-image) ให้โหลดเสร็จ
     const bgs = Array.from(el.querySelectorAll('.k-img,.s-bg')).map((d) => (d.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/) || [])[1]).filter(Boolean);
-    await Promise.all(bgs.map((src) => new Promise((r) => { const i = new Image(); i.onload = i.onerror = r; i.src = src; })));
+    await Promise.all(bgs.map((src) => Promise.race([new Promise((r) => { const i = new Image(); i.onload = i.onerror = r; i.src = src; }), window.U.sleep(6000)])));
     await new Promise((r) => setTimeout(r, 80));
     const num = el.querySelector('.s-bib .num span');
     if (num) fitText(num, 780, 250);   // เลข BIB พอดีการ์ด
@@ -157,12 +157,12 @@
       const av = await window.U.avatarCanvas(runner, 132, 6, 0);
       swapAvatar = (doc) => { const t = doc.querySelector('#story .s-avatar'); if (t) { t.innerHTML = ''; t.style.cssText = 'width:132px;height:132px;border:0;background:none;overflow:visible;display:block'; const c2 = doc.createElement('canvas'); c2.width = av.width; c2.height = av.height; c2.getContext('2d').drawImage(av, 0, 0); c2.style.cssText = av.style.cssText; t.appendChild(c2); } };
     }
-    const canvas = await html2canvas(el, {
+    const canvas = await window.U.capture(el, {
       width: 1080, height: 1920, scale: 1, x: 0, y: 0, scrollX: 0, scrollY: 0,
       windowWidth: 1080, windowHeight: 1920,
-      backgroundColor: '#0F2244', useCORS: true, onclone: (doc) => { window.U.canvasifyImages(el)(doc); swapAvatar(doc); }, logging: false,
-    });
-    return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+      backgroundColor: '#0F2244', onclone: (doc) => { window.U.isolateClone(doc, 'story'); window.U.canvasifyImages(el)(doc); swapAvatar(doc); },
+    }, 60000);
+    return await window.U.canvasToBlob(canvas);
   }
 
   /** สร้าง Story ทั้ง 3 หน้า → [Blob, Blob, Blob] */
