@@ -74,9 +74,9 @@
 
     // โลโก้ + วันที่
     if (logo) g.drawImage(logo, 80, 74, 300, 300 * logo.naturalHeight / logo.naturalWidth);
-    g.textAlign = 'right'; g.fillStyle = '#FFFFFF'; g.font = 'italic 800 38px Kanit, sans-serif';
-    g.textAlign = 'right'; g.fillText(CFG.EVENT.dateLabel, W - 80, 112);   // iOS: ตั้ง align ซ้ำหลังเปลี่ยน font
-    g.fillStyle = '#C6D5EC'; g.font = '400 26px Kanit, sans-serif'; g.textAlign = 'right'; g.fillText(CFG.EVENT.location, W - 80, 150);
+    g.textAlign = 'left'; g.fillStyle = '#FFFFFF'; g.font = 'italic 800 38px Kanit, sans-serif';
+    g.fillText(CFG.EVENT.dateLabel, W - 80 - g.measureText(CFG.EVENT.dateLabel).width, 112);   // iOS: คำนวณชิดขวาเอง (ข้อความไทยไม่ทำตาม textAlign)
+    g.fillStyle = '#C6D5EC'; g.font = '400 26px Kanit, sans-serif'; g.fillText(CFG.EVENT.location, W - 80 - g.measureText(CFG.EVENT.location).width, 150);
 
     // FINISHER
     g.textAlign = 'left'; g.fillStyle = '#FFFFFF';
@@ -116,7 +116,7 @@
     g.fillStyle = 'rgba(255,255,255,.16)'; g.fillRect(80, 1186, W - 160, 2);
     g.textAlign = 'left'; g.fillStyle = '#FFFFFF'; g.font = 'italic 800 32px Kanit, sans-serif';
     g.fillText('COMMUNITY COFFEE RUN', 80, 1250);
-    g.textAlign = 'right'; g.fillStyle = '#8CD43E'; fit(g, CFG.EVENT.hashtag, 'italic 800 {s}px Kanit, sans-serif', 32, 440); g.textAlign = 'right'; g.fillText(CFG.EVENT.hashtag, W - 80, 1250);
+    g.textAlign = 'left'; g.fillStyle = '#8CD43E'; fit(g, CFG.EVENT.hashtag, 'italic 800 {s}px Kanit, sans-serif', 32, 440); g.fillText(CFG.EVENT.hashtag, W - 80 - g.measureText(CFG.EVENT.hashtag).width, 1250);
     g.textAlign = 'left'; g.fillStyle = '#C6D5EC'; g.font = '400 24px Kanit, sans-serif';
     g.fillText('ขอบคุณที่มาวิ่งด้วยกัน · ' + CFG.EVENT.instagram, 80, 1296);
 

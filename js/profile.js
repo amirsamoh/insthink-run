@@ -397,7 +397,8 @@
     const T = (text, font, color, y, size, maxW) => {
       let sz = size; x.font = font.replace('{s}', sz);
       while (maxW && x.measureText(text).width > maxW && sz > 14) { sz -= 1; x.font = font.replace('{s}', sz); }
-      x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.fillStyle = color; x.fillText(text, 300, y);
+      x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.fillStyle = color;   // iOS: ข้อความไทยไม่ทำตาม textAlign → คำนวณกึ่งกลางเอง
+      x.fillText(text, 300 - x.measureText(text).width / 2, y);
     };
     T('PromptPay', 'bold {s}px Kanit, sans-serif', '#fff', 52, 32, 520);
     x.drawImage(cv, 80, 110, 440, 440);

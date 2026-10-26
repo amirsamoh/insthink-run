@@ -31,10 +31,13 @@
     const mkFont = (z) => (o.style || '') + ' ' + (o.weight || 400) + ' ' + z + 'px ' + FF;
     g.font = mkFont(size);
     if (o.max) while (g.measureText(s).width > o.max && size > 12) { size -= 2; g.font = mkFont(size); }
-    g.textAlign = o.align || 'left';
+    // iOS Safari: ข้อความที่มีภาษาไทยบางครั้งไม่ทำตาม textAlign (center/right) → วาดชิดซ้ายเสมอ แล้วคำนวณตำแหน่ง x เอง
+    g.textAlign = 'left';
     g.textBaseline = 'alphabetic';
+    const w = g.measureText(s).width, al = o.align || 'left';
+    const px = al === 'center' ? x - w / 2 : al === 'right' ? x - w : x;
     g.fillStyle = o.color || '#fff';
-    g.fillText(s, x, y);
+    g.fillText(s, px, y);
     return size;
   }
   /** ข้อความเว้นตัวอักษร (letter-spacing) กึ่งกลาง */
@@ -231,19 +234,6 @@
     const c = mk(SW, SH), g = c.getContext('2d');
     base(g, 1, ctx, p, style);
     const nick = runner.nickname || runner.firstName || '';
-    if (style === 'minimal') {
-      // เรียบ: ตัวเลข BIB ใหญ่กลางภาพ
-      spaced(g, "I'M RUNNING " + CFG.EVENT.distanceKm + 'K', SW / 2, 700, { size: 40, weight: 800, color: p.acc, gap: 10 });
-      T(g, runner.bib, SW / 2, 1090, { size: 460, weight: 800, style: 'italic', color: p.fg, align: 'center', max: 940 });
-      g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(80, 1170, SW - 160, 2);
-      g.drawImage(ctx.av, 80, 1210, 132, 132);
-      T(g, nick, 242, 1266, { size: 52, weight: 700, color: p.fg, max: 700 });
-      T(g, (runner.firstName + ' ' + runner.lastName).trim(), 242, 1310, { size: 30, weight: 400, color: p.sub, max: 700 });
-      T(g, CFG.ROUTE.name, SW - 80, 1262, { size: 34, weight: 800, style: 'italic', color: p.acc, align: 'right', max: 380 });
-      T(g, 'ปล่อยตัว ' + CFG.EVENT.startTime + ' น.', SW - 80, 1308, { size: 28, weight: 400, color: p.sub, align: 'right', max: 380 });
-      foot(g, 1, ctx, p);
-      return c;
-    }
     title(g, "I'm", 'running', p);
     g.drawImage(ctx.av, 80, 700, 132, 132);
     T(g, nick, 242, 756, { size: 52, weight: 700, color: p.fg, max: 700 });
@@ -328,7 +318,7 @@
   /** โลโก้งานหลัก (ไฟล์ที่ออกแบบเอง พื้นโปร่งใส) */
   function stickerMainLogo(runner, ctx, p, style) {
     const im = style === 'light' ? ctx.stLogoC : ctx.stLogoW;
-    const w = 1100, h = im ? w * im.naturalHeight / im.naturalWidth : 520, pad = 50;
+    const w = 1600, h = im ? w * im.naturalHeight / im.naturalWidth : 520, pad = 50;
     const c = mk(w + pad * 2, Math.round(h) + pad * 2), g = c.getContext('2d');
     if (im) {
       g.shadowColor = style === 'light' ? 'rgba(255,255,255,.95)' : 'rgba(0,0,0,.55)'; g.shadowBlur = style === 'light' ? 26 : 22; g.shadowOffsetY = style === 'light' ? 0 : 5;
@@ -338,7 +328,7 @@
   }
   /** แผนที่เส้นทาง (พื้นโปร่งใส ไม่มีเงา) + ข้อความ DISTANCE 6 KM ในพื้นที่ว่างกลางแผนที่ */
   function stickerMap(runner, ctx, p, style) {
-    const im = ctx.stMap, w = 1000, h = im ? w * im.naturalHeight / im.naturalWidth : 900, pad = 20;
+    const im = ctx.stMap, w = 1400, h = im ? w * im.naturalHeight / im.naturalWidth : 900, pad = 20;
     const c = mk(w + pad * 2, Math.round(h) + pad * 2), g = c.getContext('2d');
     if (im) g.drawImage(im, pad, pad, w, h);   // ไม่ใส่เงา
     return c;
