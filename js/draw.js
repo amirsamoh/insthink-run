@@ -331,14 +331,11 @@
     }
     return c;
   }
-  /** แผนที่เส้นทาง (พื้นโปร่งใส) */
+  /** แผนที่เส้นทาง (พื้นโปร่งใส ไม่มีเงา) + ข้อความ DISTANCE 6 KM ในพื้นที่ว่างกลางแผนที่ */
   function stickerMap(runner, ctx, p, style) {
-    const im = ctx.stMap, w = 900, h = im ? w * im.naturalHeight / im.naturalWidth : 800, pad = 50;
+    const im = ctx.stMap, w = 1000, h = im ? w * im.naturalHeight / im.naturalWidth : 900, pad = 20;
     const c = mk(w + pad * 2, Math.round(h) + pad * 2), g = c.getContext('2d');
-    if (im) {
-      g.shadowColor = style === 'light' ? 'rgba(255,255,255,.95)' : 'rgba(0,0,0,.5)'; g.shadowBlur = style === 'light' ? 24 : 20; g.shadowOffsetY = style === 'light' ? 0 : 5;
-      g.drawImage(im, pad, pad, w, h);
-    }
+    if (im) g.drawImage(im, pad, pad, w, h);   // ไม่ใส่เงา
     return c;
   }
   /** กรอบรูปที่ออกแบบเอง: เลข BIB อยู่ในช่องมุมขวาล่าง */
