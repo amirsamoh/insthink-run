@@ -184,3 +184,13 @@
     paint(); start();
   })();
 })();
+
+/* วิดีโอหน้าแรก: เครื่องที่ตั้ง "ลดการเคลื่อนไหว" = หยุดที่ภาพนิ่ง / บางเครื่องบล็อกเล่นอัตโนมัติ = ลองสั่งเล่นอีกครั้ง */
+(function () {
+  const v = document.querySelector('.bs-video'); if (!v) return;
+  v.muted = true;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); return; }
+  const tryPlay = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+  tryPlay();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) tryPlay(); });
+})();

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.19">
+  <link rel="stylesheet" href="css/style.css?v=20.21">
 </head>
 <body>
   <header class="site-head" data-nav></header>
@@ -36,7 +36,11 @@
       </div>
       <div class="hero2-art" aria-hidden="true">
         <div class="hero-stars" id="heroStars"></div>
-        <img class="bandana-shot" src="img/bandana-chair.webp" alt="">
+        <div class="bandana-shot bstage" id="bStage">
+          <video class="bs-video" autoplay muted loop playsinline preload="auto" poster="img/hero-chair-poster.webp" disablepictureinpicture>
+            <source src="img/hero-chair.mp4" type="video/mp4">
+          </video>
+        </div>
         <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span><span class="spark s7">✦</span><span class="spark s9">✦</span>
       </div>
     </section>
@@ -170,9 +174,9 @@
 
   <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
 
-  <script src="js/config.js?v=20.19"></script>
-  <script src="js/api.js?v=20.19"></script>
-  <script src="js/common.js?v=20.19"></script>
-  <script src="js/home.js?v=20.19"></script>
+  <script src="js/config.js?v=20.21"></script>
+  <script src="js/api.js?v=20.21"></script>
+  <script src="js/common.js?v=20.21"></script>
+  <script src="js/home.js?v=20.21"></script>
 </body>
 </html>
