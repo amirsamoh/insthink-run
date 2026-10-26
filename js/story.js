@@ -166,13 +166,13 @@
   }
 
   /** สร้าง Story ทั้ง 3 หน้า → [Blob, Blob, Blob]  (วาดด้วย Canvas ตรง ๆ ผ่าน js/draw.js) */
-  async function buildAll(runner) {
+  async function buildAll(runner, style) {
     const overlay = document.createElement('div');
     overlay.className = 'render-overlay';
     overlay.innerHTML = '<span class="spinner"></span><span id="storyProg">Creating your story… 1/3</span>';
     document.body.appendChild(overlay);
     try {
-      const out = await window.Draw.story(runner, (i) => { const p = document.getElementById('storyProg'); if (p) p.textContent = 'Creating your story… ' + (i + 1) + '/3'; });
+      const out = await window.Draw.story(runner, style, (i) => { const p = document.getElementById('storyProg'); if (p) p.textContent = 'Creating your story… ' + (i + 1) + '/3'; });
       if (out.some((b) => !b)) throw new Error('canvas empty');
       return out;
     } finally { overlay.remove(); }

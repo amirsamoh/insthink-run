@@ -1252,3 +1252,22 @@ footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity:
 .theme-btn { min-width: 40px; min-height: 40px; }
 .reg-back, #toForgot { display: inline-flex; align-items: center; min-height: 44px; }
 .site-foot .admin-link, .site-foot .btn-sm { min-height: 44px; }
+
+/* v20.8 — สโลแกนท้ายเว็บไม่ทิ้งคำว่า RUN ไว้บรรทัดเดียว */
+.site-foot .tagline { text-wrap: balance; }
+@media (max-width: 480px) { .site-foot .tagline { letter-spacing: .08em; font-size: 14px; } }
+
+/* v20.9 — เลือกสไตล์ IG Story + ปุ่ม Instagram + พรีวิวสติกเกอร์โปร่งใส */
+.style-pick { display: flex; gap: 8px; margin: 0 0 14px; }
+.style-pick button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 10px; border-radius: 99px; border: 1.5px solid var(--line-2); background: var(--surface); color: var(--ink); font: 600 14px var(--font); cursor: pointer; }
+.style-pick button.on { border-color: var(--night); box-shadow: 0 0 0 2px var(--night) inset; }
+[data-theme="dark"] .style-pick button.on { border-color: #fff; box-shadow: 0 0 0 2px #fff inset; }
+.style-pick .sw { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,.2); flex: none; }
+.sw-dark { background: linear-gradient(135deg, #1B3B67, #0A1430); }
+.sw-light { background: linear-gradient(135deg, #F4F8FE, #D3E1F3); }
+.sw-min { background: #0A0A0A; box-shadow: inset 0 0 0 4px #0A0A0A, inset 0 0 0 8px #8CD43E; }
+.btn-ig { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+.btn-ig svg { flex: none; }
+.ss-track figure.sticker img { background: repeating-conic-gradient(#d9dee8 0 25%, #f5f7fb 0 50%) 0 0 / 18px 18px; box-shadow: none; border: 1px solid var(--line); }
+.ss-track figure.sticker { align-self: center; }
+.ss-track figcaption { white-space: nowrap; }

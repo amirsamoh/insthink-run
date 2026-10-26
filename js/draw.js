@@ -164,160 +164,180 @@
   const SW = 1080, SH = 1920;
   const BG = { 1: 'img/story-bg-1.webp', 2: 'img/story-bg-3.webp', 3: 'img/story-bg-2.webp' };
   const SHADE = { 1: .12, 2: .12, 3: .10 };
+  /** ชุดสี 3 สไตล์: dark = พื้นหลังรูปกรมท่า · light = พื้นสว่างฟ้าอ่อน · minimal = ดำล้วน + เขียวมะนาว */
+  const PAL = {
+    dark:    { fg: '#FFFFFF', sub: '#C6D5EC', acc: '#8FB4E8', logo: 'img/logo-white.png', spons: 'img/sponsors-grid-white.webp', cardBg: '#FFFFFF', cardFg: '#0A0A0A', cardSub: '#45454f', head: '#0A0A0A', badgeBg: '#FFFFFF', badgeFg: '#0A0A0A', stripe: '#1B3B67', stripeBg: '#FFFFFF', box: 'rgba(255,255,255,.05)', boxLine: 'rgba(255,255,255,.16)', route: '#FFFFFF', ghost: 'rgba(255,255,255,.38)', dot: '#0F2244', cta: '#FFFFFF', ctaFg: '#0A1430', ctaSub: '#5E6573', ctaUrl: '#1B3B67' },
+    light:   { fg: '#0A1430', sub: '#4A5A78', acc: '#1B3B67', logo: 'img/logo.png', spons: 'img/sponsors-grid-dark.webp', cardBg: '#0A1430', cardFg: '#FFFFFF', cardSub: '#C6D5EC', head: '#1B3B67', badgeBg: '#8CD43E', badgeFg: '#0A1430', stripe: '#8CD43E', stripeBg: '#0A1430', box: 'rgba(27,59,103,.06)', boxLine: 'rgba(27,59,103,.18)', route: '#1B3B67', ghost: 'rgba(27,59,103,.30)', dot: '#FFFFFF', cta: '#0A1430', ctaFg: '#FFFFFF', ctaSub: '#C6D5EC', ctaUrl: '#8CD43E' },
+    minimal: { fg: '#FFFFFF', sub: '#9AA3B5', acc: '#8CD43E', logo: 'img/logo-white.png', spons: 'img/sponsors-grid-white.webp', cardBg: '#FFFFFF', cardFg: '#0A0A0A', cardSub: '#45454f', head: '#0A0A0A', badgeBg: '#8CD43E', badgeFg: '#0A0A0A', stripe: '#8CD43E', stripeBg: '#FFFFFF', box: 'rgba(255,255,255,.05)', boxLine: 'rgba(255,255,255,.18)', route: '#8CD43E', ghost: 'rgba(255,255,255,.28)', dot: '#0A0A0A', cta: '#8CD43E', ctaFg: '#0A0A0A', ctaSub: '#2B3A12', ctaUrl: '#0A0A0A' },
+  };
 
-  function base(g, n, ctx) {
-    g.fillStyle = '#0F2244'; g.fillRect(0, 0, SW, SH);
-    cover(g, ctx.bg[n], 0, 0, SW, SH);
-    const lg = g.createLinearGradient(0, 0, 0, SH), s = SHADE[n];
-    lg.addColorStop(0, 'rgba(7,15,40,' + (s + .18) + ')'); lg.addColorStop(.4, 'rgba(7,15,40,' + s + ')'); lg.addColorStop(1, 'rgba(7,15,40,' + (s + .3) + ')');
-    g.fillStyle = lg; g.fillRect(0, 0, SW, SH);
+  function base(g, n, ctx, p, style) {
+    if (style === 'dark') {
+      g.fillStyle = '#0F2244'; g.fillRect(0, 0, SW, SH);
+      cover(g, ctx.bg[n], 0, 0, SW, SH);
+      const lg = g.createLinearGradient(0, 0, 0, SH), s = SHADE[n];
+      lg.addColorStop(0, 'rgba(7,15,40,' + (s + .18) + ')'); lg.addColorStop(.4, 'rgba(7,15,40,' + s + ')'); lg.addColorStop(1, 'rgba(7,15,40,' + (s + .3) + ')');
+      g.fillStyle = lg; g.fillRect(0, 0, SW, SH);
+    } else if (style === 'light') {
+      const lg = g.createLinearGradient(0, 0, 0, SH); lg.addColorStop(0, '#F4F8FE'); lg.addColorStop(1, '#D3E1F3');
+      g.fillStyle = lg; g.fillRect(0, 0, SW, SH);
+      let rg = g.createRadialGradient(SW, 0, 0, SW, 0, 900); rg.addColorStop(0, 'rgba(61,107,176,.35)'); rg.addColorStop(1, 'rgba(61,107,176,0)');
+      g.fillStyle = rg; g.fillRect(0, 0, SW, SH);
+      rg = g.createRadialGradient(0, SH, 0, 0, SH, 900); rg.addColorStop(0, 'rgba(140,212,62,.30)'); rg.addColorStop(1, 'rgba(140,212,62,0)');
+      g.fillStyle = rg; g.fillRect(0, 0, SW, SH);
+    } else {
+      g.fillStyle = '#0A0A0A'; g.fillRect(0, 0, SW, SH);
+    }
     if (ctx.logo) g.drawImage(ctx.logo, 80, 100, 400, 400 * ctx.logo.naturalHeight / ctx.logo.naturalWidth);
-    T(g, CFG.EVENT.dateLabel, SW - 80, 154, { size: 40, weight: 800, style: 'italic', align: 'right', max: 460 });
-    T(g, CFG.EVENT.location, SW - 80, 200, { size: 26, weight: 400, color: '#C6D5EC', align: 'right', max: 460 });
+    T(g, CFG.EVENT.dateLabel, SW - 80, 154, { size: 40, weight: 800, style: 'italic', color: p.fg, align: 'right', max: 460 });
+    T(g, CFG.EVENT.location, SW - 80, 200, { size: 26, weight: 400, color: p.sub, align: 'right', max: 460 });
   }
-  function title(g, l1, l2) {
-    T(g, l1.toUpperCase(), 70, 500, { size: 200, weight: 800, style: 'italic', max: 940 });
-    T(g, l2.toUpperCase(), 70, 672, { size: 200, weight: 800, style: 'italic', color: '#8FB4E8', max: 940 });
+  function title(g, l1, l2, p) {
+    T(g, l1.toUpperCase(), 70, 500, { size: 200, weight: 800, style: 'italic', color: p.fg, max: 940 });
+    T(g, l2.toUpperCase(), 70, 672, { size: 200, weight: 800, style: 'italic', color: p.acc, max: 940 });
   }
-  function foot(g, n, ctx) {
-    spaced(g, 'SUPPORTED BY', SW / 2, 1618, { size: 20, weight: 700, color: '#C6D5EC', gap: 6 });
+  function foot(g, n, ctx, p) {
+    spaced(g, 'SUPPORTED BY', SW / 2, 1618, { size: 20, weight: 700, color: p.sub, gap: 6 });
     if (ctx.spons) { const w = 760, h = w * ctx.spons.naturalHeight / ctx.spons.naturalWidth; g.drawImage(ctx.spons, (SW - w) / 2, 1796 - h, w, h); }
-    T(g, CFG.EVENT.instagram, 80, 1848, { size: 32, weight: 800, style: 'italic', align: 'left', max: 380 });
-    T(g, n + ' / 3', SW / 2, 1848, { size: 28, weight: 800, style: 'italic', color: 'rgba(255,255,255,.55)', align: 'center' });
-    T(g, CFG.EVENT.hashtag, SW - 80, 1848, { size: 32, weight: 800, style: 'italic', color: '#8FB4E8', align: 'right', max: 380 });
+    T(g, CFG.EVENT.instagram, 80, 1848, { size: 32, weight: 800, style: 'italic', color: p.fg, align: 'left', max: 380 });
+    T(g, n + ' / 3', SW / 2, 1848, { size: 28, weight: 800, style: 'italic', color: p.sub, align: 'center' });
+    T(g, CFG.EVENT.hashtag, SW - 80, 1848, { size: 32, weight: 800, style: 'italic', color: p.acc, align: 'right', max: 380 });
   }
 
-  function slide1(runner, ctx) {
-    const c = mk(SW, SH), g = c.getContext('2d');
-    base(g, 1, ctx); title(g, "I'm", 'running');
+  /** การ์ด BIB (ใช้ทั้งหน้า 1 และสติกเกอร์) — วาดที่ (bx,by) ขนาด bw×bh */
+  function bibCard(g, ctx, p, runner, bx, by, bw, bh) {
     const nick = runner.nickname || runner.firstName || '';
-    g.drawImage(ctx.av, 80, 700, 132, 132);
-    T(g, nick, 242, 756, { size: 52, weight: 700, max: 700 });
-    T(g, (runner.firstName + ' ' + runner.lastName).trim(), 242, 800, { size: 30, weight: 400, color: '#C6D5EC', max: 700 });
+    g.save(); rr(g, bx, by, bw, bh, 34); g.clip();
+    g.fillStyle = p.cardBg; g.fillRect(bx, by, bw, bh);
+    g.fillStyle = p.head; g.fillRect(bx, by, bw, 84);
+    if (ctx.logoW) g.drawImage(ctx.logoW, bx + 36, by + 16, 52 * ctx.logoW.naturalWidth / ctx.logoW.naturalHeight, 52);
+    g.font = 'italic 800 40px ' + FF; const dw = g.measureText(CFG.EVENT.distanceKm + 'K').width + 40;
+    g.fillStyle = p.badgeBg; rr(g, bx + bw - 36 - dw, by + 16, dw, 52, 10); g.fill();
+    T(g, CFG.EVENT.distanceKm + 'K', bx + bw - 36 - dw / 2, by + 56, { size: 40, weight: 800, style: 'italic', color: p.badgeFg, align: 'center' });
+    g.fillStyle = p.stripeBg; g.fillRect(bx, by + 84, bw, 14);
+    g.fillStyle = p.stripe;
+    for (let x = bx - 30; x < bx + bw + 30; x += 26) { g.beginPath(); g.moveTo(x, by + 84); g.lineTo(x + 16, by + 84); g.lineTo(x + 6, by + 98); g.lineTo(x - 10, by + 98); g.closePath(); g.fill(); }
+    T(g, runner.bib, bx + bw / 2, by + 98 + (bh - 98 - 56) / 2 + 74, { size: 200, weight: 800, style: 'italic', color: p.cardFg, align: 'center', max: bw - 140 });
+    T(g, nick, bx + 40, by + bh - 28, { size: 28, weight: 500, color: p.cardSub, align: 'left', max: bw / 2 - 60 });
+    T(g, CFG.EVENT.dateLabel, bx + bw - 40, by + bh - 28, { size: 28, weight: 500, color: p.cardSub, align: 'right', max: bw / 2 - 60 });
+    g.restore();
+  }
 
-    // กล่องเส้นทาง
-    g.fillStyle = 'rgba(255,255,255,.05)'; rr(g, 80, 850, 920, 310, 28); g.fill();
-    g.strokeStyle = 'rgba(255,255,255,.16)'; g.lineWidth = 2; g.stroke();
+  function slide1(runner, ctx, p, style) {
+    const c = mk(SW, SH), g = c.getContext('2d');
+    base(g, 1, ctx, p, style);
+    const nick = runner.nickname || runner.firstName || '';
+    if (style === 'minimal') {
+      // เรียบ: ตัวเลข BIB ใหญ่กลางภาพ
+      spaced(g, "I'M RUNNING " + CFG.EVENT.distanceKm + 'K', SW / 2, 700, { size: 40, weight: 800, color: p.acc, gap: 10 });
+      T(g, runner.bib, SW / 2, 1090, { size: 460, weight: 800, style: 'italic', color: p.fg, align: 'center', max: 940 });
+      g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(80, 1170, SW - 160, 2);
+      g.drawImage(ctx.av, 80, 1210, 132, 132);
+      T(g, nick, 242, 1266, { size: 52, weight: 700, color: p.fg, max: 700 });
+      T(g, (runner.firstName + ' ' + runner.lastName).trim(), 242, 1310, { size: 30, weight: 400, color: p.sub, max: 700 });
+      T(g, CFG.ROUTE.name, SW - 80, 1262, { size: 34, weight: 800, style: 'italic', color: p.acc, align: 'right', max: 380 });
+      T(g, 'ปล่อยตัว ' + CFG.EVENT.startTime + ' น.', SW - 80, 1308, { size: 28, weight: 400, color: p.sub, align: 'right', max: 380 });
+      foot(g, 1, ctx, p);
+      return c;
+    }
+    title(g, "I'm", 'running', p);
+    g.drawImage(ctx.av, 80, 700, 132, 132);
+    T(g, nick, 242, 756, { size: 52, weight: 700, color: p.fg, max: 700 });
+    T(g, (runner.firstName + ' ' + runner.lastName).trim(), 242, 800, { size: 30, weight: 400, color: p.sub, max: 700 });
+
+    g.fillStyle = p.box; rr(g, 80, 850, 920, 310, 28); g.fill();
+    g.strokeStyle = p.boxLine; g.lineWidth = 2; g.stroke();
     const k = 270 / 100, ox = 100 + (460 - 270) / 2, oy = 870;
-    const P = (p) => [ox + p[0] * k, oy + p[1] * k];
+    const P = (q) => [ox + q[0] * k, oy + q[1] * k];
     g.lineJoin = 'round'; g.lineCap = 'round';
     (CFG.ROUTE.ghost || []).forEach((line) => {
-      g.beginPath(); line.forEach((p, i) => { const q = P(p); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); });
-      g.strokeStyle = 'rgba(255,255,255,.38)'; g.lineWidth = 0.55 * k; g.stroke();
+      g.beginPath(); line.forEach((q, i) => { const z = P(q); i ? g.lineTo(z[0], z[1]) : g.moveTo(z[0], z[1]); });
+      g.strokeStyle = p.ghost; g.lineWidth = 0.55 * k; g.stroke();
     });
-    g.beginPath(); CFG.ROUTE.points.forEach((p, i) => { const q = P(p); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); });
-    g.strokeStyle = '#FFFFFF'; g.lineWidth = 2.8 * k; g.stroke();
+    g.beginPath(); CFG.ROUTE.points.forEach((q, i) => { const z = P(q); i ? g.lineTo(z[0], z[1]) : g.moveTo(z[0], z[1]); });
+    g.strokeStyle = p.route; g.lineWidth = 2.8 * k; g.stroke();
     const s0 = P(CFG.ROUTE.points[0]);
-    g.fillStyle = '#0F2244'; g.beginPath(); g.arc(s0[0], s0[1], 3.7 * k, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 0.9 * k; g.stroke();
-    g.fillStyle = '#fff'; g.beginPath(); g.arc(s0[0], s0[1], 1.9 * k, 0, 7); g.fill();
-    // ข้อมูลระยะ
+    g.fillStyle = p.dot; g.beginPath(); g.arc(s0[0], s0[1], 3.7 * k, 0, 7); g.fill(); g.strokeStyle = p.route; g.lineWidth = 0.9 * k; g.stroke();
+    g.fillStyle = p.route; g.beginPath(); g.arc(s0[0], s0[1], 1.9 * k, 0, 7); g.fill();
     g.font = 'italic 800 52px ' + FF; const kmW = g.measureText('KM').width;
-    T(g, 'KM', 960, 970, { size: 52, weight: 800, style: 'italic', color: '#8FB4E8', align: 'right' });
-    T(g, CFG.EVENT.distanceKm, 960 - kmW - 6, 970, { size: 140, weight: 800, style: 'italic', align: 'right' });
-    T(g, CFG.ROUTE.name, 960, 1022, { size: 30, weight: 800, style: 'italic', align: 'right', max: 380 });
-    T(g, CFG.EVENT.edition, 960, 1066, { size: 24, weight: 400, color: '#C6D5EC', align: 'right', max: 380 });
-    T(g, 'ปล่อยตัว ' + CFG.EVENT.startTime + ' น.', 960, 1100, { size: 24, weight: 400, color: '#C6D5EC', align: 'right', max: 380 });
+    T(g, 'KM', 960, 970, { size: 52, weight: 800, style: 'italic', color: p.acc, align: 'right' });
+    T(g, CFG.EVENT.distanceKm, 960 - kmW - 6, 970, { size: 140, weight: 800, style: 'italic', color: p.fg, align: 'right' });
+    T(g, CFG.ROUTE.name, 960, 1022, { size: 30, weight: 800, style: 'italic', color: p.fg, align: 'right', max: 380 });
+    T(g, CFG.EVENT.edition, 960, 1066, { size: 24, weight: 400, color: p.sub, align: 'right', max: 380 });
+    T(g, 'ปล่อยตัว ' + CFG.EVENT.startTime + ' น.', 960, 1100, { size: 24, weight: 400, color: p.sub, align: 'right', max: 380 });
 
-    // การ์ด BIB
-    const bx = 80, by = 1190, bw = 920, bh = 370;
-    g.save(); rr(g, bx, by, bw, bh, 34); g.clip();
-    g.fillStyle = '#fff'; g.fillRect(bx, by, bw, bh);
-    g.fillStyle = '#0A0A0A'; g.fillRect(bx, by, bw, 84);
-    if (ctx.logo) g.drawImage(ctx.logo, bx + 36, by + 16, 52 * ctx.logo.naturalWidth / ctx.logo.naturalHeight, 52);
-    g.font = 'italic 800 40px ' + FF; const dw = g.measureText(CFG.EVENT.distanceKm + 'K').width + 40;
-    g.fillStyle = '#fff'; rr(g, bx + bw - 36 - dw, by + 16, dw, 52, 10); g.fill();
-    T(g, CFG.EVENT.distanceKm + 'K', bx + bw - 36 - dw / 2, by + 56, { size: 40, weight: 800, style: 'italic', color: '#0A0A0A', align: 'center' });
-    g.fillStyle = '#fff'; g.fillRect(bx, by + 84, bw, 14);
-    g.fillStyle = '#1B3B67';
-    for (let x = bx - 30; x < bx + bw + 30; x += 26) { g.beginPath(); g.moveTo(x, by + 84); g.lineTo(x + 16, by + 84); g.lineTo(x + 6, by + 98); g.lineTo(x - 10, by + 98); g.closePath(); g.fill(); }
-    T(g, runner.bib, bx + bw / 2, by + 278, { size: 200, weight: 800, style: 'italic', color: '#0A0A0A', align: 'center', max: 780 });
-    T(g, nick, bx + 40, by + bh - 28, { size: 28, weight: 500, color: '#45454f', align: 'left', max: 420 });
-    T(g, CFG.EVENT.dateLabel, bx + bw - 40, by + bh - 28, { size: 28, weight: 500, color: '#45454f', align: 'right', max: 420 });
-    g.restore();
-    foot(g, 1, ctx);
+    bibCard(g, ctx, p, runner, 80, 1190, 920, 370);
+    foot(g, 1, ctx, p);
     return c;
   }
 
-  function slide2(runner, ctx) {
-    const c = mk(SW, SH), g = c.getContext('2d');
-    base(g, 2, ctx); title(g, 'Race', 'kit');
-    const kit = [['bandana', 'ผ้าโพกหัว Bandana', true], ['stickers', 'สติกเกอร์ Limited', false], ['wristband', 'ริสแบน', false], ['meal', 'ข้าวยำ + เครื่องดื่ม', false]];
-    kit.forEach((it, i) => {
-      const x = 80 + (i % 2) * 472, y = 700 + Math.floor(i / 2) * 404, w = 448, h = 380, light = it[2];
-      g.save(); rr(g, x, y, w, h, 30); g.clip();
-      if (light) { const rg = g.createRadialGradient(x + w / 2, y + h * .2, 0, x + w / 2, y + h * .2, w * .8); rg.addColorStop(0, '#FFFFFF'); rg.addColorStop(1, '#DCE5F1'); g.fillStyle = rg; }
-      else g.fillStyle = '#1B3B67';
-      g.fillRect(x, y, w, h);
-      if (light) contain(g, ctx.kit[i], x + 20, y + 24, w - 40, h - 104); else cover(g, ctx.kit[i], x, y, w, h);
-      const lg = g.createLinearGradient(0, y, 0, y + h); lg.addColorStop(.52, 'rgba(10,20,48,0)'); lg.addColorStop(1, 'rgba(10,20,48,.9)');
-      g.fillStyle = lg; g.fillRect(x, y, w, h);
-      g.restore();
-      T(g, '0' + (i + 1), x + w - 26, y + 62, { size: 44, weight: 800, style: 'italic', color: light ? '#0A1430' : '#fff', align: 'right' });
-      T(g, it[1], x + 26, y + h - 30, { size: 36, weight: 700, align: 'left', max: w - 50 });
-    });
-    const price = (CFG.PACKAGES.find((p) => p.runner) || {}).price;
-    g.font = 'italic 800 34px ' + FF; const a = CFG.EVENT.distanceKm + 'K RUN';
-    const aw = g.measureText(a).width;
-    T(g, a, 80, 1536, { size: 34, weight: 800, style: 'italic', color: '#8CD43E', align: 'left' });
-    T(g, ' · ของที่ระลึกทั้งหมดรวมในค่าสมัคร ' + price + ' บาท', 80 + aw, 1536, { size: 32, weight: 400, color: '#C6D5EC', align: 'left', max: 920 - aw });
-    foot(g, 2, ctx);
+  /** หน้า 2: สติกเกอร์โปร่งใส (ไม่มีพื้นหลัง) — ให้ผู้ใช้เอาไปวางทับรูปของตัวเองใน IG Story */
+  function slide2(runner, ctx, p, style) {
+    const nick = runner.nickname || runner.firstName || '';
+    if (style === 'minimal') {
+      const c = mk(1000, 640), g = c.getContext('2d');
+      g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 18; g.shadowOffsetY = 4;
+      g.font = '800 40px ' + FF;
+      const lab = "I'M RUNNING " + CFG.EVENT.distanceKm + 'K', pw = 540;
+      g.fillStyle = '#8CD43E'; rr(g, (1000 - pw) / 2, 40, pw, 70, 35); g.fill();
+      g.shadowColor = 'transparent';
+      spaced(g, lab, 500, 88, { size: 34, weight: 800, color: '#0A0A0A', gap: 6 });
+      g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 24; g.shadowOffsetY = 6;
+      T(g, runner.bib, 500, 410, { size: 330, weight: 800, style: 'italic', color: '#FFFFFF', align: 'center', max: 940 });
+      T(g, nick + ' · ' + CFG.EVENT.dateLabel, 500, 500, { size: 44, weight: 700, color: '#FFFFFF', align: 'center', max: 900 });
+      g.shadowColor = 'transparent';
+      if (ctx.logoW) { const h = 70, w = h * ctx.logoW.naturalWidth / ctx.logoW.naturalHeight; g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 14; g.drawImage(ctx.logoW, (1000 - w) / 2, 540, w, h); }
+      return c;
+    }
+    const c = mk(1000, 640), g = c.getContext('2d');
+    g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 30; g.shadowOffsetY = 10;
+    g.fillStyle = p.cardBg; rr(g, 40, 40, 920, 520, 34); g.fill();   // เงาใต้การ์ด
+    g.shadowColor = 'transparent';
+    bibCard(g, ctx, p, runner, 40, 40, 920, 520);
     return c;
   }
 
-  function slide3(runner, ctx) {
+  /** หน้า 3: Run with me — ชวนเพื่อน */
+  function slide3(runner, ctx, p, style) {
     const c = mk(SW, SH), g = c.getContext('2d');
-    base(g, 3, ctx); title(g, 'Race', 'day');
-    T(g, CFG.EVENT.dateLabel, 80, 770, { size: 76, weight: 800, style: 'italic', max: 920 });
-    // หมุดสถานที่
-    g.save(); g.translate(80, 796); g.scale(1.5, 1.5); g.strokeStyle = '#8FB4E8'; g.lineWidth = 2.2; g.lineCap = 'round'; g.lineJoin = 'round';
-    g.stroke(new Path2D('M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z')); g.beginPath(); g.arc(12, 9.5, 2.5, 0, 7); g.stroke(); g.restore();
-    T(g, CFG.EVENT.location, 134, 832, { size: 38, weight: 500, color: '#C6D5EC', align: 'left', max: 860 });
+    base(g, 3, ctx, p, style); title(g, 'Run with', 'me', p);
+    const nick = runner.nickname || runner.firstName || '';
+    g.drawImage(ctx.av, 80, 700, 132, 132);
+    T(g, nick, 242, 756, { size: 52, weight: 700, color: p.fg, max: 700 });
+    T(g, 'ชวนคุณมาวิ่ง ' + CFG.EVENT.distanceKm + 'K ด้วยกัน', 242, 800, { size: 30, weight: 400, color: p.sub, max: 700 });
 
-    // ไทม์ไลน์
-    let y = 920; const items = CFG.EVENT.schedule || [];
-    const rowsInfo = items.map((x) => {
-      g.font = '400 28px ' + FF;
-      const lines = x.desc ? wrap(g, x.desc, 590, 2) : [];
-      return { x, lines, h: 56 + (lines.length ? 12 + lines.length * 38 : 0) + 36 };
-    });
-    const total = rowsInfo.reduce((a, r) => a + r.h, 0), k = total > 440 ? 440 / total : 1;
-    rowsInfo.forEach((r, idx) => {
-      const key = r.x.time === CFG.EVENT.startTime;
-      T(g, r.x.time || '', 310, y + 56, { size: 66, weight: 800, style: 'italic', color: key ? '#8CD43E' : '#fff', align: 'right', max: 230 });
-      if (idx < rowsInfo.length - 1) { g.fillStyle = 'rgba(143,180,232,.35)'; g.fillRect(355, y + 66, 4, r.h * k - 20); }
-      g.beginPath(); g.arc(357, y + 38, 17, 0, 7); g.fillStyle = key ? '#8CD43E' : '#0F2244'; g.fill();
-      g.lineWidth = 5; g.strokeStyle = key ? '#fff' : '#8FB4E8'; g.stroke();
-      T(g, r.x.title, 404, y + 44, { size: 44, weight: 700, align: 'left', max: 596 });
-      r.lines.forEach((ln, j) => T(g, ln, 404, y + 90 + j * 38, { size: 28, weight: 400, color: '#C6D5EC', align: 'left' }));
-      y += r.h * k;
-    });
+    g.fillStyle = p.box; rr(g, 80, 870, 920, 320, 28); g.fill(); g.strokeStyle = p.boxLine; g.lineWidth = 2; g.stroke();
+    T(g, CFG.EVENT.dateLabel, 124, 970, { size: 76, weight: 800, style: 'italic', color: p.fg, max: 830 });
+    T(g, CFG.EVENT.location, 124, 1030, { size: 38, weight: 500, color: p.sub, max: 830 });
+    T(g, CFG.ROUTE.name + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.', 124, 1100, { size: 34, weight: 700, style: 'italic', color: p.acc, max: 830 });
+    T(g, CFG.EVENT.edition, 124, 1150, { size: 28, weight: 400, color: p.sub, max: 830 });
 
-    // ปุ่มชวนเพื่อน
     const url = U.inviteUrl(runner.bib).replace(/^https?:\/\//, '');
-    g.fillStyle = '#fff'; rr(g, 80, 1370, 920, 180, 34); g.fill();
-    T(g, 'มาวิ่งด้วยกัน', 124, 1446, { size: 52, weight: 800, style: 'italic', color: '#0A1430', align: 'left', max: 830 });
-    T(g, 'สมัครผ่านลิงก์ของ ' + (runner.nickname || runner.firstName), 124, 1486, { size: 26, weight: 400, color: '#5E6573', align: 'left', max: 830 });
-    T(g, url, 124, 1524, { size: 28, weight: 600, color: '#1B3B67', align: 'left', max: 832 });
-    foot(g, 3, ctx);
+    g.fillStyle = p.cta; rr(g, 80, 1250, 920, 230, 34); g.fill();
+    T(g, 'สมัครผ่านลิงก์ของ ' + nick, 124, 1330, { size: 46, weight: 800, style: 'italic', color: p.ctaFg, align: 'left', max: 830 });
+    T(g, 'ใส่ลิงก์ด้วยสติกเกอร์ Link ใน Instagram', 124, 1378, { size: 26, weight: 400, color: p.ctaSub, align: 'left', max: 830 });
+    T(g, url, 124, 1440, { size: 32, weight: 700, color: p.ctaUrl, align: 'left', max: 832 });
+    foot(g, 3, ctx, p);
     return c;
   }
 
-  /** onProgress(i) ถูกเรียกก่อนวาดแต่ละหน้า → คืน [Blob×3] */
-  async function story(runner, onProgress) {
+  /** style: 'dark' | 'light' | 'minimal' → [Blob×3] : การ์ด BIB · สติกเกอร์โปร่งใส · ชวนเพื่อน */
+  async function story(runner, style, onProgress) {
+    const st = PAL[style] ? style : 'dark', p = PAL[st];
     await fonts();
-    const [logo, spons, av, b1, b2, b3, k1, k2, k3, k4] = await Promise.all([
-      loadImg('img/logo-white.png'), loadImg('img/sponsors-grid-white.webp'), U.avatarCanvas(runner, 132, 6, 0),
-      loadImg(BG[1]), loadImg(BG[2]), loadImg(BG[3]),
-      loadImg('img/bandana-flat.webp'), loadImg('img/stickers.webp'), loadImg('img/wristband.webp'), loadImg('img/meal.webp'),
+    const [logo, logoW, spons, av, b1, b2, b3] = await Promise.all([
+      loadImg(p.logo), loadImg('img/logo-white.png'), loadImg(p.spons), U.avatarCanvas(runner, 132, 6, 0),
+      st === 'dark' ? loadImg(BG[1]) : null, st === 'dark' ? loadImg(BG[2]) : null, st === 'dark' ? loadImg(BG[3]) : null,
     ]);
-    const ctx = { logo, spons, av, bg: { 1: b1, 2: b2, 3: b3 }, kit: [k1, k2, k3, k4] };
+    // โลโก้บนหัวการ์ด BIB: การ์ด light ใช้หัวสีกรมท่า → ใช้โลโก้ขาวเสมอ
+    const ctx = { logo, logoW, spons, av, bg: { 1: b1, 2: b2, 3: b3 } };
     const out = [];
     for (const [i, fn] of [slide1, slide2, slide3].entries()) {
       if (onProgress) onProgress(i);
       await sleep(30);
-      const cv = fn(runner, ctx);
+      const cv = fn(runner, ctx, p, st);
       out.push(await toBlob(cv));
-      cv.width = cv.height = 1;   // คืนหน่วยความจำ (iPhone จำกัด)
+      cv.width = cv.height = 1;
     }
     return out;
   }

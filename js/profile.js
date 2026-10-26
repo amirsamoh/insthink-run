@@ -322,7 +322,7 @@
       box.querySelector('img').src = URL.createObjectURL(finBlob);
       box.classList.remove('hidden');
       $('#btnFinSave').classList.remove('hidden');
-      btn.dataset.label = 'สร้างใหม่';
+      btn.dataset.label = btn.dataset.label.replace('สร้างรูป IG Story', 'สร้างใหม่');
     } catch (e) { console.error(e); toast('สร้างรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'err'); }
     finally { busy(btn, false); }
   });
@@ -410,7 +410,13 @@
   });
 
   /* ---------- IG Story 3 หน้า ---------- */
-  const storyName = (i) => 'INSTHINK-' + runner.bib + '-story-' + (i + 1) + '.png';
+  const STORY_KEYS = ['bib', 'sticker', 'invite'];
+  const storyName = (i) => 'INSTHINK-' + runner.bib + '-story-' + (i + 1) + '-' + STORY_KEYS[i] + '.png';
+  const STORY_LABELS = ['การ์ด BIB', 'สติกเกอร์โปร่งใส', 'ชวนเพื่อน'];
+  let storyStyle = 'dark';
+  try { const s = localStorage.getItem('irc_story_style'); if (['dark', 'light', 'minimal'].includes(s)) storyStyle = s; } catch (e) {}
+  const paintStyle = () => $$('#storyStyle [data-style]').forEach((b) => { const on = b.dataset.style === storyStyle; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  paintStyle();
   let storyIdx = 0;
   const track = $('#storyTrack');
   const paintDots = () => { $('#storyDots').innerHTML = storyBlobs.map((_, i) => `<button type="button" class="${i === storyIdx ? 'on' : ''}" data-go="${i}" aria-label="รูปที่ ${i + 1}"></button>`).join(''); };
@@ -424,17 +430,24 @@
     if (el) track.scrollTo({ left: el.offsetLeft - track.offsetLeft, behavior: 'smooth' });
   });
 
+  $('#storyStyle').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-style]'); if (!b || b.dataset.style === storyStyle) return;
+    storyStyle = b.dataset.style; try { localStorage.setItem('irc_story_style', storyStyle); } catch (er) {}
+    paintStyle();
+    if (storyBlobs.length) $('#btnStory').click();   // สร้างใหม่ตามสไตล์ที่เลือก
+  });
+
   $('#btnStory').addEventListener('click', async () => {
     if (!runner) return;
     const btn = $('#btnStory');
     busy(btn, true, 'กำลังสร้างรูป…');
     try {
-      storyBlobs = await Story.buildAll(runner);
-      track.innerHTML = storyBlobs.map((b, i) => `<figure><img src="${URL.createObjectURL(b)}" alt="รูป Story หน้า ${i + 1}"><figcaption>${i + 1} / ${storyBlobs.length}</figcaption></figure>`).join('');
+      storyBlobs = await Story.buildAll(runner, storyStyle);
+      track.innerHTML = storyBlobs.map((b, i) => `<figure class="${i === 1 ? 'sticker' : ''}"><img src="${URL.createObjectURL(b)}" alt="${STORY_LABELS[i]}"><figcaption>${STORY_LABELS[i]}</figcaption></figure>`).join('');
       storyIdx = 0; track.scrollLeft = 0; paintDots();
       $('#storyPreview').classList.remove('hidden');
       $('#storyActions').classList.remove('hidden');
-      btn.dataset.label = 'สร้างใหม่';
+      btn.dataset.label = btn.dataset.label.replace('สร้างรูป IG Story', 'สร้างใหม่');
     } catch (e) {
       console.error(e);
       toast('สร้างรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'err');
