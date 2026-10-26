@@ -200,12 +200,11 @@
     spaced(g, 'SUPPORTED BY', SW / 2, 1618, { size: 20, weight: 700, color: p.sub, gap: 6 });
     if (ctx.spons) { const w = 760, h = w * ctx.spons.naturalHeight / ctx.spons.naturalWidth; g.drawImage(ctx.spons, (SW - w) / 2, 1796 - h, w, h); }
     T(g, CFG.EVENT.instagram, 80, 1848, { size: 32, weight: 800, style: 'italic', color: p.fg, align: 'left', max: 380 });
-    T(g, n + ' / 3', SW / 2, 1848, { size: 28, weight: 800, style: 'italic', color: p.sub, align: 'center' });
     T(g, CFG.EVENT.hashtag, SW - 80, 1848, { size: 32, weight: 800, style: 'italic', color: p.acc, align: 'right', max: 380 });
   }
 
   /** การ์ด BIB (ใช้ทั้งหน้า 1 และสติกเกอร์) — วาดที่ (bx,by) ขนาด bw×bh */
-  function bibCard(g, ctx, p, runner, bx, by, bw, bh) {
+  function bibCard(g, ctx, p, runner, bx, by, bw, bh, numSize) {
     const nick = runner.nickname || runner.firstName || '';
     g.save(); rr(g, bx, by, bw, bh, 34); g.clip();
     g.fillStyle = p.cardBg; g.fillRect(bx, by, bw, bh);
@@ -217,7 +216,7 @@
     g.fillStyle = p.stripeBg; g.fillRect(bx, by + 84, bw, 14);
     g.fillStyle = p.stripe;
     for (let x = bx - 30; x < bx + bw + 30; x += 26) { g.beginPath(); g.moveTo(x, by + 84); g.lineTo(x + 16, by + 84); g.lineTo(x + 6, by + 98); g.lineTo(x - 10, by + 98); g.closePath(); g.fill(); }
-    T(g, runner.bib, bx + bw / 2, by + 98 + (bh - 98 - 56) / 2 + 74, { size: 200, weight: 800, style: 'italic', color: p.cardFg, align: 'center', max: bw - 140 });
+    T(g, runner.bib, bx + bw / 2, by + 98 + (bh - 98 - 56) / 2 + (numSize || 200) * 0.37, { size: numSize || 200, weight: 800, style: 'italic', color: p.cardFg, align: 'center', max: bw - 140 });
     T(g, nick, bx + 40, by + bh - 28, { size: 28, weight: 500, color: p.cardSub, align: 'left', max: bw / 2 - 60 });
     T(g, CFG.EVENT.dateLabel, bx + bw - 40, by + bh - 28, { size: 28, weight: 500, color: p.cardSub, align: 'right', max: bw / 2 - 60 });
     g.restore();
@@ -271,68 +270,101 @@
     return c;
   }
 
-  /** หน้า 2: สติกเกอร์โปร่งใส (ไม่มีพื้นหลัง) — ให้ผู้ใช้เอาไปวางทับรูปของตัวเองใน IG Story */
-  function slide2(runner, ctx, p, style) {
+  /* ---------- สติกเกอร์โปร่งใส 4 แบบ (หน้า 2-5): ไม่มีพื้นหลัง วางทับรูปของตัวเอง ---------- */
+  /** แผ่นรองสติกเกอร์: dark = กรมท่าเข้ม · light = ขาว · minimal = ไม่มีแผ่น (ตัวอักษรขาวมีเงา) */
+  const SK = {
+    dark:    { plate: '#0A1430', line: 'rgba(255,255,255,.22)', fg: '#FFFFFF', acc: '#8FB4E8', pillBg: '#8CD43E', pillFg: '#0A1430' },
+    light:   { plate: '#FFFFFF', line: 'rgba(27,59,103,.25)', fg: '#0A1430', acc: '#1B3B67', pillBg: '#1B3B67', pillFg: '#FFFFFF' },
+    minimal: { plate: null, line: null, fg: '#FFFFFF', acc: '#8CD43E', pillBg: '#8CD43E', pillFg: '#0A0A0A' },
+  };
+  function plate(g, s, x, y, w, h, r) {
+    if (!s.plate) return;
+    g.save(); g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 28; g.shadowOffsetY = 10;
+    g.fillStyle = s.plate; rr(g, x, y, w, h, r); g.fill(); g.restore();
+    g.strokeStyle = s.line; g.lineWidth = 2; rr(g, x, y, w, h, r); g.stroke();
+  }
+  const shadowOn = (g, s) => { if (!s.plate) { g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 22; g.shadowOffsetY = 5; } };
+  const shadowOff = (g) => { g.shadowColor = 'transparent'; g.shadowBlur = 0; g.shadowOffsetY = 0; };
+
+  /** 2) การ์ด BIB ย่อส่วน */
+  function stickerCard(runner, ctx, p, style) {
+    const c = mk(1000, 480), g = c.getContext('2d');
+    plate(g, { plate: p.cardBg, line: 'rgba(0,0,0,.0)' }, 100, 40, 800, 400, 34);
+    bibCard(g, ctx, p, runner, 100, 40, 800, 400, 150);
+    return c;
+  }
+  /** 3) โลโก้งาน + สโลแกน */
+  function stickerLogo(runner, ctx, p, style) {
+    const s = SK[style], c = mk(1000, 560), g = c.getContext('2d');
+    plate(g, s, 40, 40, 920, 480, 40);
+    shadowOn(g, s);
+    const lg = style === 'light' ? (ctx.stLogoC || ctx.logoD) : (ctx.stLogoW || ctx.logoW);
+    if (lg) { const w = 560, h = w * lg.naturalHeight / lg.naturalWidth; g.drawImage(lg, 500 - w / 2, 80, w, h); }
+    T(g, 'RUN ' + CFG.EVENT.distanceKm + 'K. FIND YOUR FLOW.', 500, 400, { size: 58, weight: 800, style: 'italic', color: s.fg, align: 'center', max: 840 });
+    T(g, CFG.EVENT.dateLabel + ' · ' + CFG.EVENT.location, 500, 460, { size: 32, weight: 500, color: s.acc, align: 'center', max: 840 });
+    shadowOff(g);
+    return c;
+  }
+  /** 4) ป้ายชื่อทรงเม็ดยา: 6K · BIB · ชื่อเล่น */
+  function stickerPill(runner, ctx, p, style) {
+    const s = SK[style], c = mk(1000, 260), g = c.getContext('2d');
     const nick = runner.nickname || runner.firstName || '';
-    if (style === 'minimal') {
-      const c = mk(1000, 640), g = c.getContext('2d');
-      g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 18; g.shadowOffsetY = 4;
-      g.font = '800 40px ' + FF;
-      const lab = "I'M RUNNING " + CFG.EVENT.distanceKm + 'K', pw = 540;
-      g.fillStyle = '#8CD43E'; rr(g, (1000 - pw) / 2, 40, pw, 70, 35); g.fill();
-      g.shadowColor = 'transparent';
-      spaced(g, lab, 500, 88, { size: 34, weight: 800, color: '#0A0A0A', gap: 6 });
-      g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 24; g.shadowOffsetY = 6;
-      T(g, runner.bib, 500, 410, { size: 330, weight: 800, style: 'italic', color: '#FFFFFF', align: 'center', max: 940 });
-      T(g, nick + ' · ' + CFG.EVENT.dateLabel, 500, 500, { size: 44, weight: 700, color: '#FFFFFF', align: 'center', max: 900 });
-      g.shadowColor = 'transparent';
-      if (ctx.logoW) { const h = 70, w = h * ctx.logoW.naturalWidth / ctx.logoW.naturalHeight; g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 14; g.drawImage(ctx.logoW, (1000 - w) / 2, 540, w, h); }
-      return c;
+    plate(g, s, 40, 50, 920, 160, 80);
+    g.fillStyle = s.pillBg; g.beginPath(); g.arc(130, 130, 56, 0, 7); g.fill();
+    T(g, CFG.EVENT.distanceKm + 'K', 130, 148, { size: 46, weight: 800, style: 'italic', color: s.pillFg, align: 'center' });
+    shadowOn(g, s);
+    T(g, runner.bib, 214, 152, { size: 84, weight: 800, style: 'italic', color: s.fg, align: 'left' });
+    g.font = 'italic 800 84px ' + FF; const bw = g.measureText(runner.bib).width;
+    g.fillStyle = s.acc; g.fillRect(214 + bw + 26, 92, 4, 76);
+    T(g, nick, 214 + bw + 56, 152, { size: 54, weight: 700, color: s.fg, align: 'left', max: 920 - (214 + bw + 56) });
+    shadowOff(g);
+    return c;
+  }
+  /** โลโก้งานหลัก (ไฟล์ที่ออกแบบเอง พื้นโปร่งใส) */
+  function stickerMainLogo(runner, ctx, p, style) {
+    const im = style === 'light' ? ctx.stLogoC : ctx.stLogoW;
+    const w = 1100, h = im ? w * im.naturalHeight / im.naturalWidth : 520, pad = 50;
+    const c = mk(w + pad * 2, Math.round(h) + pad * 2), g = c.getContext('2d');
+    if (im) {
+      g.shadowColor = style === 'light' ? 'rgba(255,255,255,.95)' : 'rgba(0,0,0,.55)'; g.shadowBlur = style === 'light' ? 26 : 22; g.shadowOffsetY = style === 'light' ? 0 : 5;
+      g.drawImage(im, pad, pad, w, h);
     }
-    const c = mk(1000, 640), g = c.getContext('2d');
-    g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 30; g.shadowOffsetY = 10;
-    g.fillStyle = p.cardBg; rr(g, 40, 40, 920, 520, 34); g.fill();   // เงาใต้การ์ด
-    g.shadowColor = 'transparent';
-    bibCard(g, ctx, p, runner, 40, 40, 920, 520);
+    return c;
+  }
+  /** แผนที่เส้นทาง (พื้นโปร่งใส) */
+  function stickerMap(runner, ctx, p, style) {
+    const im = ctx.stMap, w = 900, h = im ? w * im.naturalHeight / im.naturalWidth : 800, pad = 50;
+    const c = mk(w + pad * 2, Math.round(h) + pad * 2), g = c.getContext('2d');
+    if (im) {
+      g.shadowColor = style === 'light' ? 'rgba(255,255,255,.95)' : 'rgba(0,0,0,.5)'; g.shadowBlur = style === 'light' ? 24 : 20; g.shadowOffsetY = style === 'light' ? 0 : 5;
+      g.drawImage(im, pad, pad, w, h);
+    }
+    return c;
+  }
+  /** กรอบรูปที่ออกแบบเอง: เลข BIB อยู่ในช่องมุมขวาล่าง */
+  const FRAME_SLOT = { cx: 985, cy: 1802, w: 360, color: { dark: '#FFFFFF', light: '#0A1430', minimal: '#FFFFFF' } };
+  function stickerFrame(runner, ctx, p, style) {
+    const im = ctx.stFrame, c = mk(im ? im.naturalWidth : 1231, im ? im.naturalHeight : 1920), g = c.getContext('2d');
+    if (im) g.drawImage(im, 0, 0);
+    T(g, runner.bib, FRAME_SLOT.cx, FRAME_SLOT.cy + 40, { size: 120, weight: 800, style: 'italic', color: FRAME_SLOT.color[style], align: 'center', max: FRAME_SLOT.w });
     return c;
   }
 
-  /** หน้า 3: Run with me — ชวนเพื่อน */
-  function slide3(runner, ctx, p, style) {
-    const c = mk(SW, SH), g = c.getContext('2d');
-    base(g, 3, ctx, p, style); title(g, 'Run with', 'me', p);
-    const nick = runner.nickname || runner.firstName || '';
-    g.drawImage(ctx.av, 80, 700, 132, 132);
-    T(g, nick, 242, 756, { size: 52, weight: 700, color: p.fg, max: 700 });
-    T(g, 'ชวนคุณมาวิ่ง ' + CFG.EVENT.distanceKm + 'K ด้วยกัน', 242, 800, { size: 30, weight: 400, color: p.sub, max: 700 });
-
-    g.fillStyle = p.box; rr(g, 80, 870, 920, 320, 28); g.fill(); g.strokeStyle = p.boxLine; g.lineWidth = 2; g.stroke();
-    T(g, CFG.EVENT.dateLabel, 124, 970, { size: 76, weight: 800, style: 'italic', color: p.fg, max: 830 });
-    T(g, CFG.EVENT.location, 124, 1030, { size: 38, weight: 500, color: p.sub, max: 830 });
-    T(g, CFG.ROUTE.name + ' · ปล่อยตัว ' + CFG.EVENT.startTime + ' น.', 124, 1100, { size: 34, weight: 700, style: 'italic', color: p.acc, max: 830 });
-    T(g, CFG.EVENT.edition, 124, 1150, { size: 28, weight: 400, color: p.sub, max: 830 });
-
-    const url = U.inviteUrl(runner.bib).replace(/^https?:\/\//, '');
-    g.fillStyle = p.cta; rr(g, 80, 1250, 920, 230, 34); g.fill();
-    T(g, 'สมัครผ่านลิงก์ของ ' + nick, 124, 1330, { size: 46, weight: 800, style: 'italic', color: p.ctaFg, align: 'left', max: 830 });
-    T(g, 'ใส่ลิงก์ด้วยสติกเกอร์ Link ใน Instagram', 124, 1378, { size: 26, weight: 400, color: p.ctaSub, align: 'left', max: 830 });
-    T(g, url, 124, 1440, { size: 32, weight: 700, color: p.ctaUrl, align: 'left', max: 832 });
-    foot(g, 3, ctx, p);
-    return c;
-  }
-
-  /** style: 'dark' | 'light' | 'minimal' → [Blob×3] : การ์ด BIB · สติกเกอร์โปร่งใส · ชวนเพื่อน */
+  /** style: 'dark' | 'light' | 'minimal' → [Blob×7] : การ์ด BIB เต็มจอ + สติกเกอร์/กรอบโปร่งใส 6 แบบ */
   async function story(runner, style, onProgress) {
     const st = PAL[style] ? style : 'dark', p = PAL[st];
     await fonts();
-    const [logo, logoW, spons, av, b1, b2, b3] = await Promise.all([
-      loadImg(p.logo), loadImg('img/logo-white.png'), loadImg(p.spons), U.avatarCanvas(runner, 132, 6, 0),
+    const [logo, logoW, logoD, spons, av, b1, b2, b3, stLogoC, stLogoW, stMap, stFrame] = await Promise.all([
+      loadImg(p.logo), loadImg('img/logo-white.png'), loadImg('img/logo.png'), loadImg(p.spons), U.avatarCanvas(runner, 132, 6, 0),
       st === 'dark' ? loadImg(BG[1]) : null, st === 'dark' ? loadImg(BG[2]) : null, st === 'dark' ? loadImg(BG[3]) : null,
+      st === 'light' ? loadImg('img/st-logo-color.webp') : null, st !== 'light' ? loadImg('img/st-logo-white.webp') : null,
+      loadImg('img/st-map-' + (st === 'light' ? 'navy' : st === 'minimal' ? 'lime' : 'white') + '.webp'),
+      loadImg('img/st-frame-' + st + '.webp'),
     ]);
     // โลโก้บนหัวการ์ด BIB: การ์ด light ใช้หัวสีกรมท่า → ใช้โลโก้ขาวเสมอ
-    const ctx = { logo, logoW, spons, av, bg: { 1: b1, 2: b2, 3: b3 } };
+    const ctx = { stLogoC, stLogoW, stMap, stFrame, logo, logoW, logoD, spons, av, bg: { 1: b1, 2: b2, 3: b3 } };
     const out = [];
-    for (const [i, fn] of [slide1, slide2, slide3].entries()) {
+    for (const [i, fn] of [slide1, stickerMainLogo, stickerCard, stickerPill, stickerMap, stickerLogo, stickerFrame].entries()) {
       if (onProgress) onProgress(i);
       await sleep(30);
       const cv = fn(runner, ctx, p, st);

@@ -410,9 +410,9 @@
   });
 
   /* ---------- IG Story 3 หน้า ---------- */
-  const STORY_KEYS = ['bib', 'sticker', 'invite'];
+  const STORY_KEYS = ['bib', 'logo', 'card', 'pill', 'map', 'lockup', 'frame'];
   const storyName = (i) => 'INSTHINK-' + runner.bib + '-story-' + (i + 1) + '-' + STORY_KEYS[i] + '.png';
-  const STORY_LABELS = ['การ์ด BIB', 'สติกเกอร์โปร่งใส', 'ชวนเพื่อน'];
+  const STORY_LABELS = ['การ์ด BIB', 'โลโก้งาน', 'การ์ดย่อ', 'ป้ายชื่อ', 'แผนที่', 'โลโก้ + สโลแกน', 'กรอบรูป'];
   let storyStyle = 'dark';
   try { const s = localStorage.getItem('irc_story_style'); if (['dark', 'light', 'minimal'].includes(s)) storyStyle = s; } catch (e) {}
   const paintStyle = () => $$('#storyStyle [data-style]').forEach((b) => { const on = b.dataset.style === storyStyle; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
@@ -443,7 +443,7 @@
     busy(btn, true, 'กำลังสร้างรูป…');
     try {
       storyBlobs = await Story.buildAll(runner, storyStyle);
-      track.innerHTML = storyBlobs.map((b, i) => `<figure class="${i === 1 ? 'sticker' : ''}"><img src="${URL.createObjectURL(b)}" alt="${STORY_LABELS[i]}"><figcaption>${STORY_LABELS[i]}</figcaption></figure>`).join('');
+      track.innerHTML = storyBlobs.map((b, i) => `<figure class="${i >= 1 ? 'sticker' : ''}"><img src="${URL.createObjectURL(b)}" alt="${STORY_LABELS[i]}"><figcaption>${STORY_LABELS[i]}</figcaption></figure>`).join('');
       storyIdx = 0; track.scrollLeft = 0; paintDots();
       $('#storyPreview').classList.remove('hidden');
       $('#storyActions').classList.remove('hidden');
@@ -456,7 +456,7 @@
     }
   });
 
-  // Web Share API: แชร์ทั้ง 3 รูปพร้อมกัน → เลือก Instagram → Story
+  // Web Share API: แชร์ทั้ง 7 รูปพร้อมกัน → เลือก Instagram → Story
   $('#btnShare').addEventListener('click', async () => {
     if (!storyBlobs.length) return;
     const files = storyBlobs.map((b, i) => new File([b], storyName(i), { type: 'image/png' }));
@@ -464,7 +464,7 @@
       try { await navigator.share({ files, title: CFG.EVENT.name, text: CFG.EVENT.hashtag }); }
       catch (e) { if (e.name !== 'AbortError') toast('แชร์ไม่สำเร็จ ใช้ปุ่มบันทึกทีละรูปแทน', 'err'); }
     } else if (!U.isMobile()) {
-      storyBlobs.forEach((b, i) => setTimeout(() => U.saveImage(b, storyName(i)), i * 400));   // คอมพิวเตอร์: ดาวน์โหลดทั้ง 3 ไฟล์
+      storyBlobs.forEach((b, i) => setTimeout(() => U.saveImage(b, storyName(i)), i * 400));   // คอมพิวเตอร์: ดาวน์โหลดทั้ง 7 ไฟล์
     } else {
       U.saveImage(storyBlobs[storyIdx], storyName(storyIdx));
     }
