@@ -1241,3 +1241,14 @@ footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity:
   #leaderboard .lb-prize .lb-go { right: 24px; bottom: 22px; }
   #leaderboard .lb-prize span.lb-badge { left: 22px; top: 22px; }
 }
+
+/* v20.7 — รีวิวดีไซน์: โลโก้ไม่ถูกบีบหายบนจอแคบ + ปุ่มแตะได้ง่ายขึ้น */
+.brand, .brand img { flex: none; }
+@media (max-width: 520px) {
+  .site-head { flex-wrap: wrap; row-gap: 2px; padding-top: 8px; padding-bottom: 8px; }
+  .nav-links { flex: 1 1 100%; justify-content: space-between; }
+}
+.nav-links a { min-height: 40px; display: inline-flex; align-items: center; }
+.theme-btn { min-width: 40px; min-height: 40px; }
+.reg-back, #toForgot { display: inline-flex; align-items: center; min-height: 44px; }
+.site-foot .admin-link, .site-foot .btn-sm { min-height: 44px; }
