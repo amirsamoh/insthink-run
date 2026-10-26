@@ -1288,3 +1288,9 @@ footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity:
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 96%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 9%, #000 100%);
     mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 96%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 9%, #000 100%); }
 }
+/* v20.24 มือถือเท่านั้น: วิดีโอเป็นแถบเต็มกว้างชนขอบการ์ด ไม่มีขอบจาง (คอมใช้แบบขอบจางเดิม) */
+@media (max-width: 819px) {
+  .hero2-art:has(.bstage) { min-height: 360px; }
+  .hero2-art .bstage { left: -22px; right: -22px; width: auto; bottom: 0; height: 360px; aspect-ratio: auto; }
+  .bstage .bs-video { object-fit: cover; object-position: 88% 50%; -webkit-mask-image: none; mask-image: none; }
+}
