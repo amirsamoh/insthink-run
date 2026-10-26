@@ -175,7 +175,7 @@
     if (style === 'dark') {
       g.fillStyle = '#0F2244'; g.fillRect(0, 0, SW, SH);
       cover(g, ctx.bg[n], 0, 0, SW, SH);
-      const lg = g.createLinearGradient(0, 0, 0, SH), s = SHADE[n];
+      const lg = g.createLinearGradient(0, 0, 0, SH), s = ctx.shade != null ? ctx.shade : SHADE[n];
       lg.addColorStop(0, 'rgba(7,15,40,' + (s + .18) + ')'); lg.addColorStop(.4, 'rgba(7,15,40,' + s + ')'); lg.addColorStop(1, 'rgba(7,15,40,' + (s + .3) + ')');
       g.fillStyle = lg; g.fillRect(0, 0, SW, SH);
     } else if (style === 'light') {
@@ -187,6 +187,11 @@
       g.fillStyle = rg; g.fillRect(0, 0, SW, SH);
     } else {
       g.fillStyle = '#0A0A0A'; g.fillRect(0, 0, SW, SH);
+      if (ctx.bgMin) {
+        cover(g, ctx.bgMin, 0, 0, SW, SH);
+        const mg = g.createLinearGradient(0, 0, 0, SH); mg.addColorStop(0, 'rgba(0,0,0,.25)'); mg.addColorStop(.5, 'rgba(0,0,0,.30)'); mg.addColorStop(1, 'rgba(0,0,0,.55)');
+        g.fillStyle = mg; g.fillRect(0, 0, SW, SH);
+      }
     }
     if (ctx.logo) g.drawImage(ctx.logo, 80, 100, 400, 400 * ctx.logo.naturalHeight / ctx.logo.naturalWidth);
     T(g, CFG.EVENT.dateLabel, SW - 80, 154, { size: 40, weight: 800, style: 'italic', color: p.fg, align: 'right', max: 460 });
@@ -343,7 +348,7 @@
   function stickerFrame(runner, ctx, p, style) {
     const im = ctx.stFrame, c = mk(im ? im.naturalWidth : 1231, im ? im.naturalHeight : 1920), g = c.getContext('2d');
     if (im) g.drawImage(im, 0, 0);
-    T(g, runner.bib, FRAME_SLOT.cx, FRAME_SLOT.cy + 40, { size: 120, weight: 800, style: 'italic', color: FRAME_SLOT.color[style], align: 'center', max: FRAME_SLOT.w });
+    T(g, runner.bib, FRAME_SLOT.cx, FRAME_SLOT.cy + 26, { size: 74, weight: 500, style: 'italic', color: FRAME_SLOT.color[style], align: 'center', max: FRAME_SLOT.w });
     return c;
   }
 
@@ -351,20 +356,26 @@
   async function story(runner, style, onProgress) {
     const st = PAL[style] ? style : 'dark', p = PAL[st];
     await fonts();
-    const [logo, logoW, logoD, spons, av, b1, b2, b3, stLogoC, stLogoW, stMap, stFrame] = await Promise.all([
+    const [logo, logoW, logoD, spons, av, b1, b2, b3, stLogoC, stLogoW, stMap, stFrame, bgL, bgM, sponsW] = await Promise.all([
       loadImg(p.logo), loadImg('img/logo-white.png'), loadImg('img/logo.png'), loadImg(p.spons), U.avatarCanvas(runner, 132, 6, 0),
       st === 'dark' ? loadImg(BG[1]) : null, st === 'dark' ? loadImg(BG[2]) : null, st === 'dark' ? loadImg(BG[3]) : null,
       st === 'light' ? loadImg('img/st-logo-color.webp') : null, st !== 'light' ? loadImg('img/st-logo-white.webp') : null,
       loadImg('img/st-map-' + (st === 'light' ? 'navy' : st === 'minimal' ? 'lime' : 'white') + '.webp'),
       loadImg('img/st-frame-' + st + '.webp'),
+      st === 'light' ? loadImg('img/story-bg-light.webp') : null, st === 'minimal' ? loadImg('img/story-bg-min.webp') : null,
+      st === 'light' ? loadImg('img/sponsors-grid-white.webp') : null,
     ]);
     // โลโก้บนหัวการ์ด BIB: การ์ด light ใช้หัวสีกรมท่า → ใช้โลโก้ขาวเสมอ
-    const ctx = { stLogoC, stLogoW, stMap, stFrame, logo, logoW, logoD, spons, av, bg: { 1: b1, 2: b2, 3: b3 } };
+    const ctx = { bgMin: bgM, stLogoC, stLogoW, stMap, stFrame, logo, logoW, logoD, spons, av, bg: { 1: b1, 2: b2, 3: b3 } };
     const out = [];
-    for (const [i, fn] of [slide1, stickerMainLogo, stickerCard, stickerPill, stickerMap, stickerLogo, stickerFrame].entries()) {
+    for (const [i, fn] of [slide1, stickerMainLogo, stickerFrame, stickerCard, stickerPill, stickerMap, stickerLogo].entries()) {
       if (onProgress) onProgress(i);
       await sleep(30);
-      const cv = fn(runner, ctx, p, st);
+      let cv;
+      if (i === 0 && st === 'light') {
+        // การ์ด BIB เต็มจอสไตล์สว่าง: พื้นหลังเป็นรูปโทนเขียวอมฟ้า → ใช้ตัวอักษรขาว/การ์ดขาวแบบเดียวกับสไตล์มืด
+        cv = fn(runner, Object.assign({}, ctx, { logo: logoW, spons: sponsW, bg: { 1: bgL, 2: bgL, 3: bgL }, shade: .30 }), PAL.dark, 'dark');
+      } else cv = fn(runner, ctx, p, st);
       out.push(await toBlob(cv));
       cv.width = cv.height = 1;
     }

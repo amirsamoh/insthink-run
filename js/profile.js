@@ -410,9 +410,9 @@
   });
 
   /* ---------- IG Story 3 หน้า ---------- */
-  const STORY_KEYS = ['bib', 'logo', 'card', 'pill', 'map', 'lockup', 'frame'];
+  const STORY_KEYS = ['bib', 'logo', 'frame', 'card', 'pill', 'map', 'lockup'];
   const storyName = (i) => 'INSTHINK-' + runner.bib + '-story-' + (i + 1) + '-' + STORY_KEYS[i] + '.png';
-  const STORY_LABELS = ['การ์ด BIB', 'โลโก้งาน', 'การ์ดย่อ', 'ป้ายชื่อ', 'แผนที่', 'โลโก้ + สโลแกน', 'กรอบรูป'];
+  const STORY_LABELS = ['การ์ด BIB', 'โลโก้งาน', 'กรอบรูป', 'การ์ดย่อ', 'ป้ายชื่อ', 'แผนที่', 'โลโก้ + สโลแกน'];
   let storyStyle = 'dark';
   try { const s = localStorage.getItem('irc_story_style'); if (['dark', 'light', 'minimal'].includes(s)) storyStyle = s; } catch (e) {}
   const paintStyle = () => $$('#storyStyle [data-style]').forEach((b) => { const on = b.dataset.style === storyStyle; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
