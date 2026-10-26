@@ -1280,3 +1280,11 @@ footer.site-foot img.foot-spons { height: auto; width: min(560px, 88%); opacity:
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 18%, #000 100%);
   -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 18%, #000 100%); mask-composite: intersect; }
 @media (min-width: 820px) { .hero2-art:has(.bstage) { min-height: 0; } .hero2-art .bstage { width: 600px; right: -40px; bottom: -30px; } }
+/* v20.22 มือถือ: ให้ผ้าอยู่ในการ์ดเต็มตัว ไม่ชิดขอบ ส่วนที่ล้นไปอยู่ฝั่งเก้าอี้ด้านซ้าย */
+@media (max-width: 819px) {
+  .hero2-art:has(.bstage) { min-height: 360px; }
+  .hero2-art .bstage { width: 440px; right: 4px; bottom: -6px; }
+  .bstage .bs-video {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 96%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 9%, #000 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 96%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 9%, #000 100%); }
+}
