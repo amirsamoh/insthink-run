@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>try{var t=localStorage.getItem('irc_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;if(t==='dark')document.querySelector('meta[name=theme-color]').content='#070D1F'}catch(e){}</script>
+  <title>บัญชีของฉัน · INSTHINK RUN CLUB</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20.25">
+</head>
+<body>
+  <header class="site-head" data-nav></header>
+
+  <main class="wrap" style="max-width:640px">
+    <h1 class="display" style="font-size:34px;margin:22px 0 14px">My <span style="color:var(--navy)">Account</span></h1>
+
+    <form class="card grid" id="acctForm" novalidate>
+      <div class="avatar-pick">
+        <span id="aAvatar"></span>
+        <div>
+          <label class="btn btn-sm" for="aPhoto">เปลี่ยนรูปโปรไฟล์</label>
+          <input id="aPhoto" type="file" accept="image/*">
+          <button class="btn btn-sm hidden" id="aRemove" type="button">ลบรูป</button>
+          <div class="hint" id="aEmail"></div>
+        </div>
+      </div>
+      <div class="grid grid-2">
+        <div class="field"><label for="firstName">ชื่อ <span class="req">*</span></label><input class="input" id="firstName" maxlength="60"></div>
+        <div class="field"><label for="lastName">นามสกุล <span class="req">*</span></label><input class="input" id="lastName" maxlength="60"></div>
+      </div>
+      <div class="grid grid-3">
+        <div class="field"><label for="nickname">ชื่อเล่น / ชื่อบน BIB</label><input class="input" id="nickname" maxlength="20"></div>
+        <div class="field"><label for="gender">เพศ</label>
+          <select class="input" id="gender"><option value="">ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>อื่น ๆ</option></select></div>
+        <div class="field"><label for="birthDate">วันเกิด</label><input class="input" id="birthDate" type="date"></div>
+      </div>
+      <div class="field"><label for="phone">เบอร์โทรศัพท์ <span class="req">*</span></label>
+        <input class="input" id="phone" type="tel" inputmode="numeric" maxlength="16"></div>
+      <div class="grid grid-2">
+        <div class="field"><label for="emergencyName">ผู้ติดต่อฉุกเฉิน</label><input class="input" id="emergencyName" maxlength="60"></div>
+        <div class="field"><label for="emergencyPhone">เบอร์ผู้ติดต่อฉุกเฉิน</label><input class="input" id="emergencyPhone" type="tel" inputmode="numeric" maxlength="16"></div>
+      </div>
+      <button class="btn btn-primary btn-block" id="aSave" type="submit">บันทึกข้อมูล</button>
+    </form>
+
+    <h2 class="section-title"><span class="num">//</span>รายการสมัครของฉัน</h2>
+    <div class="results" id="regs"><p class="muted">กำลังโหลด…</p></div>
+
+    <details class="card mt">
+      <summary style="cursor:pointer;font-weight:600">เปลี่ยนรหัสผ่าน</summary>
+      <form class="grid mt" id="pwForm" novalidate>
+        <input class="input" id="oldPw" type="password" placeholder="รหัสผ่านเดิม" autocomplete="current-password" maxlength="100">
+        <input class="input" id="newPw" type="password" placeholder="รหัสผ่านใหม่ (8 ตัวขึ้นไป)" autocomplete="new-password" maxlength="100">
+        <button class="btn btn-dark" id="pwBtn" type="submit">เปลี่ยนรหัสผ่าน</button>
+      </form>
+    </details>
+
+    <div class="btn-row mt"><button class="btn" id="logoutBtn" type="button">ออกจากระบบ</button></div>
+  </main>
+
+  <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
+
+  <script src="js/config.js?v=20.25"></script>
+  <script src="js/api.js?v=20.25"></script>
+  <script src="js/common.js?v=20.25"></script>
+  <script src="js/account.js?v=20.25"></script>
+</body>
+</html>

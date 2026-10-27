@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>try{var t=localStorage.getItem('irc_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;if(t==='dark')document.querySelector('meta[name=theme-color]').content='#070D1F'}catch(e){}</script>
+  <title>INSTHINK RUN CLUB · สมัครวิ่ง 6K</title>
+  <meta name="description" content="สมัครวิ่ง 6K กับ INSTHINK RUN CLUB รับผ้าโพกหัว Bandana และ E-BIB ออนไลน์">
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20.25">
+</head>
+<body>
+  <header class="site-head" data-nav></header>
+
+  <div class="wrap">
+    <!-- ================= HERO (การ์ดมืดไล่เฉด + รูปผ้าโพกหัว) ================= -->
+    <section class="hero2">
+      <div class="hero-sparks" aria-hidden="true"><span class="spark t1">✦</span><span class="spark t2">✦</span><span class="spark t3">✦</span><span class="spark t4">✦</span></div>
+      <div class="hero2-text">
+        <span class="kicker light">INSTHINK · COMMUNITY COFFEE RUN</span>
+        <h1>Run <span class="g">6K.</span><br>Find Your Flow.</h1>
+        <p class="hero2-sub"><span id="evEdition">INSTHINK RUN CLUB</span> — วิ่ง 6 กิโลเมตร รับผ้าโพกหัว ริสแบน สติกเกอร์ Limited Edition และข้าวยำบุฟเฟ่ต์กับกาแฟหลังเข้าเส้นชัย</p>
+        <div class="hero-meta">
+          <span class="meta-chip"><b id="evDate">—</b></span>
+          <span class="meta-chip">ปล่อยตัว <b id="evTime">—</b></span>
+          <a class="meta-chip map-chip" id="evLocLink" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><b id="evLoc">—</b></a>
+        </div>
+        <div class="hero2-cta">
+          <a class="btn btn-light" href="register.html">สมัครวิ่ง <span class="arr">↗</span></a>
+          <a class="btn btn-ghost" href="#goods">ดูของที่ได้รับ</a>
+        </div>
+      </div>
+      <div class="hero2-art" aria-hidden="true">
+        <div class="hero-stars" id="heroStars"></div>
+        <div class="bandana-shot bstage" id="bStage">
+          <video class="bs-video" autoplay muted loop playsinline preload="auto" poster="img/hero-chair-poster.webp" disablepictureinpicture>
+            <source src="img/hero-chair.mp4" type="video/mp4">
+          </video>
+        </div>
+        <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span><span class="spark s7">✦</span><span class="spark s9">✦</span>
+      </div>
+    </section>
+
+    <!-- ตัวเลขสำคัญ -->
+    <section class="stats" data-reveal="stagger">
+      <div><b>6<small>KM</small></b><span>ระยะวิ่ง</span></div>
+      <div><b id="stTime">06:00</b><span>เวลาปล่อยตัว</span></div>
+      <div><b>256<small>฿</small></b><span>ค่าสมัครรวมของที่ระลึก</span></div>
+      <div><b>3<small>ชิ้น</small></b><span>ของที่ระลึก</span></div>
+    </section>
+  </div>
+
+  <!-- แถบตัวอักษรเลื่อน -->
+  <div class="marquee" aria-hidden="true"><div class="track">
+    <span>INSTHINK</span><i>✦</i><span class="jp">インスティンク</span><i>✦</i><span>RUN CLUB</span><i>✦</i><span class="jp">ランクラブ</span><i>✦</i><span>COFFEE RUN</span><i>✦</i><span class="jp">日本山</span><i>✦</i>
+    <span>INSTHINK</span><i>✦</i><span class="jp">インスティンク</span><i>✦</i><span>RUN CLUB</span><i>✦</i><span class="jp">ランクラブ</span><i>✦</i><span>COFFEE RUN</span><i>✦</i><span class="jp">日本山</span><i>✦</i>
+  </div></div>
+
+  <main class="wrap">
+    <!-- ของที่ได้รับ (สไลด์แนวนอน) -->
+    <section id="goods" class="block" data-reveal>
+      <div class="block-head">
+        <div>
+          <span class="kicker">ของที่ได้รับ</span>
+          <h2 class="block-title">Race <span class="g">Kit</span></h2>
+          <p class="muted">ทุกชิ้นรวมในค่าสมัคร 256 บาท · ซื้อผ้าโพกหัวอย่างเดียวได้ 190 บาท</p>
+        </div>
+      </div>
+      <!-- Coverflow: การ์ดกลางใหญ่ ข้างๆ เล็ก/จาง เลื่อนเองอัตโนมัติ + ปุ่มซ้ายขวา + ปัดได้ -->
+      <div class="cf" id="kitFlow" aria-roledescription="carousel" aria-label="ของที่ได้รับ">
+        <div class="cf-stage">
+          <figure class="cf-card light flat"><img src="img/bandana-flat.webp" alt="ผ้าโพกหัว INSTHINK Bandana">
+            <span class="cf-tag">ทุกแพ็กเกจ</span><span class="cf-no">01</span>
+            <figcaption><b>ผ้าโพกหัว Bandana</b><span><i>Free size</i><i>ลาย 日本山</i></span></figcaption></figure>
+          <figure class="cf-card"><img src="img/stickers.webp" alt="สติกเกอร์ Limited Edition">
+            <span class="cf-tag">เฉพาะนักวิ่ง</span><span class="cf-no">02</span>
+            <figcaption><b>สติกเกอร์ Limited</b><span><i>Limited Edition</i><i>1 แผ่น</i></span></figcaption></figure>
+          <figure class="cf-card"><img src="img/wristband.webp" alt="ริสแบน INSTHINK" style="object-position:50% 45%">
+            <span class="cf-tag">เฉพาะนักวิ่ง</span><span class="cf-no">03</span>
+            <figcaption><b>ริสแบน</b><span><i>Wristband</i><i>Coffee Run</i></span></figcaption></figure>
+          <figure class="cf-card"><img src="img/meal.webp" alt="ข้าวยำบุฟเฟ่ต์และเครื่องดื่ม INSTHINK Coffee">
+            <span class="cf-tag">เฉพาะนักวิ่ง</span><span class="cf-no">04</span>
+            <figcaption><b>ข้าวยำ + เครื่องดื่ม</b><span><i>บุฟเฟ่ต์</i><i>1 แก้ว</i></span></figcaption></figure>
+        </div>
+        <div class="cf-ctrl">
+          <button class="cf-btn" type="button" data-cf="-1" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <div class="cf-dots" role="tablist"></div>
+          <button class="cf-btn" type="button" data-cf="1" aria-label="ถัดไป"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ขั้นตอน (การ์ดปักหมุด) -->
+    <section class="block" data-reveal>
+      <span class="kicker">ขั้นตอน</span>
+      <h2 class="block-title">How it <span class="g">works</span></h2>
+      <p class="muted" style="max-width:420px">สมัครครั้งเดียว ใช้ได้ทุกรอบ · จ่ายแล้วได้ E-BIB ทันที ไม่ต้องรอแอดมิน</p>
+      <div class="pins" data-reveal="stagger">
+        <article class="pin"><i></i><small>01</small><h3>สมัครสมาชิก</h3><p>อีเมล + รหัสผ่าน และใส่รูปโปรไฟล์ของคุณ</p></article>
+        <article class="pin"><i></i><small>02</small><h3>สมัครวิ่ง</h3><p>เลือกแพ็กเกจ เครื่องดื่ม และวิธีรับผ้าโพกหัว</p></article>
+        <article class="pin"><i></i><small>03</small><h3>จ่ายผ่าน PromptPay</h3><p>สแกน QR แล้วแนบสลิป ระบบยืนยันให้ทันที</p></article>
+        <article class="pin"><i></i><small>04</small><h3>รับ E-BIB</h3><p>โชว์ QR เช็คอินหน้างาน และแชร์ลง IG Story</p></article>
+      </div>
+      <p class="ready">Ready to run!</p>
+    </section>
+
+    <!-- กระดานผู้นำ: ชวนเพื่อนมากที่สุด -->
+    <section class="block lb" id="leaderboard" data-reveal>
+      <span class="kicker">Invite &amp; win</span>
+      <h2 class="block-title">Top <span class="g">inviters</span></h2>
+      <p class="muted" style="max-width:460px" id="lbIntro"></p>
+      <div class="lb-card">
+        <div class="lb-prize" id="lbPrizeBox">
+          <figure class="lb-media" id="lbMedia">
+            <img class="m-photo" id="lbPrizeImg" alt="นายแบบสวมหมวกวิ่ง INSTHINK RUN CLUB" hidden>
+          </figure>
+          <div class="lb-txt"><span class="lb-top">TOP <i id="lbN">5</i></span><small>รางวัล</small><b id="lbPrize"></b></div>
+          <span class="lb-badge" id="lbBadge" hidden></span>
+          <span id="lbPrizeNote"></span>
+          <a class="lb-go" href="register.html" aria-label="สมัครวิ่ง"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+        </div>
+        <div class="lb-meta"><span class="lb-scarce" id="lbScarce"></span></div>
+        <div class="lb-me" id="lbMe" hidden></div>
+        <ol class="lb-list" id="lbList"></ol>
+        <div class="lb-news" id="lbNews" hidden aria-live="polite"></div>
+        <p class="lb-rule" id="lbRule"></p>
+        <a class="btn btn-primary" href="register.html" id="lbCta">สมัครวิ่ง แล้วรับลิงก์ชวนเพื่อน</a>
+      </div>
+    </section>
+
+    <!-- ตารางเวลาวันงาน -->
+    <section class="block" data-reveal>
+      <span class="kicker">ตารางเวลา</span>
+      <h2 class="block-title">Race <span class="g">Day</span></h2>
+      <p class="muted" id="tlDate"></p>
+      <ol class="timeline" id="timeline" data-reveal="stagger"></ol>
+    </section>
+
+    <!-- เส้นทาง (การ์ดมืด) -->
+    <section class="route-dark" data-reveal>
+      <div class="rd-map" id="homeRoute"></div>
+      <div class="rd-info">
+        <span class="kicker light">Route</span>
+        <div class="rd-km">6<small>KM</small></div>
+        <div class="rd-name" id="homeRouteName">INSTHINK LOOP</div>
+        <p id="homeRouteLoc"></p>
+        <a class="btn btn-light nav-btn" id="mapBtn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>นำทางไปจุดสตาร์ต</a>
+      </div>
+    </section>
+
+    <!-- ปุ่มใหญ่ไปหน้าสมัคร -->
+    <section class="cta-big" data-reveal>
+      <div>
+        <span class="kicker light">พร้อมแล้วใช่ไหม?</span>
+        <h2>Join the <span class="g">run</span></h2>
+        <p>สมัครสมาชิกครั้งเดียว ใช้ได้ทุกรอบ · จ่ายผ่าน PromptPay ได้ E-BIB ทันที</p>
+      </div>
+      <a class="btn btn-light btn-xl" href="register.html">สมัครวิ่งเลย <span class="arr">↗</span></a>
+    </section>
+
+    <!-- สปอนเซอร์ -->
+    <section class="sponsors" data-reveal>
+      <span class="kicker light">Supported by</span>
+      <picture>
+        <source media="(min-width: 720px)" srcset="img/sponsors-row-white.webp">
+        <img src="img/sponsors-grid-white.webp" alt="ผู้สนับสนุน: Insthink Coffee, Nayok J.Mad, Relax Japan Mountain, Santara, BN Youth Group, Gran Turismo Narathiwat, Ibnutec Construction, BRIP, Marubotok 40 Plus FC" loading="lazy">
+      </picture>
+    </section>
+  </main>
+
+  <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
+
+  <script src="js/config.js?v=20.25"></script>
+  <script src="js/api.js?v=20.25"></script>
+  <script src="js/common.js?v=20.25"></script>
+  <script src="js/home.js?v=20.25"></script>
+</body>
+</html>

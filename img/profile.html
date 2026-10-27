@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <script>try{var t=localStorage.getItem('irc_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;if(t==='dark')document.querySelector('meta[name=theme-color]').content='#070D1F'}catch(e){}</script>
+  <title>ของฉัน · INSTHINK RUN CLUB</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20.25">
+</head>
+<body>
+  <header class="site-head" data-nav></header>
+
+  <main class="wrap">
+    <!-- เพิ่งสมัครสำเร็จ -->
+    <div class="success-head hidden" id="successHead">
+      <div class="tick"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h2>สมัครแล้ว!</h2>
+      <p class="muted" style="margin:6px 0 0">ขั้นตอนสุดท้าย: ชำระเงินและแนบสลิปด้านล่าง ระบบยืนยันให้อัตโนมัติทันที · เราส่งลิงก์หน้านี้ไปที่อีเมลของคุณแล้ว</p>
+    </div>
+
+    <!-- ไม่ได้ระบุเลข → รายการในเครื่องนี้ -->
+    <section id="pickView" class="hidden">
+      <h2 class="section-title"><span class="num">//</span>รายการของฉัน</h2>
+      <div class="results" id="myList"></div>
+      <p class="muted mt" id="pickEmpty">ยังไม่มีรายการในเครื่องนี้ — <a href="register.html">สมัคร</a> หรือ <a href="search.html">ค้นหาด้วยชื่อ / เลข</a></p>
+    </section>
+
+    <section id="profileView" class="hidden">
+      <!-- ความคืบหน้า -->
+      <div class="card mt">
+        <div class="card-title"><span id="pHeadline">—</span><span id="pPay"></span></div>
+        <div class="steps" id="steps"></div>
+      </div>
+
+      <!-- หลังจบงาน (แอดมินเปิดโหมดหลังจบงาน): ใบ Finisher + แบบประเมิน -->
+      <div class="post-grid hidden" id="postEvent">
+        <div class="card finisher-card" id="finisherCard">
+          <div class="card-title">Finisher <span class="muted small" style="font:400 13px var(--font);text-transform:none">ขอบคุณที่มาวิ่งด้วยกัน</span></div>
+          <div id="finisherBody">
+            <p class="muted small" style="margin:0 0 12px">สร้างรูป Finisher พร้อมชื่อและเลข BIB ของคุณ ขนาด 1080×1350 เหมาะกับโพสต์ IG / Facebook</p>
+            <div class="field"><label for="finTime">เวลาที่วิ่งได้ (ไม่บังคับ)</label><input class="input" id="finTime" placeholder="เช่น 38:12" maxlength="8" inputmode="numeric" autocomplete="off"></div>
+            <div class="fin-preview hidden" id="finPreview"><img alt="ตัวอย่างรูป Finisher"></div>
+            <div class="btn-row mt"><button class="btn btn-primary" id="btnFinisher" type="button">สร้างรูป Finisher</button><button class="btn hidden" id="btnFinSave" type="button">บันทึก / แชร์</button></div>
+          </div>
+          <div class="notice info small hidden" id="finisherLocked">รูป Finisher สำหรับนักวิ่งที่เช็คอินวันงาน · ถ้ามาวิ่งแล้วแต่ยังไม่เห็น แจ้งทีมงานได้เลย</div>
+        </div>
+        <form class="card fb-card" id="fbForm">
+          <div class="card-title">แบบประเมินความพอใจ</div>
+          <p class="muted small" style="margin:0 0 6px">ใช้เวลาไม่ถึง 1 นาที ช่วยให้งานครั้งหน้าดีขึ้น</p>
+          <div class="stars-pick" id="fbStars" role="radiogroup" aria-label="ให้คะแนน 1 ถึง 5 ดาว"></div>
+          <div class="fb-label" id="fbLabel">แตะดาวเพื่อให้คะแนน</div>
+          <textarea class="input" id="fbComment" maxlength="500" rows="3" placeholder="ชอบอะไร / อยากให้ปรับอะไร (ไม่บังคับ)"></textarea>
+          <button class="btn btn-primary btn-block mt" id="fbSend" type="submit">ส่งแบบประเมิน</button>
+          <p class="fb-done hidden" id="fbDone">ขอบคุณสำหรับความคิดเห็น! แก้ไขแล้วกดส่งใหม่ได้</p>
+        </form>
+      </div>
+
+      <!-- ชำระเงิน (แสดงเมื่อยังไม่ PAID) -->
+      <div class="card mt hidden" id="payCard">
+        <div class="card-title">ชำระเงิน <span class="muted small" style="font:400 14px var(--font);text-transform:none">PromptPay</span></div>
+        <div class="notice hidden" id="payNotice"></div>
+        <div class="pay-grid mt">
+          <div class="pp-card">
+            <div class="pp-head">PromptPay · พร้อมเพย์</div>
+            <div class="pp-qr" id="ppQr"></div>
+            <div class="pp-amt" id="ppAmt">—</div>
+            <div class="pp-name" id="ppName"></div>
+          </div>
+          <div class="grid">
+            <div>
+              <div class="muted small">ยอดที่ต้องชำระ</div>
+              <div class="amount-big" id="payAmount">—</div>
+              <div class="muted small" id="payFor"></div>
+            </div>
+            <!-- 3 ขั้นตอน: เน้นขั้นที่ 3 (แนบสลิป) ให้เห็นชัดว่าต้องทำ -->
+            <div class="pay-steps">
+              <div class="pstep"><i>1</i><div><b>บันทึกรูป QR หรือสแกน</b><span>เปิดแอปธนาคาร → สแกน / เลือกรูป QR</span>
+                <button class="btn btn-sm" id="btnSaveQr" type="button">บันทึกรูป QR</button></div></div>
+              <div class="pstep"><i>2</i><div><b>โอนเงินตามยอด</b><span>ตรวจยอดให้ตรง แล้ว <u>เก็บสลิปไว้</u></span></div></div>
+              <div class="pstep must" id="slipStep"><i>3</i><div><b>แนบสลิปการโอน <em>ต้องทำ</em></b><span>ถ้าไม่แนบสลิป ระบบจะยังไม่ยืนยันการสมัคร และยังไม่ได้ E-BIB</span>
+                <label class="upload" id="uploadBox">
+                  <input type="file" id="slipFile" accept="image/*">
+                  <img id="slipPreview" class="hidden" alt="ตัวอย่างสลิป">
+                  <b id="uploadLabel">แตะเพื่อเลือกรูปสลิป</b>
+                  <span class="muted small">JPG / PNG · ระบบย่อขนาดให้อัตโนมัติ</span>
+                </label>
+                <button class="btn btn-primary btn-block hidden" id="btnSendSlip" type="button">ส่งสลิป</button></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <!-- ซ้าย: E-BIB (นักวิ่ง) -->
+        <div id="bibCol" class="hidden">
+          <!-- E-BIB แบบพลิกการ์ด: หน้า = เลข BIB · หลัง = QR + รายละเอียด
+               (ตอนบันทึกรูป ระบบรวม 2 ด้านเป็นการ์ดใบเดียวแบบเดิม) -->
+          <div class="ebib-flip" id="ebibFlip">
+          <div class="ebib flipcard" id="ebib" role="button" tabindex="0" aria-label="แตะเพื่อพลิกการ์ด">
+            <div class="ebib-face front">
+            <div class="ebib-top">
+              <img src="img/logo-white.png" alt="INSTHINK RUN CLUB">
+              <div class="d" id="bDist">6K</div>
+            </div>
+            <div class="ebib-band"></div>
+            <div class="ebib-status"><div class="ebib-ribbon hidden" id="bRibbon"></div></div>
+            <div class="ebib-num" id="bNum">R000</div>
+            <div class="center" id="bAvatar" style="margin-bottom:8px"></div>
+            <div class="ebib-name"><span id="bName"></span><small id="bNick"></small></div>
+            <div class="ebib-spons f"><small>SUPPORTED BY</small><img src="img/sponsors-grid-dark.webp" alt="Sponsors"></div>
+            <div class="flip-hint"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg>แตะการ์ดเพื่อดู QR เช็คอิน</div>
+            <i class="sheen" aria-hidden="true"></i>
+            </div>
+            <div class="ebib-face back">
+            <div class="ebib-top back-top">
+              <img src="img/logo-white.png" alt="">
+              <div class="d" id="bNumBack">R000</div>
+            </div>
+            <div class="ebib-band back-top"></div>
+            <div class="ebib-foot">
+              <div class="ebib-qr" id="bQrBox"><div id="bQr"></div></div>
+              <div class="ebib-info">
+                <div class="row"><span>ผ้าโพกหัว</span><b id="bBandana"></b></div>
+                <div class="row"><span>แพ้อาหาร</span><b id="bFood"></b></div>
+                <div class="row"><span>เครื่องดื่ม</span><b id="bDrink"></b></div>
+                <div class="row"><span>ปล่อยตัว</span><b id="bStart"></b></div>
+              </div>
+            </div>
+            <div class="ebib-barcode"><svg id="bBarcode"></svg></div>
+            <div class="ebib-spons b"><small>SUPPORTED BY</small><img src="img/sponsors-grid-dark.webp" alt="Sponsors"></div>
+            <div class="flip-hint">แตะเพื่อกลับด้านหน้า</div>
+            </div>
+          </div>
+          </div>
+          <p class="center muted small" id="bibHint" style="margin-top:12px"></p>
+          <div class="btn-row no-print hidden" id="bibActions">
+            <button class="btn" id="btnFlip" type="button">พลิกการ์ด</button>
+            <button class="btn btn-dark" id="btnSaveBib">บันทึกรูป E-BIB</button>
+          </div>
+        </div>
+
+        <!-- ขวา -->
+        <div class="grid" id="rightCol">
+          <div class="card">
+            <div class="card-title">รายละเอียด</div>
+            <div class="kv" id="detail"></div>
+          </div>
+
+          <div class="card no-print" id="storyCard">
+            <div class="card-title">Share to IG Story <span class="muted small" style="font:400 13px var(--font);text-transform:none">7 รูป</span></div>
+            <p class="muted small" style="margin:0 0 12px">ได้ 7 รูป: การ์ด BIB เต็มจอ 1 รูป + สติกเกอร์และกรอบรูปโปร่งใส 6 แบบ (วางทับรูปของคุณเอง) · ไม่มี QR ส่วนตัว ปลอดภัยต่อการแชร์</p>
+            <div class="style-pick" id="storyStyle" role="radiogroup" aria-label="สไตล์รูป Story">
+              <button type="button" role="radio" data-style="dark" class="on" aria-checked="true"><i class="sw sw-dark"></i>มืด</button>
+              <button type="button" role="radio" data-style="light" aria-checked="false"><i class="sw sw-light"></i>สว่าง</button>
+              <button type="button" role="radio" data-style="minimal" aria-checked="false"><i class="sw sw-min"></i>มินิมอล</button>
+            </div>
+            <div class="story-slides hidden" id="storyPreview"><div class="ss-track" id="storyTrack"></div><div class="ss-dots" id="storyDots"></div></div>
+            <div class="btn-row mt"><button class="btn btn-primary btn-ig" id="btnStory"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r=".9" fill="currentColor" stroke="none"/></svg><span>สร้างรูป IG Story</span></button></div>
+            <div class="btn-row mt hidden" id="storyActions">
+              <button class="btn btn-dark" id="btnShare">แชร์ไป Instagram (7 รูป)</button>
+              <button class="btn" id="btnDownload">บันทึกรูปนี้</button>
+            </div>
+          </div>
+
+          <div class="card" id="routeCard">
+            <div class="card-title"><span>Route · <span id="pRouteName" style="color:var(--navy)"></span></span></div>
+            <div class="route-box" id="pRoute"></div>
+            <p class="muted small" style="margin:10px 0 0" id="pCheckpoints"></p>
+            <a class="btn btn-sm nav-btn-sm mt" id="pMapBtn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>นำทางไปจุดสตาร์ต</a>
+          </div>
+
+          <!-- ชวนเพื่อน -->
+          <div class="card no-print invite-card" id="inviteCard">
+            <div class="card-title">ชวนเพื่อนมาวิ่ง <span class="invite-count" id="inviteCount"></span></div>
+            <p class="muted small" style="margin:0 0 12px">ส่งลิงก์นี้ให้เพื่อน เมื่อเพื่อนสมัครผ่านลิงก์ ระบบจะนับให้คุณอัตโนมัติ</p>
+            <p class="invite-rank small" id="inviteRank" style="margin:0 0 12px"></p>
+            <div class="invite-link"><input class="input" id="inviteUrl" readonly aria-label="ลิงก์ชวนเพื่อน"><button class="btn btn-dark" id="btnCopyInvite" type="button">คัดลอก</button></div>
+            <div class="btn-row mt"><button class="btn" id="btnShareInvite" type="button">แชร์ลิงก์ (LINE / IG / Facebook)</button></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- แถบล่าง (มือถือ): เตือนให้แนบสลิป ขณะยังไม่ชำระ -->
+  <button class="slip-bar hidden" id="slipBar" type="button">โอนแล้ว? <b>แนบสลิปเลย</b></button>
+
+  <!-- ยืนยันตัวตนเมื่อเปิดจากเครื่องอื่น -->
+  <div class="modal hidden" id="verifyModal">
+    <form class="card" id="verifyForm">
+      <h3>ยืนยันตัวตน</h3>
+      <p class="muted" style="margin-top:0">กรอกเบอร์โทรศัพท์ 4 ตัวท้ายที่ใช้สมัคร <b id="vBib" style="color:var(--navy)"></b></p>
+      <input class="input" id="phone4" inputmode="numeric" maxlength="4" placeholder="••••" style="text-align:center;font-size:28px;letter-spacing:.4em" autocomplete="off">
+      <p class="hint">หรือเปิดจากลิงก์ในอีเมลยืนยัน</p>
+      <div class="btn-row mt">
+        <a class="btn" href="search.html">ยกเลิก</a>
+        <button class="btn btn-primary" id="verifyBtn" type="submit">เปิด</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- พื้นที่นอกจอสำหรับเรนเดอร์ IG Story -->
+  <div class="story-stage" aria-hidden="true"><div class="story" id="story"></div></div>
+
+  <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="js/config.js?v=20.25"></script>
+  <script src="js/api.js?v=20.25"></script>
+  <script src="js/common.js?v=20.25"></script>
+  <script src="js/draw.js?v=20.25"></script>
+  <script src="js/story.js?v=20.25"></script>
+  <script src="js/finisher.js?v=20.25"></script>
+  <script src="js/profile.js?v=20.25"></script>
+</body>
+</html>
