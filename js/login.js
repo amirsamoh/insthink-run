@@ -59,7 +59,7 @@
   forms.signup.addEventListener('submit', async (e) => {
     e.preventDefault();
     const d = {
-      firstName: $('#sFirst').value.trim(), lastName: $('#sLast').value.trim(), nickname: $('#sNick').value.trim(),
+      firstName: $('#sFirst').value.trim(), lastName: $('#sLast').value.trim(), nickname: $('#sNick').value.trim(), gender: $('#sGender').value,
       phone: normPhone($('#sPhone').value), email: $('#sEmail').value.trim(), password: $('#sPass').value, photo,
     };
     const bad = !d.firstName ? 'กรอกชื่อ' : !d.lastName ? 'กรอกนามสกุล'

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.25">
+  <link rel="stylesheet" href="css/style.css?v=20.26">
 </head>
 <body>
   <header class="site-head" data-nav></header>
@@ -48,7 +48,11 @@
         <div class="field"><label for="sFirst">ชื่อ <span class="req">*</span></label><input class="input" id="sFirst" autocomplete="given-name" maxlength="60"></div>
         <div class="field"><label for="sLast">นามสกุล <span class="req">*</span></label><input class="input" id="sLast" autocomplete="family-name" maxlength="60"></div>
       </div>
-      <div class="field"><label for="sNick">ชื่อเล่น / ชื่อบน BIB</label><input class="input" id="sNick" maxlength="20" placeholder="เช่น MIRZ"></div>
+      <div class="grid grid-2">
+        <div class="field"><label for="sNick">ชื่อเล่น / ชื่อบน BIB</label><input class="input" id="sNick" maxlength="20" placeholder="เช่น MIRZ"></div>
+        <div class="field"><label for="sGender">เพศ</label>
+          <select class="input" id="sGender"><option value="">ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>อื่น ๆ</option></select></div>
+      </div>
       <div class="field"><label for="sPhone">เบอร์โทรศัพท์ <span class="req">*</span></label>
         <input class="input" id="sPhone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="16" placeholder="08xxxxxxxx"></div>
       <div class="field"><label for="sEmail">อีเมล <span class="req">*</span></label>
@@ -79,9 +83,9 @@
 
   <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
 
-  <script src="js/config.js?v=20.25"></script>
-  <script src="js/api.js?v=20.25"></script>
-  <script src="js/common.js?v=20.25"></script>
-  <script src="js/login.js?v=20.25"></script>
+  <script src="js/config.js?v=20.26"></script>
+  <script src="js/api.js?v=20.26"></script>
+  <script src="js/common.js?v=20.26"></script>
+  <script src="js/login.js?v=20.26"></script>
 </body>
 </html>
