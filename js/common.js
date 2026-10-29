@@ -184,8 +184,17 @@
   }
 
   /** แจ้งเตือนอัตโนมัติเมื่อสคริปต์ของหน้าเว็บพัง (แทนที่จะเงียบ แล้วฟอร์มรีโหลดเอง) */
-  window.addEventListener('error', (e) => { if (e.message) toast('หน้าเว็บมีข้อผิดพลาด: ' + e.message, 'err'); });
-  window.addEventListener('unhandledrejection', (e) => toast('เกิดข้อผิดพลาด: ' + ((e.reason && e.reason.message) || e.reason), 'err'));
+  // แจ้งเฉพาะข้อผิดพลาดที่มาจากสคริปต์ของเว็บเรา (ข้ามข้อผิดพลาดจากส่วนเสริมเบราว์เซอร์ / แอปแชทที่ฝังสคริปต์เข้ามา เช่น M_ID)
+  const own = (t) => typeof t === 'string' && t.indexOf(location.origin + location.pathname.replace(/[^/]*$/, '')) !== -1;
+  window.addEventListener('error', (e) => {
+    if (!e.message) return;
+    if (own(e.filename)) toast('หน้าเว็บมีข้อผิดพลาด: ' + e.message, 'err'); else console.warn('[ignored external error]', e.message, e.filename);
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    const r = e.reason, msg = (r && r.message) || r;
+    // ข้อความจาก API.call ของเราเอง (เช่น เซิร์ฟเวอร์ตอบ error) ไม่มี stack ของไฟล์อื่น จึงแจ้งตามเดิม
+    if (r && r.stack ? own(r.stack) : r && r.isApiError) toast('เกิดข้อผิดพลาด: ' + msg, 'err'); else console.warn('[ignored external rejection]', msg);
+  });
 
   /** เบอร์โทร: เหลือเฉพาะตัวเลข และแปลง +66 / 66 เป็น 0 (เบราว์เซอร์มือถือมักกรอกให้ในรูปแบบ +66) */
   function normPhone(v) {
@@ -459,7 +468,7 @@
           <a class="btn btn-sm admin-link" href="admin.html">Admin</a>
           <a class="btn btn-sm admin-link" href="checkin.html">Staff เช็คอิน</a>
         </div>
-        <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')} · v20.28</div>
+        <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')} · v20.30</div>
       </div>`;
     }
   }
