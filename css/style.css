@@ -1434,3 +1434,20 @@ html.zv-open, html.zv-open body { overflow: hidden; }
 .size-chart, .size-chart > div { min-width: 0; max-width: 100%; }
 .size-chart table { table-layout: fixed; }
 .size-chart table { min-width: 0; }
+
+/* ===== v20.37 Race Kit ลอยบนพื้นหลังหน้าเว็บ (ไม่มีกรอบน้ำเงิน) ===== */
+.cf { background: none; border-radius: 0; padding: 10px 0 6px; margin-inline: calc(50% - 50vw); }   /* เต็มความกว้างจอ ให้การ์ดข้าง ๆ ล้นขอบได้ */
+.cf-card { box-shadow: 0 28px 50px -22px rgba(10,20,48,.45); }
+.cf-card.on { box-shadow: 0 34px 60px -20px rgba(10,20,48,.55), 0 0 0 1px rgba(10,20,48,.06); }
+.cf-card:not(.on) { filter: saturate(calc(1 - var(--a) * .35)); opacity: calc(1 - var(--a) * .45); }
+.cf-btn { border-color: var(--line-2); background: var(--surface); color: var(--ink); }
+.cf-btn:hover { background: var(--surface-2); }
+.cf-dots button { background: var(--line-2); }
+.cf-dots button.on { background: var(--navy); }
+[data-theme="dark"] .cf-card { box-shadow: 0 28px 50px -18px rgba(0,0,0,.7); }
+[data-theme="dark"] .cf-dots button.on { background: var(--lime); }
+.cf-card.far { opacity: 0; }
+@media (min-width: 900px) { .cf-stage { --w: 330px; } }
+/* รูปเสื้อเต็มกรอบ (ไม่เว้นขอบแบบภาพสินค้าวางบนพื้น) */
+.cf-card.shirt > img { object-fit: cover; object-position: 50% 18%; padding: 0; background: #fff; }
+.cf-card.light.flat.shirt > img { object-fit: cover; object-position: 50% 18%; padding: 0; background: #fff; }

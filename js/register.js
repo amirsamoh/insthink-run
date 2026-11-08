@@ -26,8 +26,16 @@
     SH.sizes.map((z) => SH.chart[z] ? `<tr><td>${esc(z)}</td><td>${SH.chart[z][0]}</td><td>${SH.chart[z][1]}</td></tr>` : '').join('')}</tbody></table>
     <p class="hint">${SH.sample ? 'ค่าประมาณ จะอัปเดตเมื่อได้เสื้อจริง · ' : ''}วัดรอบอกเสื้อตัวที่ใส่สบาย แล้วเลือกไซซ์ที่ใกล้ที่สุด</p>` : '';
 
+  /* ---------- โหมดดูตัวอย่าง (เปิดจากปุ่มในหน้าแอดมินเท่านั้น: ต้องมี ?preview=1 และล็อกอินแอดมินอยู่ในแท็บนี้) ---------- */
+  let PREVIEW = false;
+  try { PREVIEW = new URLSearchParams(location.search).has('preview') && !!sessionStorage.getItem('irc_admin_key'); } catch (e) { /* ignore */ }
+  if (PREVIEW) {
+    $('#previewBar').classList.remove('hidden');
+    $('#submitBtn').textContent = 'ทดลองกดสมัคร (ไม่บันทึกจริง)';
+  }
+
   /* ---------- ปิดรับสมัคร ---------- */
-  if (CFG.REGISTRATION_OPEN === false) {
+  if (CFG.REGISTRATION_OPEN === false && !PREVIEW) {
     $('#closed').classList.remove('hidden');
     const ig = (CFG.EVENT.instagram || '').replace('@', '');
     const follow = CFG.EVENT.followUrl || (ig ? 'https://www.instagram.com/' + ig + '/' : '');
@@ -36,13 +44,14 @@
   }
 
   /* ---------- ต้องล็อกอินก่อน ---------- */
-  if (!Auth.loggedIn()) {
+  if (!Auth.loggedIn() && !PREVIEW) {
     $('#gate').classList.remove('hidden');
     return;
   }
   $('#regForm').classList.remove('hidden');
 
-  let member = Auth.member() || {};
+  // ดูตัวอย่างโดยไม่ได้ล็อกอินสมาชิก: ใช้ข้อมูลสมมติ
+  let member = Auth.member() || (PREVIEW ? { firstName: 'ตัวอย่าง', lastName: 'ผู้สมัคร', nickname: 'PREVIEW', phone: '0800000000', email: 'preview@insthink.run' } : {});
   function paintMember(m) {
     member = m;
     $('#whoCard').innerHTML = `${avatarHtml(m, 'lg')}
@@ -52,7 +61,7 @@
     $('#emgHint').classList.toggle('hidden', !!(m.emergencyName && m.emergencyPhone) || !isRunnerSelected());
   }
   // ดึงข้อมูลล่าสุด (รูป/เบอร์ที่เพิ่งแก้) — ถ้า session หมดอายุจะเด้งไปล็อกอิน
-  API.call('me').then((r) => { Auth.setMember(r.member); paintMember(r.member); })
+  if (Auth.loggedIn()) API.call('me').then((r) => { Auth.setMember(r.member); paintMember(r.member); })
     .catch(() => { if (!Auth.loggedIn()) location.reload(); });
 
   /* ---------- สร้างตัวเลือก ---------- */
@@ -127,7 +136,7 @@
     el.classList.toggle('hidden', !show);
     if (show) el.innerHTML = '<b>' + esc(MSG(myRun)) + '</b><br><span class="small">ถ้าต้องการซื้อเป็นของฝากหรือเพิ่มอีกตัว ทำต่อได้เลย รายการนี้จะแยกชำระเงินต่างหาก</span>';
   }
-  API.call('myRegs', {}).then(({ regs }) => {
+  if (Auth.loggedIn()) API.call('myRegs', {}).then(({ regs }) => {
     myRun = (regs || []).find((r) => r.package === 'RUN' && (r.eventId || CFG.EVENT.id) === CFG.EVENT.id) || null;
     dupNote();
   }).catch(() => { /* ไม่มีผลต่อการสมัคร */ });
@@ -190,6 +199,7 @@
     const d = collect();
     if (!validate(d)) return;
     const pk = pkg(d.package);
+    if (PREVIEW) { toast('โหมดดูตัวอย่าง: ฟอร์มถูกต้อง แต่ไม่ได้ส่งข้อมูลจริง', 'ok'); return; }
     if (myRun && pk && !pk.runner && !confirm(MSG(myRun) + '\n\nกด "ตกลง" เพื่อสั่งซื้อเสื้อเพิ่ม (' + money(pk.price) + ')')) return;
 
     const btn = $('#submitBtn');
