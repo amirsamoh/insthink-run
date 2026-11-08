@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.30">
+  <link rel="stylesheet" href="css/style.css?v=20.34">
 </head>
 <body>
   <header class="site-head" data-nav></header>
@@ -27,6 +27,16 @@
         <span class="meta-chip"><b id="evLoc">—</b></span>
       </div>
       <a class="reg-back" href="index.html">← รายละเอียดงาน</a>
+    </section>
+
+    <!-- ยังไม่เปิดรับสมัคร (ตั้งที่ REGISTRATION_OPEN ใน js/config.js) -->
+    <section class="card center hidden" id="closed" style="margin-top:20px">
+      <h2 style="margin:0 0 6px">ยังไม่เปิดรับสมัคร</h2>
+      <p class="muted" style="margin:0 0 16px">เราจะประกาศวันเปิดรับสมัครเร็ว ๆ นี้ ติดตามได้ทาง Instagram</p>
+      <div class="btn-row" style="justify-content:center">
+        <a class="btn btn-primary" id="closedIg" target="_blank" rel="noopener">ติดตามประกาศ</a>
+        <a class="btn" href="index.html">กลับหน้าแรก</a>
+      </div>
     </section>
 
     <!-- ยังไม่ได้เข้าสู่ระบบ -->
@@ -118,9 +128,9 @@
 
   <footer class="site-foot"></footer>
 
-  <script src="js/config.js?v=20.30"></script>
-  <script src="js/api.js?v=20.30"></script>
-  <script src="js/common.js?v=20.30"></script>
-  <script src="js/register.js?v=20.30"></script>
+  <script src="js/config.js?v=20.34"></script>
+  <script src="js/api.js?v=20.34"></script>
+  <script src="js/common.js?v=20.34"></script>
+  <script src="js/register.js?v=20.34"></script>
 </body>
 </html>

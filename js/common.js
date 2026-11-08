@@ -16,9 +16,10 @@
   /** แจ้งเตือนด้านล่างจอ */
   function toast(msg, type) {
     let wrap = $('#toasts');
-    if (!wrap) { wrap = document.createElement('div'); wrap.id = 'toasts'; document.body.appendChild(wrap); }
+    if (!wrap) { wrap = document.createElement('div'); wrap.id = 'toasts'; wrap.setAttribute('aria-live', 'polite'); document.body.appendChild(wrap); }
     const t = document.createElement('div');
     t.className = 'toast ' + (type || '');
+    t.setAttribute('role', type === 'err' ? 'alert' : 'status');
     t.textContent = msg;
     wrap.appendChild(t);
     const ms = type === 'err' ? 6500 : 3400;   // ข้อความผิดพลาดค้างนานขึ้น จะได้อ่านทัน
@@ -188,12 +189,29 @@
   const own = (t) => typeof t === 'string' && t.indexOf(location.origin + location.pathname.replace(/[^/]*$/, '')) !== -1;
   window.addEventListener('error', (e) => {
     if (!e.message) return;
-    if (own(e.filename)) toast('หน้าเว็บมีข้อผิดพลาด: ' + e.message, 'err'); else console.warn('[ignored external error]', e.message, e.filename);
+    if (own(e.filename)) toast('หน้าเว็บทำงานผิดพลาด ลองรีเฟรชหน้านี้อีกครั้ง', 'err'); else console.warn('[ignored external error]', e.message, e.filename);
   });
   window.addEventListener('unhandledrejection', (e) => {
     const r = e.reason, msg = (r && r.message) || r;
     // ข้อความจาก API.call ของเราเอง (เช่น เซิร์ฟเวอร์ตอบ error) ไม่มี stack ของไฟล์อื่น จึงแจ้งตามเดิม
-    if (r && r.stack ? own(r.stack) : r && r.isApiError) toast('เกิดข้อผิดพลาด: ' + msg, 'err'); else console.warn('[ignored external rejection]', msg);
+    if (r && r.stack ? own(r.stack) : r && r.isApiError) toast(/[\u0E00-\u0E7F]/.test(String(msg)) ? String(msg) : 'ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง หากยังไม่ได้ ติดต่อ @insthink.runclub', 'err'); else console.warn('[ignored external rejection]', msg);
+  });
+
+  /** ลิงก์ "ข้ามไปเนื้อหา" สำหรับคนที่ใช้คีย์บอร์ด/เครื่องอ่านหน้าจอ (โผล่เมื่อกด Tab ครั้งแรก) */
+  document.addEventListener('DOMContentLoaded', () => {
+    const main = document.querySelector('main'); if (!main) return;
+    if (!main.id) main.id = 'main';
+    main.setAttribute('tabindex', '-1');
+    const a = document.createElement('a'); a.className = 'skip-link'; a.href = '#' + main.id; a.textContent = 'ข้ามไปเนื้อหา';
+    document.body.insertBefore(a, document.body.firstChild);
+  });
+
+  /** ปิดรับสมัคร: ปุ่ม "สมัครวิ่ง" ในหน้าแรก/กระดานผู้นำ เปลี่ยนเป็นป้ายบอกสถานะ (กดไม่ได้) */
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.APP_CONFIG.REGISTRATION_OPEN !== false) return;
+    document.querySelectorAll('.hero2-cta .btn-light, .hero3-cta .btn-white, .btn-xl[href="register.html"], #lbCta, .lb-me-btn[href="register.html"]').forEach((a) => {
+      a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); a.classList.add('is-closed'); a.textContent = 'ยังไม่เปิดรับสมัคร';
+    });
   });
 
   /** เบอร์โทร: เหลือเฉพาะตัวเลข และแปลง +66 / 66 เป็น 0 (เบราว์เซอร์มือถือมักกรอกให้ในรูปแบบ +66) */
@@ -468,7 +486,7 @@
           <a class="btn btn-sm admin-link" href="admin.html">Admin</a>
           <a class="btn btn-sm admin-link" href="checkin.html">Staff เช็คอิน</a>
         </div>
-        <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')} · v20.30</div>
+        <div class="copy">© ${new Date().getFullYear()} INSTHINK RUN CLUB · ${esc(CFG.EVENT.hashtag || '')} · v20.34</div>
       </div>`;
     }
   }

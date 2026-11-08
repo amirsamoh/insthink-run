@@ -83,7 +83,7 @@
   $('#verifyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const v = $('#phone4').value.replace(/\D/g, '');
-    if (v.length !== 4) return toast('กรอก 4 หลัก', 'err');
+    if (v.length !== 4) return toast('กรอกเบอร์โทร 4 ตัวท้าย', 'err');
     busy($('#verifyBtn'), true, 'ตรวจสอบ…');
     try {
       await load({ phone4: v });

@@ -9,6 +9,10 @@ window.APP_CONFIG = {
   /** URL ของ Apps Script Web App (ลงท้ายด้วย /exec) */
   API_URL: 'https://script.google.com/macros/s/AKfycbygBjYMGAH_a6iA87fdDCD3uuU7iw1R0TMBRwL7brJINR3-tl6JEFHKrkJm7fo1fyL4/exec',
 
+  /** เปิด/ปิดรับสมัคร: false = ทั้งเว็บแสดง "ยังไม่เปิดรับสมัคร" และหน้าสมัครใช้งานไม่ได้
+   *  (ต้องตั้ง REGISTRATION_OPEN ใน backend/Code.gs ให้ตรงกัน แล้ว Deploy → New version เพื่อล็อกฝั่งเซิร์ฟเวอร์ด้วย) */
+  REGISTRATION_OPEN: false,
+
   EVENT: {
     id: 'RUN-01',                            // ต้องตรงกับ EVENT_ID ใน Code.gs (เปิดรอบใหม่ให้เปลี่ยนทั้งสองที่)
     name: 'INSTHINK RUN CLUB',

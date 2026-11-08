@@ -18,6 +18,14 @@
   $('#evLoc').textContent = CFG.EVENT.location;
   $('#bandanaIco').innerHTML = starSvg('#fff');
 
+  /* ---------- ปิดรับสมัคร ---------- */
+  if (CFG.REGISTRATION_OPEN === false) {
+    $('#closed').classList.remove('hidden');
+    const ig = (CFG.EVENT.instagram || '').replace('@', '');
+    if (ig) $('#closedIg').href = 'https://www.instagram.com/' + ig + '/'; else $('#closedIg').remove();
+    return;
+  }
+
   /* ---------- ต้องล็อกอินก่อน ---------- */
   if (!Auth.loggedIn()) {
     $('#gate').classList.remove('hidden');

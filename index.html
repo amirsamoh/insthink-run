@@ -11,48 +11,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.30">
+  <link rel="stylesheet" href="css/style.css?v=20.34">
 </head>
 <body>
   <header class="site-head" data-nav></header>
 
-  <div class="wrap">
-    <!-- ================= HERO (การ์ดมืดไล่เฉด + รูปผ้าโพกหัว) ================= -->
-    <section class="hero2">
-      <div class="hero-sparks" aria-hidden="true"><span class="spark t1">✦</span><span class="spark t2">✦</span><span class="spark t3">✦</span><span class="spark t4">✦</span></div>
-      <div class="hero2-text">
-        <span class="kicker light">INSTHINK · COMMUNITY COFFEE RUN</span>
-        <h1>Run <span class="g">6K.</span><br>Find Your Flow.</h1>
-        <p class="hero2-sub"><span id="evEdition">INSTHINK RUN CLUB</span> — วิ่ง 6 กิโลเมตร รับผ้าโพกหัว ริสแบน สติกเกอร์ Limited Edition และข้าวยำบุฟเฟ่ต์กับกาแฟหลังเข้าเส้นชัย</p>
-        <div class="hero-meta">
-          <span class="meta-chip"><b id="evDate">—</b></span>
-          <span class="meta-chip">ปล่อยตัว <b id="evTime">—</b></span>
-          <a class="meta-chip map-chip" id="evLocLink" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><b id="evLoc">—</b></a>
+  <!-- ================= HERO (ภาพนักวิ่งเต็มจอ) ================= -->
+  <section class="hero3">
+    <div class="hero3-photo" role="img" aria-label="นักวิ่งกำลังวิ่งเร็ว ภาพเบลอแบบเคลื่อนไหว"></div>
+    <div class="hero3-body">
+      <span class="hero3-chip glass"><i></i>COMMUNITY COFFEE RUN · 6K</span>
+      <h1><span>Run.</span><span class="accent">Coffee.</span><span>Flow.</span></h1>
+      <span id="evEdition" hidden>INSTHINK RUN CLUB</span>
+      <p class="hero3-sub">วิ่ง 6 กิโลเมตรกับเพื่อนในชุมชน รับผ้าโพกหัว ริสแบน สติกเกอร์ Limited Edition และข้าวยำบุฟเฟ่ต์กับกาแฟหลังเข้าเส้นชัย</p>
+      <div class="hero-meta">
+        <span class="meta-chip glass"><b id="evDate">—</b></span>
+        <span class="meta-chip glass">ปล่อยตัว <b id="evTime">—</b></span>
+        <a class="meta-chip glass map-chip" id="evLocLink" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><b id="evLoc">—</b></a>
+      </div>
+      <div class="hero3-lower">
+        <div class="hero3-stats">
+          <div class="h3stat glass"><small>ระยะวิ่ง</small><b>6<em>KM</em></b><div class="meter"><i></i></div></div>
+          <div class="h3stat glass"><small>ค่าสมัคร</small><b>256<em>฿</em></b><div class="meter"><i style="width:62%"></i></div></div>
+          <div class="h3stat glass"><small>ของที่ระลึก</small><b>3<em>ชิ้น</em></b><div class="meter"><i style="width:38%"></i></div></div>
         </div>
-        <div class="hero2-cta">
-          <a class="btn btn-light" href="register.html">สมัครวิ่ง <span class="arr">↗</span></a>
-          <a class="btn btn-ghost" href="#goods">ดูของที่ได้รับ</a>
+        <div class="hero3-cta">
+          <a class="btn btn-ghost glass" href="#goods">ดูของที่ได้รับ</a>
+          <a class="btn btn-white" href="register.html">สมัครวิ่ง <span class="arr">↗</span></a>
         </div>
       </div>
-      <div class="hero2-art" aria-hidden="true">
-        <div class="hero-stars" id="heroStars"></div>
-        <div class="bandana-shot bstage" id="bStage">
-          <video class="bs-video" autoplay muted loop playsinline preload="auto" poster="img/hero-chair-poster.webp" disablepictureinpicture>
-            <source src="img/hero-chair.mp4" type="video/mp4">
-          </video>
-        </div>
-        <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span><span class="spark s7">✦</span><span class="spark s9">✦</span>
-      </div>
-    </section>
-
-    <!-- ตัวเลขสำคัญ -->
-    <section class="stats" data-reveal="stagger">
-      <div><b>6<small>KM</small></b><span>ระยะวิ่ง</span></div>
-      <div><b id="stTime">06:00</b><span>เวลาปล่อยตัว</span></div>
-      <div><b>256<small>฿</small></b><span>ค่าสมัครรวมของที่ระลึก</span></div>
-      <div><b>3<small>ชิ้น</small></b><span>ของที่ระลึก</span></div>
-    </section>
-  </div>
+    </div>
+  </section>
 
   <!-- แถบตัวอักษรเลื่อน -->
   <div class="marquee" aria-hidden="true"><div class="track">
@@ -174,9 +163,9 @@
 
   <footer class="site-foot"><img src="img/logo.png" alt="INSTHINK RUN CLUB"></footer>
 
-  <script src="js/config.js?v=20.30"></script>
-  <script src="js/api.js?v=20.30"></script>
-  <script src="js/common.js?v=20.30"></script>
-  <script src="js/home.js?v=20.30"></script>
+  <script src="js/config.js?v=20.34"></script>
+  <script src="js/api.js?v=20.34"></script>
+  <script src="js/common.js?v=20.34"></script>
+  <script src="js/home.js?v=20.34"></script>
 </body>
 </html>

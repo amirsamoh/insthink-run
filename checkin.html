@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.30">
+  <link rel="stylesheet" href="css/style.css?v=20.34">
 </head>
 <body>
   <header class="site-head">
@@ -20,13 +20,14 @@
   </header>
 
   <main class="wrap">
+    <h1 class="sr-only">เช็กอินหน้างาน</h1>
     <!-- เข้าสู่ระบบด้วย STAFF_KEY -->
     <form class="gate card" id="gate">
       <h2>Staff Check-in</h2>
       <p class="muted" style="margin-top:0">กรอกรหัสเจ้าหน้าที่ (STAFF_KEY หรือ ADMIN_KEY)</p>
       <div class="grid">
-        <input class="input" id="staffName" placeholder="ชื่อเจ้าหน้าที่ / จุด เช่น โต๊ะ 1" maxlength="40">
-        <input class="input" id="staffKey" type="password" placeholder="รหัส" autocomplete="current-password">
+        <input class="input" id="staffName" aria-label="ชื่อเจ้าหน้าที่หรือจุดปฏิบัติงาน" placeholder="ชื่อเจ้าหน้าที่ / จุด เช่น โต๊ะ 1" maxlength="40">
+        <input class="input" id="staffKey" aria-label="รหัสเจ้าหน้าที่" type="password" placeholder="รหัส" autocomplete="current-password">
         <button class="btn btn-primary btn-block" id="gateBtn" type="submit">เข้าสู่ระบบ</button>
       </div>
     </form>
@@ -37,7 +38,7 @@
           <div id="reader"></div>
           <button class="btn btn-primary" id="camBtn">เปิดกล้องสแกน</button>
           <form class="search-bar" id="manualForm">
-            <input class="input" id="manualBib" placeholder="พิมพ์เลข เช่น R012" autocomplete="off" style="text-transform:uppercase" maxlength="6">
+            <input class="input" id="manualBib" aria-label="เลข BIB สำหรับเช็กอินด้วยมือ" placeholder="พิมพ์เลข เช่น R012" autocomplete="off" style="text-transform:uppercase" maxlength="6">
             <button class="btn btn-dark" type="submit">เช็คอิน</button>
           </form>
         </div>
@@ -57,9 +58,9 @@
   </main>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="js/config.js?v=20.30"></script>
-  <script src="js/api.js?v=20.30"></script>
-  <script src="js/common.js?v=20.30"></script>
-  <script src="js/checkin.js?v=20.30"></script>
+  <script src="js/config.js?v=20.34"></script>
+  <script src="js/api.js?v=20.34"></script>
+  <script src="js/common.js?v=20.34"></script>
+  <script src="js/checkin.js?v=20.34"></script>
 </body>
 </html>

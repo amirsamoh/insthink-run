@@ -10,12 +10,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.30">
+  <link rel="stylesheet" href="css/style.css?v=20.34">
 </head>
 <body>
   <header class="site-head" data-nav></header>
 
   <main class="wrap">
+    <h1 class="sr-only">ของฉัน · รายการสมัครและ E-BIB</h1>
     <!-- เพิ่งสมัครสำเร็จ -->
     <div class="success-head hidden" id="successHead">
       <div class="tick"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
@@ -54,7 +55,7 @@
           <p class="muted small" style="margin:0 0 6px">ใช้เวลาไม่ถึง 1 นาที ช่วยให้งานครั้งหน้าดีขึ้น</p>
           <div class="stars-pick" id="fbStars" role="radiogroup" aria-label="ให้คะแนน 1 ถึง 5 ดาว"></div>
           <div class="fb-label" id="fbLabel">แตะดาวเพื่อให้คะแนน</div>
-          <textarea class="input" id="fbComment" maxlength="500" rows="3" placeholder="ชอบอะไร / อยากให้ปรับอะไร (ไม่บังคับ)"></textarea>
+          <textarea class="input" id="fbComment" aria-label="ความคิดเห็นหลังจบงาน" maxlength="500" rows="3" placeholder="ชอบอะไร / อยากให้ปรับอะไร (ไม่บังคับ)"></textarea>
           <button class="btn btn-primary btn-block mt" id="fbSend" type="submit">ส่งแบบประเมิน</button>
           <p class="fb-done hidden" id="fbDone">ขอบคุณสำหรับความคิดเห็น! แก้ไขแล้วกดส่งใหม่ได้</p>
         </form>
@@ -196,7 +197,7 @@
     <form class="card" id="verifyForm">
       <h3>ยืนยันตัวตน</h3>
       <p class="muted" style="margin-top:0">กรอกเบอร์โทรศัพท์ 4 ตัวท้ายที่ใช้สมัคร <b id="vBib" style="color:var(--navy)"></b></p>
-      <input class="input" id="phone4" inputmode="numeric" maxlength="4" placeholder="••••" style="text-align:center;font-size:28px;letter-spacing:.4em" autocomplete="off">
+      <input class="input" id="phone4" aria-label="เบอร์โทร 4 ตัวท้าย" inputmode="numeric" maxlength="4" placeholder="••••" style="text-align:center;font-size:28px;letter-spacing:.4em" autocomplete="off">
       <p class="hint">หรือเปิดจากลิงก์ในอีเมลยืนยัน</p>
       <div class="btn-row mt">
         <a class="btn" href="search.html">ยกเลิก</a>
@@ -213,12 +214,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="js/config.js?v=20.30"></script>
-  <script src="js/api.js?v=20.30"></script>
-  <script src="js/common.js?v=20.30"></script>
-  <script src="js/draw.js?v=20.30"></script>
-  <script src="js/story.js?v=20.30"></script>
-  <script src="js/finisher.js?v=20.30"></script>
-  <script src="js/profile.js?v=20.30"></script>
+  <script src="js/config.js?v=20.34"></script>
+  <script src="js/api.js?v=20.34"></script>
+  <script src="js/common.js?v=20.34"></script>
+  <script src="js/draw.js?v=20.34"></script>
+  <script src="js/story.js?v=20.34"></script>
+  <script src="js/finisher.js?v=20.34"></script>
+  <script src="js/profile.js?v=20.34"></script>
 </body>
 </html>

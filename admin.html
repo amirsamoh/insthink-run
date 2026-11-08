@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.30">
+  <link rel="stylesheet" href="css/style.css?v=20.34">
 </head>
 <body>
   <header class="site-head">
@@ -28,7 +28,7 @@
       <h2>Admin</h2>
       <p class="muted" style="margin-top:0">กรอก ADMIN_KEY (ดูได้จาก Execution log ตอนรัน setup() ใน Apps Script)</p>
       <div class="grid">
-        <input class="input" id="adminKey" type="password" placeholder="ADMIN_KEY" autocomplete="current-password">
+        <input class="input" id="adminKey" aria-label="รหัสแอดมิน" type="password" placeholder="ADMIN_KEY" autocomplete="current-password">
         <button class="btn btn-primary btn-block" id="gateBtn" type="submit">เข้าสู่แดชบอร์ด</button>
       </div>
     </form>
@@ -88,17 +88,17 @@
       <!-- ตาราง -->
       <h2 class="section-title" style="margin-top:28px"><span class="num">//</span>รายการทั้งหมด <small id="rowCount"></small></h2>
       <div class="toolbar">
-        <select class="input" id="fEvent"></select>
-        <input class="input" id="fText" placeholder="ค้นหา ชื่อ / เลข / เบอร์">
-        <select class="input" id="fPkg"><option value="">ทุกแพ็กเกจ</option></select>
-        <select class="input" id="fPay"><option value="">ทุกสถานะชำระ</option></select>
-        <select class="input" id="fDel">
+        <select class="input" id="fEvent" aria-label="กรองตามรอบงาน"></select>
+        <input class="input" id="fText" aria-label="ค้นหาชื่อ เลข หรือเบอร์" placeholder="ค้นหา ชื่อ / เลข / เบอร์">
+        <select class="input" id="fPkg" aria-label="กรองตามแพ็กเกจ"><option value="">ทุกแพ็กเกจ</option></select>
+        <select class="input" id="fPay" aria-label="กรองตามสถานะชำระเงิน"><option value="">ทุกสถานะชำระ</option></select>
+        <select class="input" id="fDel" aria-label="กรองตามวิธีรับของ">
           <option value="">ทุกวิธีรับของ</option>
           <option value="PICKUP">รับที่งาน</option>
           <option value="SHIP_PENDING">จัดส่ง · รอส่ง</option>
           <option value="SHIP_SHIPPED">จัดส่ง · ส่งแล้ว</option>
         </select>
-        <select class="input" id="fIn">
+        <select class="input" id="fIn" aria-label="กรองตามสถานะเช็กอิน">
           <option value="">ทุกสถานะเช็คอิน</option>
           <option value="CHECKED_IN">เช็คอิน/รับของแล้ว</option>
           <option value="REGISTERED">ยังไม่เช็คอิน</option>
@@ -122,7 +122,7 @@
       <div class="summary" id="sInfo"></div>
       <img class="slip-view" id="sImg" alt="สลิป">
       <a class="small hidden" id="sLink" target="_blank" rel="noopener">เปิดไฟล์ใน Google Drive</a>
-      <input class="input" id="sReason" placeholder="เหตุผล (กรณีไม่ผ่าน) เช่น ยอดไม่ตรง">
+      <input class="input" id="sReason" aria-label="เหตุผลที่สลิปไม่ผ่าน" placeholder="เหตุผล (กรณีไม่ผ่าน) เช่น ยอดไม่ตรง">
       <div class="btn-row">
         <button class="btn" type="button" data-close>ปิด</button>
         <button class="btn btn-danger" type="button" id="sReject">ไม่ผ่าน</button>
@@ -171,9 +171,9 @@
     </form>
   </div>
 
-  <script src="js/config.js?v=20.30"></script>
-  <script src="js/api.js?v=20.30"></script>
-  <script src="js/common.js?v=20.30"></script>
-  <script src="js/admin.js?v=20.30"></script>
+  <script src="js/config.js?v=20.34"></script>
+  <script src="js/api.js?v=20.34"></script>
+  <script src="js/common.js?v=20.34"></script>
+  <script src="js/admin.js?v=20.34"></script>
 </body>
 </html>

@@ -21,8 +21,8 @@
   $('#tlDate').textContent = CFG.EVENT.dateLabel + ' · ' + CFG.EVENT.location;
   $('#timeline').innerHTML = (CFG.EVENT.schedule || []).map((s) => `<li class="${s.time === CFG.EVENT.startTime ? 'key' : ''}">
     <time>${U.esc(s.time || '')}</time><i></i><div><b>${U.esc(s.title)}</b>${s.desc ? `<span>${U.esc(s.desc)}</span>` : ''}</div></li>`).join('');
-  $('#stTime').textContent = CFG.EVENT.startTime;
-  $('#heroStars').innerHTML = '<img src="img/stars-navy.png" alt="">';
+  if ($('#stTime')) $('#stTime').textContent = CFG.EVENT.startTime;
+  if ($('#heroStars')) $('#heroStars').innerHTML = '<img src="img/stars-navy.png" alt="">';
 
   // เส้นทาง
   $('#homeRoute').innerHTML = window.U.routeSvg({ stroke: '#7FDDF5', ghost: 'rgba(255,255,255,.38)', glow: false, start: '#0A1430', grid: 'rgba(255,255,255,.06)', width: 2.6 });
@@ -89,7 +89,7 @@
     const drawMe = (m, topN) => {
       const el = $('#lbMe'); if (!m) { el.hidden = true; return; }
       let html = '';
-      if (!m.hasRun) html = '<span>สมัครวิ่งก่อน เพื่อรับลิงก์ชวนเพื่อนและลุ้นรับ' + U.esc(prize) + '</span><a class="lb-me-btn" href="register.html">สมัครวิ่ง</a>';
+      if (!m.hasRun) html = '<span>สมัครวิ่งก่อน เพื่อรับลิงก์ชวนเพื่อนและลุ้นรับ' + U.esc(prize) + '</span>' + (CFG.REGISTRATION_OPEN === false ? '' : '<a class="lb-me-btn" href="register.html">สมัครวิ่ง</a>');
       else {
         const lead = m.inTop ? 'คุณอยู่อันดับ <b>' + m.rank + '</b> · ชวนแล้ว ' + m.count + ' คน — รักษาอันดับไว้!'
           : m.count > 0 ? 'คุณอยู่อันดับ <b>' + m.rank + '</b> · ชวนอีก <b>' + m.need + '</b> คนเข้า Top ' + topN
@@ -189,8 +189,15 @@
 (function () {
   const v = document.querySelector('.bs-video'); if (!v) return;
   v.muted = true;
-  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); return; }
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); const t0 = document.getElementById('vidToggle'); if (t0) t0.hidden = true; return; }
   const tryPlay = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
   tryPlay();
+  const tg = document.getElementById('vidToggle');
+  if (tg) tg.addEventListener('click', () => {
+    const stop = !v.paused;
+    if (stop) v.pause(); else tryPlay();
+    tg.setAttribute('aria-pressed', stop ? 'true' : 'false');
+    tg.setAttribute('aria-label', stop ? 'เล่นวิดีโอ' : 'หยุดวิดีโอ');
+  });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) tryPlay(); });
 })();
