@@ -4,7 +4,7 @@
  *  - ยืนยันตัวตน: บัญชีที่ล็อกอิน / token ในเครื่อง / ลิงก์อีเมล (?t=) / เบอร์โทร 4 ตัวท้าย
  *  - ชำระเงิน: PromptPay QR ตามยอดจริง + แนบสลิป (ย่อรูปก่อนส่ง)
  *  - นักวิ่ง: E-BIB (QR ใช้งานได้เมื่อชำระแล้ว) + เส้นทาง + IG Story
- *  - ออเดอร์ผ้าโพกหัว: สถานะการชำระ/จัดส่ง
+ *  - ออเดอร์เสื้อวิ่ง: สถานะการชำระ/จัดส่ง
  * =====================================================================
  */
 (function () {
@@ -123,7 +123,7 @@
     renderInvite();
     renderPost(p, paid);
 
-    // นักวิ่ง: E-BIB / เส้นทาง / Story — ออเดอร์ผ้าโพกหัวไม่มีส่วนนี้
+    // นักวิ่ง: E-BIB / เส้นทาง / Story — ออเดอร์เสื้อวิ่งไม่มีส่วนนี้
     $('#bibCol').classList.toggle('hidden', !p.runner);
     $('#routeCard').classList.toggle('hidden', !p.runner);
     $('#storyCard').classList.toggle('hidden', !p.runner);
@@ -164,7 +164,7 @@
     const rows = [
       ['แพ็กเกจ', p.title],
       ['ยอดชำระ', money(runner.amount)],
-      ['ผ้าโพกหัว', d.label],
+      ['เสื้อวิ่ง', (r.size ? 'ไซซ์ ' + r.size + ' · ' : '') + d.label],
       ['สถานะ', runner.paymentStatus === 'PAID' ? checkinLabel(runner) : PAY_LABEL[runner.paymentStatus]],
     ];
     if (d.code === 'SHIP') {
@@ -181,7 +181,7 @@
     $('#bNumBack').textContent = runner.bib;
     $('#bName').textContent = runner.firstName + ' ' + runner.lastName;
     $('#bNick').textContent = runner.nickname ? '“' + runner.nickname + '”' : '';
-    $('#bBandana').textContent = d.code === 'SHIP' ? 'จัดส่ง' : 'รับที่งาน';
+    $('#bBandana').textContent = (runner.size ? runner.size + ' · ' : '') + (d.code === 'SHIP' ? 'จัดส่ง' : 'รับที่งาน');
     $('#bFood').textContent = runner.note || '-';
     $('#bDrink').textContent = runner.drink;
     $('#bAvatar').innerHTML = U.avatarHtml(runner, 'lg');
@@ -199,7 +199,7 @@
     const old = box.querySelector('.lock'); if (old) old.remove();
     if (paid && runner.token) {
       U.renderQR($('#bQr'), U.qrPayload(runner), 232);
-      $('#bibHint').textContent = 'แสดง QR นี้ที่จุดลงทะเบียนเพื่อเช็คอินและรับผ้าโพกหัว';
+      $('#bibHint').textContent = 'แสดง QR นี้ที่จุดลงทะเบียนเพื่อเช็คอินและรับเสื้อวิ่ง';
     } else {
       $('#bQr').innerHTML = '';
       const lock = document.createElement('div');
@@ -214,7 +214,7 @@
     $('#pRoute').innerHTML = U.routeSvg();
     $('#pCheckpoints').textContent = CFG.ROUTE.checkpoints.join('  ·  ');
     if (CFG.EVENT.mapUrl) $('#pMapBtn').href = CFG.EVENT.mapUrl; else $('#pMapBtn').remove();
-    $('#bibHint').textContent = paid && runner.token ? 'แตะการ์ดเพื่อพลิกดู QR · แสดงที่จุดลงทะเบียนเพื่อเช็คอินและรับผ้าโพกหัว' : $('#bibHint').textContent;
+    $('#bibHint').textContent = paid && runner.token ? 'แตะการ์ดเพื่อพลิกดู QR · แสดงที่จุดลงทะเบียนเพื่อเช็คอินและรับเสื้อวิ่ง' : $('#bibHint').textContent;
   }
 
   /* ---------- E-BIB พลิกการ์ด ---------- */
@@ -252,7 +252,7 @@
     if (pend) msg += '<br><span class="muted">มีเพื่อน ' + pend + ' คนสมัครแล้วแต่ยังไม่ชำระเงิน (ยังไม่นับ)</span>';
     $('#inviteRank').innerHTML = msg;
   }
-  const inviteText = () => 'มาวิ่ง 6K ด้วยกันที่ ' + CFG.EVENT.name + ' · ' + CFG.EVENT.location + ' ได้ผ้าโพกหัว ริสแบน สติกเกอร์ และข้าวยำบุฟเฟ่ต์ สมัครผ่านลิงก์นี้ได้เลย';
+  const inviteText = () => 'มาวิ่ง 6K ด้วยกันที่ ' + CFG.EVENT.name + ' · ' + CFG.EVENT.location + ' ได้เสื้อวิ่ง ริสแบน สติกเกอร์ และข้าวยำบุฟเฟ่ต์ สมัครผ่านลิงก์นี้ได้เลย';
   $('#btnCopyInvite').addEventListener('click', async () => {
     const inp = $('#inviteUrl');
     try { await navigator.clipboard.writeText(inp.value); }

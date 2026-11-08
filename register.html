@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#FFFFFF">
   <script>try{var t=localStorage.getItem('irc_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t;if(t==='dark')document.querySelector('meta[name=theme-color]').content='#070D1F'}catch(e){}</script>
   <title>สมัครวิ่ง · INSTHINK RUN CLUB</title>
-  <meta name="description" content="สมัครวิ่ง 6K กับ INSTHINK RUN CLUB รับผ้าโพกหัว Bandana และ E-BIB ออนไลน์">
+  <meta name="description" content="สมัครวิ่ง 6K กับ INSTHINK RUN CLUB รับเสื้อวิ่ง INSTHINK RUN CLUB และ E-BIB ออนไลน์">
   <link rel="icon" href="img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20.34">
+  <link rel="stylesheet" href="css/style.css?v=20.36">
 </head>
 <body>
   <header class="site-head" data-nav></header>
@@ -90,12 +90,18 @@
         </div>
       </div>
 
-      <!-- 04 การรับผ้าโพกหัว -->
-      <h2 class="section-title"><span class="num" id="numDelivery">04</span>รับผ้าโพกหัว</h2>
+      <!-- 04 เสื้อวิ่ง: ไซซ์ + วิธีรับ -->
+      <h2 class="section-title"><span class="num" id="numDelivery">04</span>ไซซ์และการรับเสื้อ</h2>
       <div class="card grid">
         <div class="bandana-note">
           <div class="ico" id="bandanaIco"></div>
-          <div><b>ผ้าโพกหัว INSTHINK Bandana</b><br><span class="muted">Free size · 1 ผืนต่อ 1 รายการ</span></div>
+          <div><b id="shirtName">เสื้อวิ่ง INSTHINK RUN CLUB</b><br><span class="muted">1 ตัวต่อ 1 รายการ · เลือกไซซ์ด้านล่าง</span></div>
+        </div>
+        <div class="field">
+          <span class="label" id="sizeLbl">ไซซ์เสื้อ <span class="req">*</span></span>
+          <div class="chips size-chips" id="sizeList" role="radiogroup" aria-labelledby="sizeLbl"></div>
+          <div class="err-msg hidden" data-err="size">กรุณาเลือกไซซ์เสื้อ</div>
+          <details class="size-chart"><summary>ดูตารางไซซ์</summary><div id="sizeChart"></div></details>
         </div>
         <div class="options" id="deliveryList"></div>
         <div class="grid hidden" id="addressBox">
@@ -128,9 +134,9 @@
 
   <footer class="site-foot"></footer>
 
-  <script src="js/config.js?v=20.34"></script>
-  <script src="js/api.js?v=20.34"></script>
-  <script src="js/common.js?v=20.34"></script>
-  <script src="js/register.js?v=20.34"></script>
+  <script src="js/config.js?v=20.36"></script>
+  <script src="js/api.js?v=20.36"></script>
+  <script src="js/common.js?v=20.36"></script>
+  <script src="js/register.js?v=20.36"></script>
 </body>
 </html>

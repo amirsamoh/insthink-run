@@ -23,26 +23,27 @@ window.APP_CONFIG = {
     distanceKm: 6,
     hashtag: '#INSTHINKRUNCLUB',
     instagram: '@insthink.runclub',          // TODO: IG ของงาน
+    followUrl: 'https://www.instagram.com/insthink.coffee/',   // ปุ่ม "ติดตามประกาศ" ตอนยังไม่เปิดรับสมัคร
     mapUrl: 'https://maps.app.goo.gl/tKYUkMPTCtGo2Yte6',   // ปุ่ม "นำทางไปจุดสตาร์ต" (Google Maps)
     /** ตารางเวลาวันงาน (แสดงในหน้าแรก + รูป Story) — time เว้นว่างได้ */
     schedule: [
-      { time: '05:40', title: 'เช็คอิน', desc: 'โชว์ QR ใน E-BIB ที่จุดลงทะเบียน รับริสแบนและผ้าโพกหัว' },
+      { time: '05:40', title: 'เช็คอิน', desc: 'โชว์ QR ใน E-BIB ที่จุดลงทะเบียน รับริสแบนและเสื้อวิ่ง' },
       { time: '06:00', title: 'ปล่อยตัว 6K', desc: 'ออกตัวพร้อมกันที่จุดสตาร์ต INSTHINK LOOP' },
       { time: 'หลังวิ่ง', title: 'ข้าวยำบุฟเฟ่ต์ + เครื่องดื่ม', desc: 'รับเครื่องดื่มตามที่เลือกไว้ และถ่ายรูปกับเพื่อนๆ' },
     ],
   },
 
-  /** แพ็กเกจ — prefix = ตัวอักษรนำหน้าเลข (R001 นักวิ่ง / M001 ออเดอร์ผ้าโพกหัว) */
+  /** แพ็กเกจ — prefix = ตัวอักษรนำหน้าเลข (R001 นักวิ่ง / M001 ออเดอร์เสื้อวิ่ง) */
   PACKAGES: [
     {
       code: 'RUN', prefix: 'R', price: 256, runner: true,
-      label: 'RUNNER 6K', title: 'วิ่ง 6K + ผ้าโพกหัว',
-      includes: ['สิทธิ์วิ่ง 6K + E-BIB', 'ผ้าโพกหัว Bandana', 'ริสแบน (Wristband)', 'สติกเกอร์ Limited Edition', 'ข้าวยำบุฟเฟ่ต์ + เครื่องดื่ม 1 แก้ว'],
+      label: 'RUNNER 6K', title: 'วิ่ง 6K + เสื้อวิ่ง',
+      includes: ['สิทธิ์วิ่ง 6K + E-BIB', 'เสื้อวิ่ง INSTHINK RUN CLUB', 'ริสแบน (Wristband)', 'สติกเกอร์ Limited Edition', 'ข้าวยำบุฟเฟ่ต์ + เครื่องดื่ม 1 แก้ว'],
     },
     {
       code: 'MERCH', prefix: 'M', price: 190, runner: false,
-      label: 'BANDANA ONLY', title: 'ซื้อผ้าโพกหัวอย่างเดียว',
-      includes: ['ผ้าโพกหัว Bandana', 'ไม่รวมสิทธิ์วิ่ง'],
+      label: 'SHIRT ONLY', title: 'ซื้อเสื้อวิ่งอย่างเดียว',
+      includes: ['เสื้อวิ่ง INSTHINK RUN CLUB', 'ไม่รวมสิทธิ์วิ่ง'],
     },
   ],
 
@@ -56,7 +57,16 @@ window.APP_CONFIG = {
     rule: 'นับเฉพาะเพื่อนที่สมัครวิ่งผ่านลิงก์ของคุณและชำระเงินแล้ว · 1 บัญชี = 1 คน · เสมอกันดูใครถึงยอดก่อน · ผู้จัดงานสงวนสิทธิ์ตัดสิทธิ์รายการที่ผิดปกติ',
   },
 
-  /** วิธีรับผ้าโพกหัว */
+  /** เสื้อวิ่ง (แทนผ้าโพกหัว) — sizes ต้องตรงกับ SIZES ใน Code.gs · chart = รอบอก/ความยาว (นิ้ว) ค่าประมาณ แก้ได้เมื่อได้เสื้อจริง */
+  SHIRT: {
+    name: 'เสื้อวิ่ง INSTHINK RUN CLUB',
+    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'],
+    chart: { XS: [34, 25], S: [36, 26], M: [38, 27], L: [40, 28], XL: [42, 29], '2XL': [44, 30], '3XL': [46, 31] },
+    img: 'img/shirt-sample.webp',
+    sample: true,                            // true = ยังเป็นภาพตัวอย่าง (แสดงป้าย "ภาพตัวอย่าง")
+  },
+
+  /** วิธีรับเสื้อวิ่ง */
   DELIVERY: [
     { code: 'PICKUP', label: 'รับที่จุดลงทะเบียนวันงาน', fee: 0 },
     { code: 'SHIP', label: 'จัดส่งทางไปรษณีย์', fee: 50 },

@@ -170,7 +170,17 @@
     const stop = () => { if (timer) clearInterval(timer); timer = null; };
     $$('[data-cf]', root).forEach((b) => b.addEventListener('click', () => { go(cur + Number(b.dataset.cf)); start(); }));
     dotEls.forEach((d, i) => d.addEventListener('click', () => { go(i); start(); }));
-    cards.forEach((c, i) => c.addEventListener('click', () => { if (i !== cur) { go(i); start(); } }));
+    const items = cards.map((c) => { const im = c.querySelector('img'); const cap = c.querySelector('figcaption b'); return { src: im.currentSrc || im.src, alt: im.alt, cap: cap ? cap.textContent : im.alt }; });
+    const openAt = (i) => { stop(); U.lightbox(items, i, { onClose: start }); };
+    cards.forEach((c, i) => {
+      // ปุ่มขยายรูป (ใช้ได้ทั้งนิ้วและคีย์บอร์ด)
+      const zb = document.createElement('button');
+      zb.type = 'button'; zb.className = 'cf-zoom'; zb.setAttribute('aria-label', 'ขยายรูป ' + items[i].cap);
+      zb.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2M11 8.5v5M8.5 11h5"/></svg>';
+      zb.addEventListener('click', (e) => { e.stopPropagation(); if (i !== cur) go(i); openAt(i); });
+      c.appendChild(zb);
+      c.addEventListener('click', () => { if (i !== cur) { go(i); start(); } else openAt(i); });
+    });
     // ปัดซ้าย/ขวาบนมือถือ
     let x0 = null;
     const stage = $('.cf-stage', root);

@@ -2,7 +2,7 @@
  * =====================================================================
  *  Admin Dashboard (admin.html)
  *  - ดึงข้อมูลด้วย action "list" ทุก ADMIN_REFRESH_SEC วินาที (near real-time)
- *  - สถิติ: นักวิ่ง, ยังไม่ชำระ, รายได้, ผ้าโพกหัว (รับที่งาน/จัดส่ง), เครื่องดื่ม, แพ้อาหาร (กรองตามอีเวนต์ได้)
+ *  - สถิติ: นักวิ่ง, ยังไม่ชำระ, รายได้, เสื้อวิ่ง (รับที่งาน/จัดส่ง), เครื่องดื่ม, แพ้อาหาร (กรองตามอีเวนต์ได้)
  *  - การชำระเงินยืนยันอัตโนมัติเมื่อแนบสลิป · แอดมินดูสลิป/ปฏิเสธได้ (verify), บันทึกเลขพัสดุ (ship), เช็คอิน, แก้ไข, ลบ, CSV
  * =====================================================================
  */
@@ -141,7 +141,7 @@
     $('#kRunners').innerHTML = runners.length + '<small> คน</small>';
     $('#kPending').textContent = unpaid;
     $('#kRevenue').textContent = money(revenue);
-    $('#kBandana').innerHTML = rows.filter(isPaid).length + '<small> ผืน</small>';
+    $('#kBandana').innerHTML = rows.filter(isPaid).length + '<small> ตัว</small>';
     $('#kIn').innerHTML = inRun + '<small> / ' + paidRunners.length + '</small>';
     $('#kInBar').style.width = (paidRunners.length ? (inRun / paidRunners.length) * 100 : 0) + '%';
 
@@ -150,7 +150,7 @@
       colors: { UNPAID: 'var(--warn)', SLIP_UPLOADED: 'var(--info)', PAID: 'var(--ok)', REJECTED: 'var(--bad)' },
     });
 
-    // ผ้าโพกหัว: นับเฉพาะรายการที่ชำระแล้ว
+    // เสื้อวิ่ง: นับเฉพาะรายการที่ชำระแล้ว (แยกไซซ์ไว้สั่งผลิต)
     const paid = rows.filter(isPaid);
     const pickup = paid.filter((r) => r.delivery !== 'SHIP');
     const ship = paid.filter((r) => r.delivery === 'SHIP');
@@ -159,7 +159,9 @@
       <div><span>รับที่งาน · มอบแล้ว</span><b>${pickup.filter(isIn).length} / ${pickup.length}</b></div>
       <div><span>จัดส่ง · รอส่ง</span><b style="color:var(--warn)">${ship.length - shipped}</b></div>
       <div><span>จัดส่ง · ส่งแล้ว</span><b>${shipped}</b></div>
-      <div><span>ซื้อผ้าโพกหัวอย่างเดียว</span><b>${paid.filter((r) => !isRun(r)).length}</b></div>`;
+      <div><span>ซื้อเสื้ออย่างเดียว</span><b>${paid.filter((r) => !isRun(r)).length}</b></div>
+      <div class="size-row">${(CFG.SHIRT ? CFG.SHIRT.sizes : []).map((z) => `<span><small>${esc(z)}</small><b>${paid.filter((r) => r.size === z).length}</b></span>`).join('')}${
+        paid.some((r) => !r.size) ? `<span><small>ไม่ระบุ</small><b>${paid.filter((r) => !r.size).length}</b></span>` : ''}</div>`;
 
     hbars($('#drinkBars'), CFG.DRINKS, paidRunners, 'drink', { colors: Object.fromEntries(CFG.DRINKS.map((d) => [d, 'var(--sky)'])) });
     const allergy = paidRunners.filter((r) => r.note && !/^(ไม่แพ้|ไม่มี|-|no)/i.test(r.note));
@@ -373,7 +375,7 @@
   /* ---------- ส่งออก CSV (เปิดใน Excel ภาษาไทยได้ เพราะใส่ BOM) ---------- */
   $('#csvBtn').addEventListener('click', () => {
     const cols = ['bib', 'package', 'firstName', 'lastName', 'nickname', 'gender', 'phone', 'email', 'drink', 'sweetness',
-      'delivery', 'address', 'zipcode', 'amount', 'paymentStatus', 'paidAt', 'shipStatus', 'trackingNo', 'status', 'checkinAt', 'checkinBy', 'note', 'ref', 'eventId', 'createdAt'];
+      'size', 'delivery', 'address', 'zipcode', 'amount', 'paymentStatus', 'paidAt', 'shipStatus', 'trackingNo', 'status', 'checkinAt', 'checkinBy', 'note', 'ref', 'eventId', 'createdAt'];
     const cell = (v) => {
       let s = String(v == null ? '' : v);
       if (/^[=+\-@]/.test(s)) s = "'" + s;   // กันสูตรใน Excel

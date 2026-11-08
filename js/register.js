@@ -2,7 +2,7 @@
  * =====================================================================
  *  หน้าสมัครวิ่ง (register.html) — หน้าแรก (index.html) เป็นรายละเอียดงานอย่างเดียว
  *  1) ต้องเข้าสู่ระบบ (บัญชีสมาชิก) — ข้อมูลส่วนตัวมาจากบัญชี ไม่ต้องกรอกซ้ำ
- *  2) เลือกแพ็กเกจ / เครื่องดื่ม / แพ้อาหาร / รับผ้าโพกหัว
+ *  2) เลือกแพ็กเกจ / เครื่องดื่ม / แพ้อาหาร / ไซซ์และการรับเสื้อ
  *  3) คำนวณยอด → ตรวจฟอร์ม → register → ไปหน้าชำระเงิน
  * =====================================================================
  */
@@ -17,12 +17,21 @@
   $('#evTime').textContent = CFG.EVENT.startTime + ' น.';
   $('#evLoc').textContent = CFG.EVENT.location;
   $('#bandanaIco').innerHTML = starSvg('#fff');
+  /* ---------- ไซซ์เสื้อ ---------- */
+  const SH = CFG.SHIRT || { sizes: [] };
+  if (SH.name) $('#shirtName').textContent = SH.name;
+  $('#sizeList').innerHTML = SH.sizes.map((z) => `
+    <label class="chip"><input type="radio" name="size" value="${esc(z)}"><span>${esc(z)}</span></label>`).join('');
+  $('#sizeChart').innerHTML = SH.chart ? `<table><thead><tr><th>ไซซ์</th><th>รอบอก (นิ้ว)</th><th>ความยาว (นิ้ว)</th></tr></thead><tbody>${
+    SH.sizes.map((z) => SH.chart[z] ? `<tr><td>${esc(z)}</td><td>${SH.chart[z][0]}</td><td>${SH.chart[z][1]}</td></tr>` : '').join('')}</tbody></table>
+    <p class="hint">${SH.sample ? 'ค่าประมาณ จะอัปเดตเมื่อได้เสื้อจริง · ' : ''}วัดรอบอกเสื้อตัวที่ใส่สบาย แล้วเลือกไซซ์ที่ใกล้ที่สุด</p>` : '';
 
   /* ---------- ปิดรับสมัคร ---------- */
   if (CFG.REGISTRATION_OPEN === false) {
     $('#closed').classList.remove('hidden');
     const ig = (CFG.EVENT.instagram || '').replace('@', '');
-    if (ig) $('#closedIg').href = 'https://www.instagram.com/' + ig + '/'; else $('#closedIg').remove();
+    const follow = CFG.EVENT.followUrl || (ig ? 'https://www.instagram.com/' + ig + '/' : '');
+    if (follow) $('#closedIg').href = follow; else $('#closedIg').remove();
     return;
   }
 
@@ -105,18 +114,18 @@
       </div>` : '';
     $('#summary').innerHTML = stack + `
       <div class="row"><span>${p ? esc(p.title) : '<span class="muted">ยังไม่ได้เลือกแพ็กเกจ</span>'}</span><span>${money(price)}</span></div>
-      <div class="row"><span>${esc(d.label)}</span><span>${d.fee ? money(d.fee) : 'ฟรี'}</span></div>
+      <div class="row"><span>เสื้อวิ่ง${radio('size') ? ' ไซซ์ ' + esc(radio('size')) : ''} · ${esc(d.label)}</span><span>${d.fee ? money(d.fee) : 'ฟรี'}</span></div>
       <div class="row total"><span>ยอดชำระ</span><b>${money(price + d.fee)}</b></div>`;
   }
-  /* ---------- สมัครวิ่งแล้ว (มีผ้าโพกหัวในแพ็กเกจ) แต่เลือก BANDANA ONLY → เตือนก่อนซื้อซ้ำ ---------- */
+  /* ---------- สมัครวิ่งแล้ว (มีเสื้อในแพ็กเกจ) แต่เลือก SHIRT ONLY → เตือนก่อนซื้อซ้ำ ---------- */
   let myRun = null;   // รายการ RUNNER ของบัญชีนี้ในรอบนี้ (ถ้ามี)
-  const MSG = (r) => 'แพ็กเกจวิ่งของคุณ (BIB ' + r.bib + ') มีผ้าโพกหัวแล้ว ต้องการซื้อเพิ่มใช่ไหม';
+  const MSG = (r) => 'แพ็กเกจวิ่งของคุณ (BIB ' + r.bib + ') มีเสื้อวิ่งแล้ว ต้องการซื้อเพิ่มใช่ไหม';
   function dupNote() {
     const p = radio('package') ? pkg(radio('package')) : null;
     const show = !!(myRun && p && !p.runner);
     const el = $('#dupNote');
     el.classList.toggle('hidden', !show);
-    if (show) el.innerHTML = '<b>' + esc(MSG(myRun)) + '</b><br><span class="small">ถ้าต้องการซื้อเป็นของฝากหรือเพิ่มอีกผืน ทำต่อได้เลย รายการนี้จะแยกชำระเงินต่างหาก</span>';
+    if (show) el.innerHTML = '<b>' + esc(MSG(myRun)) + '</b><br><span class="small">ถ้าต้องการซื้อเป็นของฝากหรือเพิ่มอีกตัว ทำต่อได้เลย รายการนี้จะแยกชำระเงินต่างหาก</span>';
   }
   API.call('myRegs', {}).then(({ regs }) => {
     myRun = (regs || []).find((r) => r.package === 'RUN' && (r.eventId || CFG.EVENT.id) === CFG.EVENT.id) || null;
@@ -131,7 +140,7 @@
 
   /* ---------- ตรวจฟอร์ม ---------- */
   function collect() {
-    const d = { package: radio('package'), drink: radio('drink'), sweetness: radio('sweetness'), delivery: radio('delivery') };
+    const d = { package: radio('package'), drink: radio('drink'), sweetness: radio('sweetness'), delivery: radio('delivery'), size: radio('size') };
     ['note', 'address', 'zipcode'].forEach((k) => { d[k] = $('#' + k).value.trim(); });
     d.consent = $('#consent').checked;
     d.ref = U.ref.get();   // ลิงก์ชวนเพื่อน (ถ้ามี)
@@ -160,6 +169,7 @@
       toast('ข้อมูลในบัญชีไม่ครบ กรุณาแก้ไขที่ "บัญชีของฉัน" ก่อน', 'err');
       return false;
     }
+    if (!d.size) badGroup('size', 'ไซซ์เสื้อ');
     if (p && p.runner && !d.drink) badGroup('drink', 'เครื่องดื่ม');
     if (d.delivery === 'SHIP') {
       if (d.address.length < 10) bad('address', 'ที่อยู่จัดส่ง', 'กรุณากรอกที่อยู่ให้ครบ (บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด)');
@@ -180,7 +190,7 @@
     const d = collect();
     if (!validate(d)) return;
     const pk = pkg(d.package);
-    if (myRun && pk && !pk.runner && !confirm(MSG(myRun) + '\n\nกด "ตกลง" เพื่อสั่งซื้อผ้าโพกหัวเพิ่ม (' + money(pk.price) + ')')) return;
+    if (myRun && pk && !pk.runner && !confirm(MSG(myRun) + '\n\nกด "ตกลง" เพื่อสั่งซื้อเสื้อเพิ่ม (' + money(pk.price) + ')')) return;
 
     const btn = $('#submitBtn');
     busy(btn, true, 'กำลังบันทึก…');

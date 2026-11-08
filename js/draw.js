@@ -140,7 +140,7 @@
       T(g, 'QR ใช้ได้หลัง', qx + qs / 2, qy + 60, { size: 13, weight: 500, color: '#5E6573', align: 'center' });
       T(g, 'ชำระเงินแล้ว', qx + qs / 2, qy + 80, { size: 13, weight: 500, color: '#5E6573', align: 'center' });
     }
-    const rows = [['ผ้าโพกหัว', d.bandana], ['แพ้อาหาร', d.food], ['เครื่องดื่ม', d.drink], ['ปล่อยตัว', d.start]];
+    const rows = [['เสื้อวิ่ง', d.bandana], ['แพ้อาหาร', d.food], ['เครื่องดื่ม', d.drink], ['ปล่อยตัว', d.start]];
     const ix = 176, ir = W - 24;
     rows.forEach((r, i) => {
       const y = 452 + i * 34;

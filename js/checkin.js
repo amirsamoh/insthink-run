@@ -1,7 +1,7 @@
 /**
  * =====================================================================
  *  หน้าเช็คอิน (checkin.html) — สำหรับเจ้าหน้าที่หน้างาน
- *  นักวิ่ง = เช็คอิน + รับผ้าโพกหัว · ออเดอร์ผ้าโพกหัว (รับที่งาน) = บันทึกการรับของ
+ *  นักวิ่ง = เช็คอิน + รับเสื้อวิ่ง · ออเดอร์เสื้อวิ่ง (รับที่งาน) = บันทึกการรับของ
  *  backend ปฏิเสธรายการที่ยังไม่ชำระเงิน
  *  สแกน QR (IRC|BIB|TOKEN) หรือ Barcode (BIB) → action "checkin"
  *  → backend อัปเดตคอลัมน์ status/checkinAt ใน Google Sheets ทันที
@@ -67,8 +67,8 @@
     const p = pkg(r.package);
     const d = delivery(r.delivery);
     const tags = [`<span class="tag"><b>${esc(p.label)}</b></span>`];
-    if (d.code === 'SHIP') tags.push(`<span class="tag">ผ้าโพกหัว: <b>${r.shipStatus === 'SHIPPED' ? 'จัดส่งแล้ว' : 'รอจัดส่ง'}</b> (ไม่ต้องมอบที่งาน)</span>`);
-    else tags.push('<span class="tag">มอบ <b>ผ้าโพกหัว 1 ผืน</b></span>');
+    if (d.code === 'SHIP') tags.push(`<span class="tag">เสื้อวิ่ง${r.size ? ' ' + esc(r.size) : ''}: <b>${r.shipStatus === 'SHIPPED' ? 'จัดส่งแล้ว' : 'รอจัดส่ง'}</b> (ไม่ต้องมอบที่งาน)</span>`);
+    else tags.push(`<span class="tag">มอบ <b>เสื้อวิ่ง${r.size ? ' ไซซ์ ' + esc(r.size) : ''}</b></span>`);
     if (p.runner) tags.push(`<span class="tag">เครื่องดื่ม: <b>${esc(r.drink)}</b> · ${esc(window.U.sweetLabel(r.sweetness))}</span>`);
     return `<p style="margin:8px 0 0;font-size:20px;font-weight:500">${esc(r.firstName)} ${esc(r.lastName)} ${r.nickname ? '(' + esc(r.nickname) + ')' : ''}</p>
       <div class="tags">${tags.join('')}</div>`;
